@@ -1,0 +1,29 @@
+services:
+
+  alpine-base:
+    build:
+      context: "build/alpine-base"
+      dockerfile: Dockerfile
+    image: alpine-base:latest
+    container_name: alpine-base
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./workspace/alpine-base:/workspace
+    hostname: alpine-base
+    # Comment out when done testing
+    # entrypoint: /bin/echo "Alpine Base image built successfully, cascading to next service"
+
+  quagga-base:
+    build:
+      context: "build/quagga-base"
+      dockerfile: Dockerfile
+    image: quagga-base:latest
+    container_name: quagga-base
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./workspace/quagga-base:/workspace
+    hostname: quagga-base
+    # Comment out when done testing
+    # entrypoint: /bin/echo "Quagga Base image built successfully, cascading to next service"

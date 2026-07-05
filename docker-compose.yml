@@ -1,0 +1,34 @@
+include:
+  - docker-compose-base.yml
+
+services:
+
+  computer-10.0.1.2:
+    image: alpine-base:latest
+    container_name: computer-10.0.1.2
+    stdin_open: true
+    tty: true
+    hostname: computer-10-0-1-2 # dots don't work here
+    networks:
+      net-10.0.1.0:
+        ipv4_address: 10.0.1.2
+
+  computer-10.0.1.3:
+    image: alpine-base:latest
+    container_name: computer-10.0.1.3
+    stdin_open: true
+    tty: true
+    hostname: computer-10-0-1-3 # dots don't work here
+    networks:
+      net-10.0.1.0:
+        ipv4_address: 10.0.1.3
+
+networks:
+  net-10.0.1.0:
+    driver: bridge # reserves IP x.x.x.1 as default gateway, we can't re-assign the IP
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.1.0/24
+          gateway: 10.0.1.1 # to use a container as gateway the container's IP can't be x.x.x.1
