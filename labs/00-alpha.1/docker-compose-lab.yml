@@ -1,0 +1,26 @@
+include:
+  - ../../compose/docker-compose-base.yml
+  - ../../compose/docker-compose-machines.yml
+  - docker-compose-net.yml
+
+services:
+
+  e2-computer-10.0.1.11:
+    image: e2-computer:latest
+    container_name: e2-computer-10.0.1.11
+    stdin_open: true
+    tty: true
+    hostname: computer-10-0-1-11 # dots don't work here
+    networks:
+      net-10-0-1-0:
+        ipv4_address: 10.0.1.11
+
+  e2-computer-10.0.1.12:
+    image: e2-computer:latest
+    container_name: e2-computer-10.0.1.12
+    stdin_open: true
+    tty: true
+    hostname: computer-10-0-1-12 # dots don't work here
+    networks:
+      net-10-0-1-0:
+        ipv4_address: 10.0.1.12

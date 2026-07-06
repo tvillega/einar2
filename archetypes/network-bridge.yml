@@ -1,0 +1,10 @@
+networks:
+  net-{{ .NetworkUnderscore }}:
+    name: net-{{ .NetworkUnderscore }}
+    driver: bridge # reserves IP x.x.x.1 as default gateway, we can't re-assign it
+    # internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: {{ .Network }}/{{ .Mask }}
+          gateway: {{ .Gateway }} # to use a container as gateway the container's IP can't be x.x.x.1

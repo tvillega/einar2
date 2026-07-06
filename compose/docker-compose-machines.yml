@@ -1,0 +1,25 @@
+services:
+
+  e2-computer:
+    build: 
+      context: "../build/e2-computer"
+      dockerfile: Dockerfile
+    image: e2-computer:latest
+    container_name: e2-computer
+    stdin_open: true
+    tty: true
+    hostname: e2-computer
+    # Comment out when done testing
+    entrypoint: /bin/echo "Einar2 Computer image built successfully, cascading to next service"
+
+  e2-server:
+    build:
+      context: "../build/e2-server"
+      dockerfile: Dockerfile
+    image: e2-server:latest
+    container_name: e2-server
+    stdin_open: true
+    tty: true
+    hostname: e2-server
+    # Comment out when done testing
+    entrypoint: /bin/echo "Einar2 Server image built successfully, cascading to next service"

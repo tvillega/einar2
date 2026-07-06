@@ -1,9 +1,11 @@
 FROM alpine-base:latest
 
-RUN apk add --no-cache quagga
+# Available in Alpine v3.24
+RUN apk add --no-cache php85
 
-RUN echo "zebra=yes" > /etc/quagga/daemons
-RUN touch /etc/quagga/zebra.conf
+EXPOSE 80
+
+COPY index.php  /var/www/php/index.php
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

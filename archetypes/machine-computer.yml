@@ -1,0 +1,9 @@
+  e2-computer-{{ .Address }}:
+    image: alpine-base:latest
+    container_name: e2-computer-{{ .Address }}
+    stdin_open: true
+    tty: true
+    hostname: computer-{{ .AddressUnderscore }} # dots don't work here
+    networks:
+      net-{{ .NetworkUnderscore }}:
+        ipv4_address: {{ .Address }}
