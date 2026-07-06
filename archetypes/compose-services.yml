@@ -1,0 +1,6 @@
+include:
+  - ../../compose/docker-compose-base.yml
+  - ../../compose/docker-compose-machines.yml
+  - docker-compose-networks.yml
+
+services:

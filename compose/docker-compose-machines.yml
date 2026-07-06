@@ -10,7 +10,7 @@ services:
     tty: true
     hostname: e2-computer
     # Comment out when done testing
-    entrypoint: /bin/echo "Einar2 Computer image built successfully, cascading to next service"
+    entrypoint: /bin/echo "Einar2 Computer image built successfully. Stopping container."
 
   e2-server:
     build:
@@ -22,4 +22,4 @@ services:
     tty: true
     hostname: e2-server
     # Comment out when done testing
-    entrypoint: /bin/echo "Einar2 Server image built successfully, cascading to next service"
+    entrypoint: /bin/echo "Einar2 Server image built successfully. Stopping container."

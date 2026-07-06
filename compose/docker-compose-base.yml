@@ -10,7 +10,7 @@ services:
     tty: true
     hostname: alpine-base
     # Comment out when done testing
-    entrypoint: /bin/echo "Alpine Base image built successfully, cascading to next service"
+    entrypoint: /bin/echo "Alpine Base image built successfully. Stopping container."
 
   quagga-base:
     build:
@@ -22,4 +22,4 @@ services:
     tty: true
     hostname: quagga-base
     # Comment out when done testing
-    entrypoint: /bin/echo "Quagga Base image built successfully, cascading to next service"
+    entrypoint: /bin/echo "Quagga Base image built successfully. Stopping container."

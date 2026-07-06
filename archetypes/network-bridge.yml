@@ -1,8 +1,7 @@
-networks:
-  net-{{ .NetworkUnderscore }}:
-    name: net-{{ .NetworkUnderscore }}
+  net-{{ .NetworkDashed }}:
+    name: net-{{ .NetworkDashed }}
     driver: bridge # reserves IP x.x.x.1 as default gateway, we can't re-assign it
-    # internal: true
+    # internal: true # Disables docker's port bind with host
     ipam:
       driver: default
       config:

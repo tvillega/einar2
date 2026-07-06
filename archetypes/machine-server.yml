@@ -1,11 +1,11 @@
-  e2-server-{{ .Address }}:
+  e2-server-{{ .AddressDashed }}:
     image: e2-server:latest
-    container_name: e2-server-{{ .Address }}
+    container_name: e2-server-{{ .AddressDashed }}
     stdin_open: true
     tty: true
-    hostname: server-{{ .AddressUnderscore }} # dots don't work here
+    hostname: server-{{ .AddressDashed }}
     ports:
       - "{{ .Port }}:80"
     networks:
-      net-{{ .NetworkUnderscore }}:
+      net-{{ .NetworkDashed }}:
         ipv4_address: {{ .Address }}

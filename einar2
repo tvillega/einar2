@@ -1,186 +1,74 @@
 #!/bin/bash
 
-cmd="$1"
-
-print_help() {
-
-cat << EOF
-usage: einar2 [CMD]
-
-Commands:
-
-  run start <dir>: starts the lab from the selected directory
-  run stop  <dir>: stops the lab from the selected directory
-
-  edit lab  <dir>: edits the containers from the selected directory
-  edit net  <dir>: edits the networks from the selected directory
-
-Written by Tom Villegas (tvillega)
-
-EOF
-
-}
-
-run_start()    { 
-  docker-compose -f "${1%%/}/docker-compose-lab.yml" up --build
-}
-
-run_stop()     {
-  docker-compose -f "${1%%/}/docker-compose-lab.yml" down
-}
-
-run_edit_lab() {
-  $EDITOR "${1%%/}/docker-compose-lab.yml"
-}
-
-run_edit_net() {
-  $EDITOR "${1%%/}/docker-compose-net.yml"
-}
-
-cmd_run() {
+san_cmd_run() {
 
   local cmd="$1"
   local lab="$2"
 
-  if [[ "$cmd" == "start" ]] ; then
-    run_start "$lab"
-
-  elif [[ "$cmd" == "stop" ]] ; then
-    run_stop "$lab"
-
+  if [[ -z "$cmd" ]] ; then
+    ./libexec/e2-help.sh run
+    exit
+  elif [[ -z "$cmd" || -z "$lab" ]] ; then
+    echo "usage: run start <lab>"
+    exit
   else
-    echo "Available commands: start|stop"
+    ./libexec/e2-run.sh "$cmd" "$lab"
   fi
 
 }
 
-cmd_edit() {
+san_cmd_edit() {
 
   local cmd="$1"
   local lab="$2"
 
-  if [[ -z "$EDITOR" ]] ; then
+  if [[ -z "$cmd" ]] ; then
+    ./libexec/e2-help.sh edit
+    exit
+  elif [[ -z "$EDITOR" ]] ; then
     echo '$EDITOR is unset'
     exit
-  fi
-
-  if [[ "$cmd" == "lab" ]] ; then
-    run_edit_lab "$lab"
-
-  elif [[ "$cmd" == "net" ]] ; then
-    run_edit_net "$lab"
-
+  elif [[ -z "$lab" || ! -d "$lab" ]] ; then
+    echo "error: invalid directory"
+    echo "usage: edit <section> <lab>"
+    exit
   else
-    echo "Available commands: lab|net"
+    ./libexec/e2-edit.sh "$cmd" "$lab"
   fi
 
 }
 
-cmd_new_computer() {
-
-  local address="$1"
-  local network="$2"
-
-  if [[ -z "$address" || -z "$network" ]] ; then
-    echo "usage: new computer <address> <network>"
-    exit
-  fi
-
-  address_underscore=$(echo $address | sed 's|\.|-|g')
-  network_underscore=$(echo $network | sed 's|\.|-|g')
-
-
-  cat "archetypes/machine-computer.yml" \
-    | sed "s|{{ .Address }}|$address|g" \
-    | sed "s|{{ .AddressUnderscore }}|$address_underscore|g" \
-    | sed "s|{{ .NetworkUnderscore }}|$network_underscore|g"
-
-}
-
-cmd_new_server() {
-
-  local address="$1"
-  local network="$2"
-  local port="$3"
-
-  if [[ -z "$address" || -z "$network" || -z "$port" ]] ; then
-    echo "usage: new server <address> <network> <port>"
-    exit
-  fi
-
-  address_underscore=$(echo $address | sed 's|\.|-|g')
-  network_underscore=$(echo $network | sed 's|\.|-|g')
-
-
-  cat "archetypes/machine-server.yml" \
-    | sed "s|{{ .Address }}|$address|g" \
-    | sed "s|{{ .AddressUnderscore }}|$address_underscore|g" \
-    | sed "s|{{ .Port }}|$port|g" \
-    | sed "s|{{ .NetworkUnderscore }}|$network_underscore|g"
-
-}
-
-
-cmd_new_network_bridge() {
-
-  local network="$1"
-  local mask="$2"
-  local gateway="$3"
-
-  if [[ -z "$network" || -z "$mask" || -z "$gateway" ]] ; then
-    echo "usage: new network <network> <mask> <gateway>"
-    exit
-  fi
-
-  network_underscore=$(echo $network | sed 's|\.|-|g')
-
-
-  cat "archetypes/network-bridge.yml" \
-    | sed "s|{{ .NetworkUnderscore }}|$network_underscore|g" \
-    | sed "s|{{ .NetworkUnderscore }}|$network_underscore|g" \
-    | sed "s|{{ .Mask }}|$mask|g" \
-    | sed "s|{{ .Gateway }}|$gateway|g"
-
-}
-
-cmd_new() {
+san_cmd_gen() {
 
   local what="$1"
 
-  if [[ "$what" == "computer" ]] ; then
-    shift
-    cmd_new_computer "${@}"
-
-  elif [[ "$what" == "server" ]] ; then
-    shift
-    cmd_new_server "${@}"
-
-  elif [[ "$what" == "network" ]] ; then
-    shift
-    cmd_new_network_bridge "${@}"
-
-  else
-    echo "Available commands: computer|server|network"
+  if [[ -z "$what" ]] ; then
+    ./libexec/e2-help.sh gen
     exit
+  else
+    ./libexec/e2-gen.sh "${@}"
   fi
 
 }
 
-if [[ "$cmd" == "help" || "$cmd" == "--help" || "$cmd" == "-h" ]] ; then 
-  print_help
+cmd="$1"
+
+if [[ -z "$cmd" ]] ; then
+  ./libexec/e2-help.sh help
+  exit
 
 elif [[ "$cmd" == "run" ]] ; then
   shift
-  cmd_run "${@}"
+  san_cmd_run "${@}"
 
 elif [[ "$cmd" == "edit" ]] ; then
   shift
-  cmd_edit "${@}"
+  san_cmd_edit "${@}"
 
-elif [[ "$cmd" == "new" ]] ; then
+elif [[ "$cmd" == "gen" ]] ; then
   shift
-  cmd_new "${@}"
+  san_cmd_gen "${@}"
 
 else
-  echo "Unkown command: $cmd"
+  echo "Unknown command: $cmd"
 fi
