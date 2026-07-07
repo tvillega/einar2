@@ -1,6 +1,6 @@
 FROM alpine:3.24
 
-RUN apk add --no-cache bash nano
+RUN apk add --no-cache bash nano tmux
 SHELL ["/bin/bash", "-c"]
 
 COPY entrypoint.sh /entrypoint.sh
