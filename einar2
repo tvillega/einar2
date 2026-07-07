@@ -8,7 +8,10 @@ san_cmd_run() {
   if [[ -z "$cmd" ]] ; then
     ./libexec/e2-help.sh run
     exit
-  elif [[ -z "$cmd" || -z "$lab" ]] ; then
+  elif [[ "$cmd" == "ps" ]] ; then
+    docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Ports}}"
+    exit
+  elif [[ -z "$lab" ]] ; then
     echo "usage: run start <lab>"
     exit
   else

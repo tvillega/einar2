@@ -11,12 +11,8 @@ run_stop()      {
   docker-compose -f "${1%%/}/docker-compose-services.yml" down
 }
 
-run_ls()        {
-  docker ps
-}
-
-run_prune() {
-  :
+run_exec()      {
+  docker exec -it $1 bash
 }
 
 [[ -z "${1-}" ]] && exit
@@ -32,14 +28,9 @@ while [[ "$1" != "--" ]]; do case $1 in
     run_stop "${@}"
     exit
     ;;
-  ls|ps)
+  shell)
     shift
-    run_ls "${@}"
-    exit
-    ;;
-  prune)
-    shift
-    run_prune "${@}"
+    run_exec "${@}"
     exit
     ;;
   *)

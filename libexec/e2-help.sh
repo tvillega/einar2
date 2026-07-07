@@ -81,13 +81,17 @@ usage: einar2 run <command>
 Run a docker command. Requires a privileged user or sudo|doas.
 
   <command> := start <lab>
-             | stop <lab>
+             | stop  <lab>
+             | ps
+             | shell <container>
 
   <lab> is a relative directory with the following structure:
 
        XX-labname
        ├── docker-compose-services.yml
        └── docker-compose-networks.yml
+
+  <container> is the name as seen in the ps output.
 EOF
 }
 
