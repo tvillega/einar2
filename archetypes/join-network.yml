@@ -1,0 +1,2 @@
+      net-{{ .NetworkDashed }}:
+        ipv4_address: {{ .Address }}

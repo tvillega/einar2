@@ -52,6 +52,7 @@ Prints a service or network block from an archetype.
                | server   <address> <network>
                | network  <network> <mask> <gateway>
                | compose  <section>
+               | join-network <address> <network>
 
   <section> := services
              | networks

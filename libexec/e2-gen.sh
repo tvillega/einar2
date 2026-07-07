@@ -47,6 +47,27 @@ gen_server() {
 
 }
 
+join_network() {
+
+  local address="${1-}"
+  local network="${2-}"
+
+  if [[ -z "$address" || -z "$network" ]] ; then
+    echo "usage: gen join-network <address> <network>"
+    exit
+  fi
+
+  address_dashed=$(echo $address | sed 's|\.|-|g')
+  network_dashed=$(echo $network | sed 's|\.|-|g')
+
+  cat "archetypes/join-network.yml" \
+    | sed "s|{{ .Address }}|$address|g" \
+    | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
+    | sed "s|{{ .Network }}|$network|g" \
+    | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
+
+}
+
 gen_network_bridge() {
 
   local network="${1-}"
@@ -102,17 +123,22 @@ gen_compose() {
 }
 
 while [[ "$1" != "--" ]]; do case $1 in
-  computer)
+  computer|c)
     shift
     gen_computer "${@}"
     exit
     ;;
-  server)
+  server|s)
     shift
     gen_server "${@}"
     exit
     ;;
-  bridge|network)
+  join-network|jn)
+    shift
+    join_network "${@}"
+    exit
+    ;;
+  bridge|network|n)
     shift
     gen_network_bridge "${@}"
     exit
