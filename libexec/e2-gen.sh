@@ -17,6 +17,7 @@ gen_computer() {
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
   cat "archetypes/machine-computer.yml" \
+    | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
     | sed "s|{{ .Network }}|$network|g" \
@@ -39,6 +40,7 @@ gen_server() {
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
   cat "archetypes/machine-server.yml" \
+    | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
     | sed "s|{{ .Port }}|$port|g" \
@@ -61,6 +63,7 @@ join_network() {
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
   cat "archetypes/join-network.yml" \
+    | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
     | sed "s|{{ .Network }}|$network|g" \
@@ -83,6 +86,7 @@ gen_network_bridge() {
   mask_no_leading_slash="${mask##/}"
 
   cat "archetypes/network-bridge.yml" \
+    | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Network }}|$network|g" \
     | sed "s|{{ .NetworkDashed }}|$network_dashed|g" \
     | sed "s|{{ .Mask }}|$mask_no_leading_slash|g" \
@@ -92,13 +96,16 @@ gen_network_bridge() {
 
 gen_compose_services() {
 
-  cat "archetypes/compose-services.yml"
+  cat "archetypes/compose-services.yml" \
+    | sed 's/{#[^}]*#}//g'
+
 
 }
 
 gen_compose_networks() {
 
-  cat "archetypes/compose-networks.yml"
+  cat "archetypes/compose-networks.yml" \
+    | sed 's/{#[^}]*#}//g'
 
 }
 

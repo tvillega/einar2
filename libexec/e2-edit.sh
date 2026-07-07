@@ -15,12 +15,12 @@ edit_networks() {
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
-  services)
+  services|s)
     shift
     edit_services "${@}"
     exit
     ;;
-  networks)
+  networks|n)
     shift
     edit_networks "${@}"
     exit

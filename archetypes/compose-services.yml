@@ -1,6 +1,6 @@
 include:
-  - ../../compose/docker-compose-base.yml
-  - ../../compose/docker-compose-machines.yml
-  - docker-compose-networks.yml
+  - ../../compose/docker-compose-base.yml      {# Builds the alpine & quagga images #}
+  - ../../compose/docker-compose-machines.yml  {# Builds the computer, server & router machines #}
+  - docker-compose-networks.yml                {# Networks of the laboratory on a different file #}
 
 services:
