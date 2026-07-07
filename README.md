@@ -284,7 +284,7 @@ the router images will greatly vary according to your laboratory goals.
 * `e2-router`: enabled modes defined by archetype.
 
 > [!NOTE]
-> The default `*compose-services.yml` archetype does not include routers
+> The default `compose-services.yml` archetype does not include routers
 by default. Please create a `docker-compose-routers.yml` in your laboratory
 directory and add them there.
 
@@ -422,7 +422,7 @@ $ ./einar2 gen computer 192.168.0.11 192.168.0.0 >> labs/99-example/docker-compo
 $ ./einar2 gen computer 192.168.0.12 192.168.0.0 >> labs/99-example/docker-compose-services.yml
 ```
 
-For the router it will be a little different since we also have to declare the exposed port of our (real) computer to bind its service.
+For the server it will be a little different since we also have to declare the exposed port of our (real) computer to bind its service.
 
 ```
 $ ./einar2 gen server 192.168.0.51 192.168.0.0 8081 >> labs/99-example/docker-compose-services.yml
