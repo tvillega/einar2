@@ -378,7 +378,7 @@ You'll notice that this archetype makes an include of `docker-compose-networks.y
 we need to create that one as well.
 
 ```
-$ ./einar2 gen compose networks > labs/99-example/docker-compose-services.yml
+$ ./einar2 gen compose networks > labs/99-example/docker-compose-networks.yml
 ```
 
 Although the resulting file is almost empty, you are free to modify
