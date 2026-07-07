@@ -437,7 +437,7 @@ We also have an archetype to make the declaration straightforward:
 > The leading `/` of the mask is ignored, but you can include it for clarity.
 
 ```
-$ ./einar2 gen network 192.168.0.0 /24 192.168.0.1 >> labs/99-example/docker-compose.networks.yml
+$ ./einar2 gen network 192.168.0.0 /24 192.168.0.1 >> labs/99-example/docker-compose-networks.yml
 ```
 
 And that's it! We created our first laboratory under docker with the help of Einar2!
