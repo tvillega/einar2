@@ -82,8 +82,11 @@ Run a docker command. Requires a privileged user or sudo|doas.
 
   <command> := start <lab>
              | stop  <lab>
-             | ps
              | shell <container>
+             | list  <section>
+
+  <section> := services
+             | networks
 
   <lab> is a relative directory with the following structure:
 
@@ -91,7 +94,7 @@ Run a docker command. Requires a privileged user or sudo|doas.
        ├── docker-compose-services.yml
        └── docker-compose-networks.yml
 
-  <container> is the name as seen in the ps output.
+  <container> is the name as seen in the services listing
 EOF
 }
 
