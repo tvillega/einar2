@@ -1,3 +1,4 @@
+
   e2-server-{{ .AddressDashed }}:
     image: e2-server:latest
     container_name: e2-server-{{ .AddressDashed }}

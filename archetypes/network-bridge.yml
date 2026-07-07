@@ -1,3 +1,4 @@
+
   net-{{ .NetworkDashed }}:
     name: net-{{ .NetworkDashed }}
     driver: bridge # reserves IP x.x.x.1 as default gateway, we can't re-assign it
