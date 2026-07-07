@@ -16,10 +16,10 @@ gen_computer() {
   address_dashed=$(echo $address | sed 's|\.|-|g')
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
-
   cat "archetypes/machine-computer.yml" \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
+    | sed "s|{{ .Network }}|$network|g" \
     | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
 
 }
@@ -42,6 +42,7 @@ gen_server() {
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
     | sed "s|{{ .Port }}|$port|g" \
+    | sed "s|{{ .Network }}|$network|g" \
     | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
 
 }
@@ -59,7 +60,6 @@ gen_network_bridge() {
 
   network_dashed=$(echo $network | sed 's|\.|-|g')
   mask_no_leading_slash="${mask##/}"
-
 
   cat "archetypes/network-bridge.yml" \
     | sed "s|{{ .Network }}|$network|g" \

@@ -82,8 +82,6 @@ Run a docker command. Requires a privileged user or sudo|doas.
 
   <command> := start <lab>
              | stop <lab>
-             | ls
-             | prune
 
   <lab> is a relative directory with the following structure:
 
