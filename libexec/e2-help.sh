@@ -50,6 +50,7 @@ Prints a service or network block from an archetype.
 
   <archetype> := computer <address> <network>
                | server   <address> <network>
+               | router   <address> <network>
                | network  <network> <mask> <gateway>
                | compose  <section>
                | join-network <address> <network>

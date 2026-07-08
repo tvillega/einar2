@@ -1,0 +1,12 @@
+
+  e2-router-{{ .AddressDashed }}:
+    image: e2-router:latest
+    container_name: e2-router-{{ .AddressDashed }}
+    stdin_open: true
+    tty: true
+    hostname: router-{{ .AddressDashed }}
+    volumes:
+      - ./quagga:/etc/quagga
+    networks:
+      net-{{ .NetworkDashed }}:
+        ipv4_address: {{ .Address }}

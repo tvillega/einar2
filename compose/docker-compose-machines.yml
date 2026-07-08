@@ -23,3 +23,15 @@ services:
     hostname: e2-server
     # Comment out when done testing
     entrypoint: /bin/echo "Einar2 Server image built successfully. Stopping container."
+
+  e2-router:
+    build:
+      context: "../build/e2-router"
+      dockerfile: Dockerfile
+    image: e2-router:latest
+    container_name: e2-router
+    stdin_open: true
+    tty: true
+    hostname: e2-router
+    # Comment out when done testing
+    entrypoint: /bin/echo "Einar2 Router image built successfully. Stopping container."

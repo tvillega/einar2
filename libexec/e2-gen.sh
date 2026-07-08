@@ -49,6 +49,28 @@ gen_server() {
 
 }
 
+gen_router() {
+
+  local address="${1-}"
+  local network="${2-}"
+
+  if [[ -z "$address" || -z "$network" ]] ; then
+    echo "usage: gen router <address> <network>"
+    exit
+  fi
+
+  address_dashed=$(echo $address | sed 's|\.|-|g')
+  network_dashed=$(echo $network | sed 's|\.|-|g')
+
+  cat "archetypes/machine-router.yml" \
+    | sed 's/{#[^}]*#}//g' \
+    | sed "s|{{ .Address }}|$address|g" \
+    | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
+    | sed "s|{{ .Network }}|$network|g" \
+    | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
+
+}
+
 join_network() {
 
   local address="${1-}"
@@ -138,6 +160,11 @@ while [[ "$1" != "--" ]]; do case $1 in
   server|s)
     shift
     gen_server "${@}"
+    exit
+    ;;
+  router|r)
+    shift
+    gen_router "${@}"
     exit
     ;;
   join-network|jn)
