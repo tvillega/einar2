@@ -1,0 +1,10 @@
+
+  net-{{ .NetworkDashed }}:
+    name: net-{{ .NetworkDashed }}
+    driver: ipvlan
+    driver_opts:
+      parent: {{ .Subinterface }}
+    ipam:
+      config:
+        - subnet: {{ .Network }}/{{ .Mask }}
+          gateway: {{ .Gateway }}

@@ -16,7 +16,7 @@ gen_computer() {
   address_dashed=$(echo $address | sed 's|\.|-|g')
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
-  cat "archetypes/machine-computer.yml" \
+  cat "archetypes/service-computer.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
@@ -39,7 +39,7 @@ gen_server() {
   address_dashed=$(echo $address | sed 's|\.|-|g')
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
-  cat "archetypes/machine-server.yml" \
+  cat "archetypes/service-server.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
@@ -62,7 +62,7 @@ gen_router() {
   address_dashed=$(echo $address | sed 's|\.|-|g')
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
-  cat "archetypes/machine-router.yml" \
+  cat "archetypes/service-router.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ .Address }}|$address|g" \
     | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
@@ -100,7 +100,7 @@ gen_network_bridge() {
   local gateway="${3-}"
 
   if [[ -z "$network" || -z "$mask" || -z "$gateway" ]] ; then
-    echo "usage: gen network <network> <mask> <gateway>"
+    echo "usage: gen bridge <network> <mask> <gateway>"
     exit
   fi
 
@@ -114,6 +114,31 @@ gen_network_bridge() {
     | sed "s|{{ .Mask }}|$mask_no_leading_slash|g" \
     | sed "s|{{ .Gateway }}|$gateway|g"
 
+}
+
+gen_network_ipvlan() {
+
+  local network="${1-}"
+  local mask="${2-}"   
+  local gateway="${3-}"
+  local subinterface="${4-}"
+
+  if [[ -z "$network" || -z "$mask" || -z "$gateway" || -z "$subinterface" ]] ; then
+    echo "usage: gen ipvlan <network> <mask> <gateway> <subinterface>"
+    exit
+  fi
+
+  network_dashed=$(echo $network | sed 's|\.|-|g')
+  mask_no_leading_slash="${mask##/}"
+
+  cat "archetypes/network-ipvlan.yml" \
+    | sed 's/{#[^}]*#}//g' \
+    | sed "s|{{ .Network }}|$network|g" \
+    | sed "s|{{ .NetworkDashed }}|$network_dashed|g" \
+    | sed "s|{{ .Mask }}|$mask_no_leading_slash|g" \
+    | sed "s|{{ .Gateway }}|$gateway|g" \
+    | sed "s|{{ .Subinterface }}|$subinterface|g"
+ 
 }
 
 gen_compose_services() {
@@ -172,9 +197,14 @@ while [[ "$1" != "--" ]]; do case $1 in
     join_network "${@}"
     exit
     ;;
-  bridge|network|n)
+  bridge|b|network|n)
     shift
     gen_network_bridge "${@}"
+    exit
+    ;;
+  ipvlan|v)
+    shift
+    gen_network_ipvlan "${@}"
     exit
     ;;
   compose)

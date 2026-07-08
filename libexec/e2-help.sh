@@ -51,7 +51,8 @@ Prints a service or network block from an archetype.
   <archetype> := computer <address> <network>
                | server   <address> <network>
                | router   <address> <network>
-               | network  <network> <mask> <gateway>
+               | bridge   <network> <mask> <gateway>
+               | ipvlan   <network> <mask> <gateway> <subint>
                | compose  <section>
                | join-network <address> <network>
 
@@ -65,7 +66,8 @@ Prints a service or network block from an archetype.
   <mask>    is the network mask, ranging from 0 to 32,
             leading slash is ignored if present.
   <gateway> is an IPv4 address that acts as gateway,
-            the x.x.x.1 corresponds to docker's guest:host bind.
+                 the x.x.x.1 corresponds to docker's guest:host bind.
+  <subint>  is a subinterface from the eth0 interface e.g. eth0.10
 
   <section> fills compose with Einar2 custom images and networks
             to use as base for new laboratories
