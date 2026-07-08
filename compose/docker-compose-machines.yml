@@ -8,6 +8,8 @@ services:
     container_name: e2-computer
     stdin_open: true
     tty: true
+    cap_add:
+      - NET_ADMIN
     hostname: e2-computer
     # Comment out when done testing
     entrypoint: /bin/echo "Einar2 Computer image built successfully. Stopping container."
@@ -20,6 +22,8 @@ services:
     container_name: e2-server
     stdin_open: true
     tty: true
+    cap_add:
+      - NET_ADMIN
     hostname: e2-server
     # Comment out when done testing
     entrypoint: /bin/echo "Einar2 Server image built successfully. Stopping container."
@@ -32,6 +36,8 @@ services:
     container_name: e2-router
     stdin_open: true
     tty: true
+    cap_add:
+      - NET_ADMIN
     hostname: e2-router
     # Comment out when done testing
     entrypoint: /bin/echo "Einar2 Router image built successfully. Stopping container."

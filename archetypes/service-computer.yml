@@ -4,6 +4,8 @@
     container_name: e2-computer-{{ .AddressDashed }}
     stdin_open: true
     tty: true
+    cap_add:
+      - NET_ADMIN
     hostname: computer-{{ .AddressDashed }}
     networks:
       net-{{ .NetworkDashed }}:

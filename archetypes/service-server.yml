@@ -4,6 +4,8 @@
     container_name: e2-server-{{ .AddressDashed }}
     stdin_open: true
     tty: true
+    cap_add:
+      - NET_ADMIN
     hostname: server-{{ .AddressDashed }}
     ports:
       - "{{ .Port }}:80"
