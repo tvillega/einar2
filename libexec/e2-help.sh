@@ -84,12 +84,12 @@ usage: einar2 run <command>
 
 Run a docker command. Requires a privileged user or sudo|doas.
 
-  <command> := list   <section>
+  <command> := inj    <config>
+             | list   <section>
              | shell  <container>
              | start  <container>
              | stop   <container>
              | shell  <container>
-             | list   <section>
 
   <container> := registry
                | <lab>

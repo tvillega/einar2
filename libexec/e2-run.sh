@@ -78,15 +78,15 @@ run_list()      {
 }
 
 run_inject_sysctl() {
-  cp -v "config/includes.system/sysctl.conf" /etc/sysctl.conf.d/
+  cp -v "config/includes.system/sysctl.conf" /etc/sysctl.d/
 }
 
 run_inject() {
 
-  local what="${2-}"
+  local what="${1-}"
 
   if [[ -z "$what" ]] ; then
-    echo "usage: run inj <config>"
+    echo "Available configs: sysctl"
     exit
   elif [[ "$what" == "sysctl" ]] ; then
     run_inject_sysctl
@@ -132,7 +132,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    ./e2-help.sh run
+    ./libexec/e2-help.sh run
     exit
     ;;
 esac; shift; done
