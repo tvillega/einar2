@@ -118,7 +118,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     ;;
   shell|sh)
     shift
-    run_exec "${@}"
+    run_shell "${@}"
     exit
     ;;
   start|up)
