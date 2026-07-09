@@ -1,6 +1,11 @@
-FROM quagga-base:latest
+FROM localhost:5000/einar2:latest
 
-RUN apk add --no-cache tcpdump
+COPY zebra.conf   /etc/quagga/zebra.conf
+COPY daemons      /etc/quagga/daemons
+
 RUN cp -r /etc/quagga /etc/quagga.defaults
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

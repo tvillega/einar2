@@ -1,7 +1,4 @@
-FROM alpine-base:latest
-
-# Available in Alpine v3.24
-RUN apk add --no-cache php85
+FROM localhost:5000/einar2:latest
 
 EXPOSE 80
 
