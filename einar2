@@ -1,19 +1,5 @@
 #!/bin/bash
 
-san_cmd_init() {
-
-  local cmd="$1"
-
-  if [[ -z "$cmd" ]] ; then
-    ./libexec/e2-help.sh init
-    exit
-  else
-    shift
-    ./libexec/e2-init.sh "$cmd" "${@}"
-  fi
-
-}
-
 san_cmd_run() {
 
   local cmd="$1"
@@ -70,9 +56,6 @@ cmd="$1"
 if [[ -z "$cmd" ]] ; then
   ./libexec/e2-help.sh help
   exit
-
-elif [[ "$cmd" == "init" ]] ; then
-  san_cmd_init "${@}"
 
 elif [[ "$cmd" == "run" ]] ; then
   shift

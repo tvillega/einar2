@@ -84,10 +84,25 @@ usage: einar2 run <command>
 
 Run a docker command. Requires a privileged user or sudo|doas.
 
-  <command> := start <lab>
-             | stop  <lab>
-             | shell <container>
-             | list  <section>
+  <command> := build  <image>
+             | list   <section>
+             | push   <image>
+             | shell  <container>
+             | start  <container>
+             | stop   <container>
+             | shell  <container>
+             | list   <section>
+
+  <container> := registry
+               | <lab>
+
+  <image> is an einar2 image, default images are:
+
+       build
+       ├── e2-computer
+       ├── e2-router
+       ├── e2-server
+       └── einar2
 
   <section> := services
              | networks
@@ -97,8 +112,6 @@ Run a docker command. Requires a privileged user or sudo|doas.
        XX-labname
        ├── docker-compose-services.yml
        └── docker-compose-networks.yml
-
-  <container> is the name as seen in the services listing
 EOF
 }
 
@@ -134,10 +147,6 @@ while [[ "$1" != "--" ]]; do case $1 in
     ;;
   run)
     print_help_run
-    exit
-    ;;
-  init)
-    print_help_init
     exit
     ;;
 esac; shift; done

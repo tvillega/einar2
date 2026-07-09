@@ -5,11 +5,27 @@ set -euo pipefail
 IFS=$'\n\t'
 
 run_start()     {
-  docker-compose -f "${1%%/}/docker-compose-services.yml" up --build
+
+  local what="${1-}"
+
+  if [[ "$what" == "registry" ]] ; then
+    docker-compose -f "../compose/docker-compose-registry" up -d
+
+  else
+    docker-compose -f "${1%%/}/docker-compose-services.yml" up --build
+  fi
 }
 
 run_stop()      {
-  docker-compose -f "${1%%/}/docker-compose-services.yml" down
+
+  local what="${1-}"
+
+  if [[ "$what" == "registry" ]] ; then
+    docker-compose -f "../compose/docker-compose-registry" down
+
+  else
+    docker-compose -f "${1%%/}/docker-compose-services.yml" down
+  fi
 }
 
 run_exec()      {
