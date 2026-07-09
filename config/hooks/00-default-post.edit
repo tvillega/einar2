@@ -1,0 +1,7 @@
+#
+# Default post-transaction hook for edit subcommand
+#
+
+#User args
+cmd="$1"
+lab="$2"

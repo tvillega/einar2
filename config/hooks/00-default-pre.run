@@ -1,0 +1,7 @@
+#
+# Default pre-transaction hook for run subcommand
+#
+
+#User args
+cmd="$1"
+lab="$2"
