@@ -60,7 +60,22 @@ hook_gen() {
 
 }
 
-[[ ! -d "config/hooks" ]] && exit
+hook_or_disable() {
+
+  # Default hooks are mandatory for simplicity
+  # removing any of them will disable all hooks
+
+  [[ ! -d "config/hooks" ]] && exit
+  [[ ! -f "config/hooks/00-default-post.edit" ]] && exit
+  [[ ! -f "config/hooks/00-default-post.gen"  ]] && exit
+  [[ ! -f "config/hooks/00-default-post.run"  ]] && exit
+  [[ ! -f "config/hooks/00-default-pre.edit"  ]] && exit
+  [[ ! -f "config/hooks/00-default-pre.gen"   ]] && exit
+  [[ ! -f "config/hooks/00-default-pre.run"   ]] && exit
+
+}
+
+hook_or_disable
 
 [[ -z "${1-}" ]] && exit
 
