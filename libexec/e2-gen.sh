@@ -176,6 +176,23 @@ gen_compose() {
 
 }
 
+gen_laboratory() {
+
+  local lab="${1-}"
+
+  if [[ -z "$lab" ]] ; then
+    echo "Lab name can't be empty"
+    exit
+  fi
+
+  local dir="labs/$lab"
+
+  mkdir -p "$dir"
+  echo "$(gen_compose_networks)" > "$dir/docker-compose-networks.yml"
+  echo "$(gen_compose_services)" > "$dir/docker-compose-services.yml"
+
+}
+
 while [[ "$1" != "--" ]]; do case $1 in
   computer|c)
     shift
@@ -210,6 +227,11 @@ while [[ "$1" != "--" ]]; do case $1 in
   compose)
     shift
     gen_compose "${@}"
+    exit
+    ;;
+  lab|l)
+    shift
+    gen_laboratory "${@}"
     exit
     ;;
   *)
