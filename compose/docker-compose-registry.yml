@@ -1,4 +1,5 @@
 services:
+
   einar2-registry:
     image: registry:3
     container_name: einar2-registry
