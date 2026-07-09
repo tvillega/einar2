@@ -21,23 +21,17 @@ san_cmd_run() {
 
 san_cmd_edit() {
 
-  local cmd="$1"
-  local lab="$2"
+  local what="$1"
 
-  if [[ -z "$cmd" ]] ; then
+  [[ -z "$EDITOR" ]] && echo "EDITOR unset" && exit
+
+  if [[ -z "$what" ]] ; then
     ./libexec/e2-help.sh edit
     exit
-  elif [[ -z "$EDITOR" ]] ; then
-    echo '$EDITOR is unset'
-    exit
-  elif [[ -z "$lab" || ! -d "$lab" ]] ; then
-    echo "error: invalid directory"
-    echo "usage: edit <section> <lab>"
-    exit
   else
-    ./libexec/e2-hook.sh edit -1 "$cmd" "$lab"
-    ./libexec/e2-edit.sh "$cmd" "$lab"
-    ./libexec/e2-hook.sh edit  1 "$cmd" "$lab"
+    ./libexec/e2-hook.sh edit -1 "${@}"
+    ./libexec/e2-edit.sh "${@}"
+    ./libexec/e2-hook.sh edit  1 "${@}"
   fi
 
 }
