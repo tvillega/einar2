@@ -2,19 +2,15 @@
 
 san_cmd_run() {
 
-  local cmd="$1"
-  local lab="$2"
+  local what="$1"
 
-  if [[ -z "$cmd" ]] ; then
+  if [[ -z "$what" ]] ; then
     ./libexec/e2-help.sh run
     exit
-  elif [[ -z "$lab" && "$cmd" != "ls" && "$cmd" != "ln" ]] ; then
-    echo "usage: run start <lab>"
-    exit
   else
-    ./libexec/e2-hook.sh run -1 "$cmd" "$lab"
-    ./libexec/e2-run.sh "$cmd" "$lab"
-    ./libexec/e2-hook.sh run  1 "$cmd" "$lab"
+    ./libexec/e2-hook.sh run -1 "${@}"
+    ./libexec/e2-run.sh "${@}"
+    ./libexec/e2-hook.sh run  1 "${@}"
   fi
 
 }

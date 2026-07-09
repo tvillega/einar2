@@ -8,7 +8,11 @@ run_start()     {
 
   local what="${1-}"
 
-  if [[ "$what" == "registry" ]] ; then
+  if [[ -z "$what" ]] ; then
+    echo "usage: run start <lab>"
+    exit
+
+  elif [[ "$what" == "registry" ]] ; then
     docker-compose -f "compose/docker-compose-registry.yml" up -d
 
   else
@@ -20,7 +24,11 @@ run_stop()      {
 
   local what="${1-}"
 
-  if [[ "$what" == "registry" ]] ; then
+  if [[ -z "$what" ]] ; then
+    echo "usage: run stop <lab>"
+    exit
+
+  elif [[ "$what" == "registry" ]] ; then
     docker-compose -f "compose/docker-compose-registry.yml" down
 
   else
@@ -28,8 +36,17 @@ run_stop()      {
   fi
 }
 
-run_exec()      {
-  docker exec -it $1 bash
+run_shell()      {
+
+  local what="${1-}"
+
+  if [[ -z "$what" ]] ; then
+    echo "usage: run shell <container>"
+    exit
+
+  else
+    docker exec -it "$what" bash
+  fi
 }
 
 run_list_services() {
@@ -42,12 +59,12 @@ run_list_networks() {
 
 run_list()      {
 
-  local what="{1-}"
+  local what="${1-}"
 
   if [[ -z "$what" ]] ; then
-    echo "Available listings: networks|services"
+    echo "usage: run list services|networks"
     exit
-  elif [[ "$what" == "services" || "$what" == "service" ]] ; then
+  elif [[ "$what" == "services" || "$what" == "service" || "$what" == "ls" ]] ; then
     run_list_services
     exit
   elif [[ "$what" == "networks" || "$what" == "network" ]] ; then
@@ -63,14 +80,19 @@ run_list()      {
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
+  list)
+    shift
+    run_list "${@}"
+    exit
+    ;;
   list-networks|ln)
     shift
     run_list_networks
     exit
     ;;
-  list|ls)
+  list-networks|ls)
     shift
-    run_list "${@}"
+    run_list_services
     exit
     ;;
   shell|sh)
