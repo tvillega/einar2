@@ -63,6 +63,21 @@ run_list()      {
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
+  list-networks|ln)
+    shift
+    run_list_networks
+    exit
+    ;;
+  list|ls)
+    shift
+    run_list "${@}"
+    exit
+    ;;
+  shell|sh)
+    shift
+    run_exec "${@}"
+    exit
+    ;;
   start|up)
     shift
     run_start "${@}"
@@ -71,21 +86,6 @@ while [[ "$1" != "--" ]]; do case $1 in
   stop|down)
     shift
     run_stop "${@}"
-    exit
-    ;;
-  shell|sh)
-    shift
-    run_exec "${@}"
-    exit
-    ;;
-  list|ls)
-    shift
-    run_list "${@}"
-    exit
-    ;;
-  ln)
-    shift
-    run_list_networks
     exit
     ;;
   *)
