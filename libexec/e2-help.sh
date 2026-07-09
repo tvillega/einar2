@@ -84,9 +84,7 @@ usage: einar2 run <command>
 
 Run a docker command. Requires a privileged user or sudo|doas.
 
-  <command> := build  <image>
-             | list   <section>
-             | push   <image>
+  <command> := list   <section>
              | shell  <container>
              | start  <container>
              | stop   <container>
@@ -95,14 +93,6 @@ Run a docker command. Requires a privileged user or sudo|doas.
 
   <container> := registry
                | <lab>
-
-  <image> is an einar2 image, default images are:
-
-       build
-       ├── e2-computer
-       ├── e2-router
-       ├── e2-server
-       └── einar2
 
   <section> := services
              | networks
