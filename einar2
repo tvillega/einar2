@@ -12,7 +12,9 @@ san_cmd_run() {
     echo "usage: run start <lab>"
     exit
   else
+    ./libexec/e2-hook.sh run -1
     ./libexec/e2-run.sh "$cmd" "$lab"
+    ./libexec/e2-hook.sh run  1
   fi
 
 }
@@ -33,7 +35,9 @@ san_cmd_edit() {
     echo "usage: edit <section> <lab>"
     exit
   else
+    ./libexec/e2-hook.sh edit -1
     ./libexec/e2-edit.sh "$cmd" "$lab"
+    ./libexec/e2-hook.sh edit  1
   fi
 
 }
@@ -46,7 +50,9 @@ san_cmd_gen() {
     ./libexec/e2-help.sh gen
     exit
   else
+    ./libexec/e2-hook.sh gen -1
     ./libexec/e2-gen.sh "${@}"
+    ./libexec/e2-hook.sh gen  1
   fi
 
 }
