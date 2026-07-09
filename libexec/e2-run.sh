@@ -9,7 +9,7 @@ run_start()     {
   local what="${1-}"
 
   if [[ "$what" == "registry" ]] ; then
-    docker-compose -f "../compose/docker-compose-registry" up -d
+    docker-compose -f "compose/docker-compose-registry.yml" up -d
 
   else
     docker-compose -f "${1%%/}/docker-compose-services.yml" up --build
@@ -21,7 +21,7 @@ run_stop()      {
   local what="${1-}"
 
   if [[ "$what" == "registry" ]] ; then
-    docker-compose -f "../compose/docker-compose-registry" down
+    docker-compose -f "compose/docker-compose-registry.yml" down
 
   else
     docker-compose -f "${1%%/}/docker-compose-services.yml" down
