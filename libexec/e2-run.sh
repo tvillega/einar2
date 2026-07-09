@@ -13,10 +13,10 @@ run_start()     {
     exit
 
   elif [[ "$what" == "registry" ]] ; then
-    docker-compose -f "compose/docker-compose-registry.yml" up -d
+    docker compose -f "compose/docker-compose-registry.yml" up -d
 
   else
-    docker-compose -f "${1%%/}/docker-compose-services.yml" up --build
+    docker compose -f "${1%%/}/docker-compose-services.yml" up --build
   fi
 }
 
@@ -29,10 +29,10 @@ run_stop()      {
     exit
 
   elif [[ "$what" == "registry" ]] ; then
-    docker-compose -f "compose/docker-compose-registry.yml" down
+    docker compose -f "compose/docker-compose-registry.yml" down
 
   else
-    docker-compose -f "${1%%/}/docker-compose-services.yml" down
+    docker compose -f "${1%%/}/docker-compose-services.yml" down
   fi
 }
 
