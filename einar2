@@ -53,15 +53,15 @@ if [[ -z "$cmd" ]] ; then
   ./libexec/e2-help.sh help
   exit
 
-elif [[ "$cmd" == "run" ]] ; then
+elif [[ "$cmd" == "run" || "$cmd" == "r" ]] ; then
   shift
   san_cmd_run "${@}"
 
-elif [[ "$cmd" == "edit" ]] ; then
+elif [[ "$cmd" == "edit" || "$cmd" == "e" ]] ; then
   shift
   san_cmd_edit "${@}"
 
-elif [[ "$cmd" == "gen" ]] ; then
+elif [[ "$cmd" == "gen" || "$cmd" == "g" ]] ; then
   shift
   san_cmd_gen "${@}"
 
