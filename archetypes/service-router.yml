@@ -4,8 +4,7 @@
     container_name: e2-router-{{ .AddressDashed }}
     stdin_open: true
     tty: true
-    cap_add:
-      - NET_ADMIN
+    privileged: true {# Allows the container to modify the host #}
     hostname: router-{{ .AddressDashed }}
     volumes:
       - ./quagga:/etc/quagga
