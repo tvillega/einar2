@@ -29,7 +29,7 @@ docker build -t localhost:5000/einar2 build/einar2
 Save the image to the local registry:
 
 ```
-docker publish localhost:5000/einar2
+docker push localhost:5000/einar2
 ```
 
 Now you can edit and rebuild all the `e2-*` images without rate limiting the official docker registry.
