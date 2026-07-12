@@ -25,8 +25,8 @@ done
 
 echo ":: Hijacking network namespaces"
 for c in "${CONTAINERS[@]}" ; do
-  ip netns attach $c ${P[0]}
-  P=${P[@]:1}
+  ip netns attach $c ${PIDS[0]}
+  PIDS=${PIDS[@]:1}
 done
 
 echo "-> ip net list"
