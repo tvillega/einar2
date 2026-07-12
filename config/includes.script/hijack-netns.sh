@@ -18,9 +18,11 @@ echo ":: Getting containers PIDs"
 
 PIDS=()
 for c in "${CONTAINERS[@]}" ; do
-  P=( $(docker inspect --format '{{ .State.Pid }}' $c) )
-  PIDS+=( $P )
-  echo "$c -> $P"
+  if [[ "${c:0:3}" == "e2-" ]] ; then
+    P=( $(docker inspect --format '{{ .State.Pid }}' $c) )
+    PIDS+=( $P )
+    echo "$c -> $P"
+  fi
 done
 
 echo ":: Hijacking network namespaces"
