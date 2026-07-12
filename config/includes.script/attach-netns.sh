@@ -30,7 +30,7 @@ done
 
 echo ":: Attaching to docker network namespaces"
 for k in "${!CONTAINERS[@]}" ; do
-  ip netns attach" "${CONTAINERS[$k]}" "${PIDS[$k]}"
+  ip netns attach "${CONTAINERS[$k]}" "${PIDS[$k]}"
 done
 
 echo "-> ip net list"
