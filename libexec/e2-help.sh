@@ -48,13 +48,14 @@ usage: einar2 gen <archetype>
 
 Prints a service or network block from an archetype.
 
-  <archetype> := computer <address> <network>
-               | server   <address> <network>
-               | router   <address> <network>
-               | bridge   <network> <mask> <gateway>
-               | ipvlan   <network> <mask> <gateway> <subint>
+  <archetype> := bridge   <network> <mask> <gateway>
                | compose  <section>
+               | computer <address> <network>
+               | ipvlan   <network> <mask> <gateway> <subint>
                | join-network <address> <network>
+               | laboratory <name>
+               | router   <address> <network>
+               | server   <address> <network>
 
   <section> := services
              | networks
