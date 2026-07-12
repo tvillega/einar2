@@ -16,9 +16,7 @@ run_start()     {
     docker compose -f "compose/docker-compose-registry.yml" up -d
 
   else
-    ./libexec/e2-hook.sh start -1 "${@}"
     docker compose -f "${1%%/}/docker-compose-services.yml" up --build
-    ./libexec/e2-hook.sh start  1 "${@}"
   fi
 }
 
@@ -34,9 +32,7 @@ run_stop()      {
     docker compose -f "compose/docker-compose-registry.yml" down
 
   else
-    ./libexec/e2-hook.sh stop -1 "${@}"
     docker compose -f "${1%%/}/docker-compose-services.yml" down
-    ./libexec/e2-hook.sh stop  1 "${@}"
   fi
 }
 
