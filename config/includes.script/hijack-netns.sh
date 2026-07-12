@@ -8,7 +8,7 @@ ip net list
 
 echo ":: Gathering container names"
 CONTAINERS=( $( docker ps --format "table {{ .Names }}") )
-CONTAINERS=${C[@]:1} # Remove column name
+CONTAINERS=${CONTAINERS[@]:1} # Remove column name
 
 for c in "${CONTAINERS[@]}" ; do
   echo $c
