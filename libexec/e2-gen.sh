@@ -229,13 +229,13 @@ while [[ "$1" != "--" ]]; do case $1 in
     gen_compose "${@}"
     exit
     ;;
-  lab|l)
+  laboratory|lab|l)
     shift
     gen_laboratory "${@}"
     exit
     ;;
   *)
-    ./e2-help.sh gen
+    ./libexec/e2-help.sh gen
     exit
     ;;
 esac; shift; done
