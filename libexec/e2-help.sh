@@ -94,6 +94,14 @@ Run a docker command. Requires a privileged user or sudo|doas.
   <container> := registry
                | <lab>
 
+  <config> := sysctl
+
+      sysctl injects to the host system the following rules:
+
+        -> net.ipv4.conf.all.rp_filter=0
+        -> net.ipv4.conf.default.rp_filter=0
+        -> net.ipv4.ip_forward=1
+
   <section> := services
              | networks
 
