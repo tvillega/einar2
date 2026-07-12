@@ -1,8 +1,5 @@
 #!/bin/bash
 
-## Find docker network namespace list /run/docker/netns
-## and attach it to system namespace list /run/netns
-
 echo "-> ip net list"
 ip net list
 
@@ -28,9 +25,10 @@ for k in "${!CONTAINERS[@]}" ; do
   echo "$c -> $P"
 done
 
-echo ":: Attaching to docker network namespaces"
+echo ":: Detaching from docker network namespaces"
+
 for k in "${!CONTAINERS[@]}" ; do
-  ip netns attach "${CONTAINERS[$k]}" "${PIDS[$k]}"
+  ip netns delete "${CONTAINERS[$k]}" "${PIDS[$k]}"
 done
 
 echo "-> ip net list"
