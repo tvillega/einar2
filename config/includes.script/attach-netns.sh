@@ -4,7 +4,7 @@
 ## and attach it to system namespace list /run/netns
 
 echo "-> ip net list"
-# ip net list
+ip net list
 
 echo ":: Getting docker container names"
 

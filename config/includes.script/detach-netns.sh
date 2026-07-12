@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "-> ip net list"
-# ip net list
+ip net list
 
 echo ":: Getting docker container names"
 
@@ -25,7 +25,7 @@ for k in "${!CONTAINERS[@]}" ; do
   echo "$c -> $P"
 done
 
-echo ":: Attaching to docker network namespaces"
+echo ":: Detaching from docker network namespaces"
 for k in "${!CONTAINERS[@]}" ; do
   ip netns delete "${CONTAINERS[$k]}" "${PIDS[$k]}"
 done
