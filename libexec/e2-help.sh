@@ -105,21 +105,6 @@ Run a docker command. Requires a privileged user or sudo|doas.
 EOF
 }
 
-print_help_init() {
-
-cat <<EOF
-usage: einar2 init <env>
-
-Setup a development environment for einar2.
-
-  <env> := registry
-
-  registry:   starts a local registry on port 5000.
-              This is necessary to build the laboratory images
-              without over-using the official docker registry.
-EOF
-}
-
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
