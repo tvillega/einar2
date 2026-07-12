@@ -1,17 +1,19 @@
 #!/bin/bash
 
+HOOKS_DIR="hooks"
+
 hook_run() {
 
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in config/hooks/*pre.run ; do
+    for a in "$HOOKS_DIR"s/*pre.run ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
     done
   else
-    for a in config/hooks/*post.run ; do
+    for a in "$HOOKS_DIR"/*post.run ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
@@ -25,13 +27,13 @@ hook_edit() {
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in config/hooks/*pre.edit ; do
+    for a in "$HOOKS_DIR"/*pre.edit ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
     done
   else
-    for a in config/hooks/*post.edit ; do
+    for a in "$HOOKS_DIR"/*post.edit ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
@@ -45,13 +47,13 @@ hook_gen() {
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in config/hooks/*pre.gen ; do
+    for a in "$HOOKS_DIR"/*pre.gen ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
     done
   else
-    for a in config/hooks/*post.gen ; do
+    for a in "$HOOKS_DIR"/*post.gen ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
@@ -65,13 +67,13 @@ hook_or_disable() {
   # Default hooks are mandatory for simplicity
   # removing any of them will disable all hooks
 
-  [[ ! -d "config/hooks" ]] && exit
-  [[ ! -f "config/hooks/00-default-post.edit" ]] && exit
-  [[ ! -f "config/hooks/00-default-post.gen"  ]] && exit
-  [[ ! -f "config/hooks/00-default-post.run"  ]] && exit
-  [[ ! -f "config/hooks/00-default-pre.edit"  ]] && exit
-  [[ ! -f "config/hooks/00-default-pre.gen"   ]] && exit
-  [[ ! -f "config/hooks/00-default-pre.run"   ]] && exit
+  [[ ! -d "${HOOKS_DIR}" ]] && exit
+  [[ ! -f "${HOOKS_DIR}/00-default-post.edit" ]] && exit
+  [[ ! -f "${HOOKS_DIR}/00-default-post.gen"  ]] && exit
+  [[ ! -f "${HOOKS_DIR}/00-default-post.run"  ]] && exit
+  [[ ! -f "${HOOKS_DIR}/00-default-pre.edit"  ]] && exit
+  [[ ! -f "${HOOKS_DIR}/00-default-pre.gen"   ]] && exit
+  [[ ! -f "${HOOKS_DIR}/00-default-pre.run"   ]] && exit
 
 }
 
