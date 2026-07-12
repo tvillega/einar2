@@ -7,7 +7,7 @@ hook_run() {
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in "$HOOKS_DIR"s/*pre.run ; do
+    for a in "$HOOKS_DIR"/*pre.run ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
