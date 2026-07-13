@@ -91,6 +91,7 @@ Run a docker command. Requires a privileged user or sudo|doas.
              | start  <container>
              | stop   <container>
              | shell  <container>
+             | util   <utility>
 
   <container> := registry
                | <lab>
@@ -111,6 +112,12 @@ Run a docker command. Requires a privileged user or sudo|doas.
        XX-labname
        ├── docker-compose-services.yml
        └── docker-compose-networks.yml
+
+  <utility> is a script under the utils directory, you must
+            reference it by name without the .sh extension.
+
+            You can create your own utilities and save them
+            under the utils dir to call them from einar2.
 EOF
 }
 

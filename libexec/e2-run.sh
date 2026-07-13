@@ -93,6 +93,22 @@ run_inject() {
   fi
 }
 
+run_utility() {
+
+  local what="${1-}"
+
+  if [[ -z "$what" ]] ; then
+    echo "You must specify an utility by its name"
+    exit
+  elif [[ ! -f "./utils/${what}.sh" ]] ; then
+    echo "Utility not found."
+    exit
+  else
+    ./utils/"${what}.sh"
+  fi
+
+}
+
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
@@ -129,6 +145,11 @@ while [[ "$1" != "--" ]]; do case $1 in
   stop|down)
     shift
     run_stop "${@}"
+    exit
+    ;;
+  util)
+    shift
+    run_utility "${@}"
     exit
     ;;
   *)
