@@ -74,7 +74,7 @@ nsenter --net=/run/netns/<container-name> <command>
 To detach the network namespaces of your host, run the following einar2 utility:
 
 ```
-e2 run util detach-netns
+e2 run util netns-detach
 ```
 
 If you don't do this before spinning down the containers, the network namespaces will linger on your system.
