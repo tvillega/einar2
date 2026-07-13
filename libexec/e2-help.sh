@@ -85,8 +85,7 @@ usage: einar2 run <command>
 
 Run a docker command. Requires a privileged user or sudo|doas.
 
-  <command> := inj    <config>
-             | list   <section>
+  <command> := list   <section>
              | shell  <container>
              | start  <container>
              | stop   <container>

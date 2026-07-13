@@ -77,22 +77,6 @@ run_list()      {
 
 }
 
-run_inject_sysctl() {
-  cp -v "config/includes.system/sysctl.conf" /etc/sysctl.d/
-}
-
-run_inject() {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "Available configs: sysctl"
-    exit
-  elif [[ "$what" == "sysctl" ]] ; then
-    run_inject_sysctl
-  fi
-}
-
 run_utility() {
 
   local what="${1-}"
@@ -112,11 +96,6 @@ run_utility() {
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
-  inj)
-    shift
-    run_inject "${@}"
-    exit
-    ;;
   list)
     shift
     run_list "${@}"
