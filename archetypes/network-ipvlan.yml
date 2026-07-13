@@ -1,6 +1,6 @@
 
-  net-{{ .NetworkDashed }}:
-    name: net-{{ .NetworkDashed }}
+  switch-{{ .NetworkDashed }}:
+    name: switch-{{ .NetworkDashed }}
     driver: ipvlan
     driver_opts:
       parent: {{ .Subinterface }}

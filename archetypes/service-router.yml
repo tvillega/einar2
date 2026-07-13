@@ -10,5 +10,5 @@
     volumes:
       - ./quagga:/etc/quagga
     networks:
-      net-{{ .NetworkDashed }}:
+      switch-{{ .NetworkDashed }}:
         ipv4_address: {{ .Address }}

@@ -1,6 +1,6 @@
 
-  net-{{ .NetworkDashed }}:
-    name: net-{{ .NetworkDashed }}
+  switch-{{ .NetworkDashed }}:
+    name: switch-{{ .NetworkDashed }}
     driver: bridge    {# Reserves IP x.x.x.1 as default gateway, we can't re-assign it #}
     # internal: true  {# Disables docker's port bind with host #}
     ipam:

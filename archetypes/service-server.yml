@@ -10,5 +10,5 @@
     ports:
       - "{{ .Port }}:80"
     networks:
-      net-{{ .NetworkDashed }}:
+      switch-{{ .NetworkDashed }}:
         ipv4_address: {{ .Address }}
