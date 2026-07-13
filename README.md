@@ -37,9 +37,9 @@ Now you can edit and rebuild all the `e2-*` images without rate limiting the off
 ### Network Namespaces
 
 Docker saves its network namespaces in `/run/docker/netns`, separated to the system's `/run/netns`.
-Einar2 provides a utility to attach those namespaces to your system:
+Einar2 provides a utility to attach those namespaces to your system.
 
-Once your containers are up and running, check their existance on the host.
+Once your containers are up and running, check their existence on the host.
 You require superuser privileges to include docker private network namespace directory on the list.
 
 ```
