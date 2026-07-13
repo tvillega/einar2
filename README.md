@@ -49,7 +49,7 @@ lsns -t net
 Knowing that, you can now let einar2 attach them to your system:
 
 ```
-e2 run util attach-netns
+e2 run util netns-attach
 ```
 
 List the network namespaces again and you'll find that each of them now has as alias the container's name:
@@ -68,7 +68,7 @@ ip netns exec <container-name> ip route show
 You can also run a new process under that namespaces and it will have the same network restrictions as your container:
 
 ```
-nsenter --net=/run/netns/<container-name>
+nsenter --net=/run/netns/<container-name> <command>
 ```
 
 To detach the network namespaces of your host, run the following einar2 utility:
