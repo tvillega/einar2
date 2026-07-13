@@ -4,7 +4,8 @@
     container_name: e2-computer-{{ .AddressDashed }}
     stdin_open: true
     tty: true
-    privileged: true {# Allows the container to modify the host #}
+    cap_add:
+      - NET_ADMIN
     hostname: computer-{{ .AddressDashed }}
     networks:
       net-{{ .NetworkDashed }}:
