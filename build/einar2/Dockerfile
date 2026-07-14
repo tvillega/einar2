@@ -12,7 +12,15 @@ RUN apk add --no-cache \
       quagga \
       bind \
       bind-tools \
-      traceroute
+      traceroute \
+      lighttpd \
+      php-cgi
+
+RUN mkdir -v /archetypes /compose /labs /libexec /utils /einar2
+RUN mkdir -vp /www /var/lib/php/sessions
+RUN chown -R lighttpd:lighttpd /www /var/lib/php/sessions
+
+COPY lighttpd.conf /etc/lighttpd/lighttpd.conf
 
 SHELL ["/bin/bash", "-c"]
 
