@@ -1,0 +1,16 @@
+services:
+
+  einar2-website:
+    image: localhost:5000/einar2:latest
+    container_name: einar2-website
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ../www:/www
+      - ../archetypes:/archetypes:ro
+      - ../compose:/compose:ro
+      - ../labs:/labs
+      - ../libexec:/libexec:ro
+      - ../utils:/utils:ro
+    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/lighttpd.conf
