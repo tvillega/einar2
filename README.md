@@ -2,9 +2,34 @@
 
 Einar Is Not A Router v2, networking laboratory on docker.
 
-## Setup
+## Classroom Environment
 
-### Environment
+Create a directory on your system and enter it:
+
+```
+mkdir path/to/work && cd path/to/work
+```
+
+Use the image [tvillega/einar2:latest](https://hub.docker.com/r/tvillega/einar2) to create the following `docker-compose.yaml`:
+
+```
+services:
+
+  einar2-website:
+    image: tvillega/einar2:latest
+    container_name: einar2-website
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./labs:/labs
+    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2-website.conf
+```
+
+## Development Environment
+
+The following instructions will guide you on how to deploy the project locally,
+build custom einar2 images and push the limits on how much a laboratory can do.
 
 (Optional) Create an alias:
 
@@ -33,6 +58,12 @@ docker push localhost:5000/einar2
 ```
 
 Now you can edit and rebuild all the `e2-*` images without rate limiting the official docker registry.
+
+Consulta the CLI usage by running:
+
+```
+e2
+```
 
 ### Network Namespaces
 
