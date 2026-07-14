@@ -13,7 +13,7 @@
       {# - net.ipv4.conf.eth0.rp_filter=0 #}
     hostname: router-{{ .AddressDashed }}
     volumes:
-      - ./quagga:/etc/quagga
+      - ./e2-router-{{ .AddressDashed }}-quagga:/etc/quagga
     networks:
       switch-{{ .NetworkDashed }}:
         ipv4_address: {{ .Address }}
