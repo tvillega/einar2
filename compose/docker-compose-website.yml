@@ -13,4 +13,4 @@ services:
       - ../labs:/labs
       - ../libexec:/libexec:ro
       - ../utils:/utils:ro
-    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/lighttpd.conf
+    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2.conf
