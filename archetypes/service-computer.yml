@@ -1,6 +1,6 @@
 
   e2-computer-{{ .AddressDashed }}:
-    image: einar2:latest
+    image: tvillega/einar2:latest
     container_name: e2-computer-{{ .AddressDashed }}
     entrypoint: /computer/entrypoint.sh
     stdin_open: true

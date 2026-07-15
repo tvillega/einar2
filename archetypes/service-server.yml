@@ -1,6 +1,6 @@
 
   e2-server-{{ .AddressDashed }}:
-    image: einar2:latest
+    image: tvillega/einar2:latest
     container_name: e2-server-{{ .AddressDashed }}
     entrypoint: /server/entrypoint.sh
     stdin_open: true
