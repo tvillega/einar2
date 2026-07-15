@@ -1,9 +1,5 @@
 FROM localhost:5000/einar2:latest
 
-EXPOSE 80
-
-COPY index.php  /www/index.php
-
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
