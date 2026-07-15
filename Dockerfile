@@ -36,6 +36,11 @@ COPY config/entrypoint-computer.sh /computer/entrypoint.sh
 
 RUN chown -R lighttpd:lighttpd /einar2 /server/www /var/lib/php/sessions
 
-EXPORT 80
+RUN curl -L https://github.com/chevdor/tera-cli/releases/download/v0.5.1/tera-cli-x86_64-unknown-linux-musl.tar.gz | tar xzf -
+RUN mv tera /usr/local/bin/
+
+EXPOSE 80
+
+RUN chmod +x /einar2/entrypoint.sh /server/entrypoint.sh /router/entrypoint.sh /computer/entrypoint.sh
 
 ENTRYPOINT ["/einar2/entrypoint.sh"]
