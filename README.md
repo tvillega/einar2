@@ -26,29 +26,23 @@ services:
     entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2-website.conf
 ```
 
+Now you can go to `localhost` or `127.0.0.1:80` on your web browser to start using Einar2.
+
 ## Development Environment
 
 The following instructions will guide you on how to deploy the project locally,
 build custom einar2 images and push the limits on how much a laboratory can do.
 
-(Optional) Create an alias:
+Start a local registry on your computer:
 
 ```
-alias e2='./einar2'
+einar2 run up registry
 ```
 
-Do notice that `sudo` won't have this alias available.
-
-Setup a local registry on your computer:
+Build the `einar2` image and tag it as local at the same time:
 
 ```
-e2 run up registry
-```
-
-Build the `einar2` image:
-
-```
-docker build -t localhost:5000/einar2 build/einar2
+docker build -t localhost:5000/einar2 .
 ```
 
 Save the image to the local registry:
@@ -57,15 +51,16 @@ Save the image to the local registry:
 docker push localhost:5000/einar2
 ```
 
-Now you can edit and rebuild all the `e2-*` images without rate limiting the official docker registry.
+Now you can make folders under `build/` to create new kinds of machines, the default machines are provided as examples..
+Remember to always use `localhost:5000/einar2` for the base image, that will query your local registry.
 
-Consulta the CLI usage by running:
+Learn more about the CLI by running:
 
 ```
-e2
+einar2
 ```
 
-### Network Namespaces
+## Network Namespaces
 
 Docker saves its network namespaces in `/run/docker/netns`, separated to the system's `/run/netns`.
 Einar2 provides a utility to attach those namespaces to your system.
@@ -80,7 +75,7 @@ lsns -t net
 Knowing that, you can now let einar2 attach them to your system:
 
 ```
-e2 run util netns-attach
+einar2 run util netns-attach
 ```
 
 List the network namespaces again and you'll find that each of them now has as alias the container's name:
@@ -105,7 +100,7 @@ nsenter --net=/run/netns/<container-name> <command>
 To detach the network namespaces of your host, run the following einar2 utility:
 
 ```
-e2 run util netns-detach
+einar2 run util netns-detach
 ```
 
 If you don't do this before spinning down the containers, the network namespaces will linger on your system.
