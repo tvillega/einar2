@@ -1,7 +1,8 @@
 
   e2-router-{{ .AddressDashed }}:
-    image: e2-router:latest
+    image: einar2:latest
     container_name: e2-router-{{ .AddressDashed }}
+    entrypoint: /router/entrypoint.sh
     stdin_open: true
     tty: true
     cap_add:

@@ -1,7 +1,8 @@
 
   e2-server-{{ .AddressDashed }}:
-    image: e2-server:latest
+    image: einar2:latest
     container_name: e2-server-{{ .AddressDashed }}
+    entrypoint: /server/entrypoint.sh
     stdin_open: true
     tty: true
     cap_add:

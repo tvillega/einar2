@@ -1,5 +1,4 @@
 include:
-  - ../../compose/docker-compose-machines.yml  {# Builds the computer, server & router machines #}
   - docker-compose-networks.yml                {# Networks of the laboratory on a different file #}
 
 services:
