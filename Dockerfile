@@ -34,7 +34,7 @@ COPY config/entrypoint-server.sh   /server/entrypoint.sh
 COPY config/entrypoint-router.sh   /router/entrypoint.sh
 COPY config/entrypoint-computer.sh /computer/entrypoint.sh
 
-RUN chown -R lighttpd:lighttpd /einar2/www /server/www /var/lib/php/sessions
+RUN chown -R lighttpd:lighttpd /einar2 /server/www /var/lib/php/sessions
 
 EXPORT 80
 
