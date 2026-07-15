@@ -22,7 +22,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./labs:/labs
+      - ./labs:/einar2/labs
     entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2.conf
 ```
 
