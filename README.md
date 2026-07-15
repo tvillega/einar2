@@ -23,7 +23,7 @@ services:
       - "80:80"
     volumes:
       - ./labs:/labs
-    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2-website.conf
+    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2.conf
 ```
 
 Now you can go to `localhost` or `127.0.0.1:80` on your web browser to start using Einar2.
