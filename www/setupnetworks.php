@@ -1,5 +1,7 @@
 <?php
 
+$validForm = true;
+
 $labName           = $_GET['laboratory'];
 $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $labName);
 $labPath           = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName;
@@ -170,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <?php
                     $key = "switch" . $i;
-                    $validForm = true;
+
                 ?>
 
                 <p>Switch <?php echo $i; ?></p>
