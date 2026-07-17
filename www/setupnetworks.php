@@ -150,6 +150,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div style="padding-top: 15px;">
             <button type="submit">Submit</button>
+            <?php
+                $networksFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/networks.json';
+                if (file_exists($networksFile)) {
+                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load from file)" . "</a>";
+                }
+            ?>
         </div>
     </form>
 
