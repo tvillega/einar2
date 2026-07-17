@@ -105,6 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Setup <?php echo $labData['lab_name']; ?> networks</h1>
         <?php endif; ?>
 
+        <h2>Step 2 of 4</h2>
+
         <?php for ($i = 1; $i <= $switchesNumber; $i++): ?>
             <fieldset>
                 <legend>Switch<?php echo $i; ?></legend>

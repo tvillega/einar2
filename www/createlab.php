@@ -52,6 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Create a new lab</title>
     <style>
+        body {
+            padding: 20px;
+        }
         .form-table {
             display: table;
             margin-bottom: 15px;
