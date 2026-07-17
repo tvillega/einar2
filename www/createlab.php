@@ -97,7 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="routers">Number of routers:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="number" id="routers" name="routers" min="0" required>
+                    <input type="number" id="routers" name="routers" min="0"
+                           value="<?php echo $labDataExists ? htmlspecialchars($labData['routers']) : ''; ?>"
+                           required>
                 </div>
             </div>
 
@@ -106,7 +108,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="servers">Number of servers:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="number" id="servers" name="servers" min="0" required>
+                    <input type="number" id="servers" name="servers" min="0"
+                           value="<?php echo $labDataExists ? htmlspecialchars($labData['servers']) : ''; ?>"
+                           required>
                 </div>
             </div>
 
@@ -115,7 +119,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="computers">Number of computers:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="number" id="computers" name="computers" min="0" required>
+                    <input type="number" id="computers" name="computers" min="0"
+                           value="<?php echo $labDataExists ? htmlspecialchars($labData['computers']) : ''; ?>"
+                           required>
                 </div>
             </div>
 
@@ -124,7 +130,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="switches">Number of switches:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="number" id="switches" name="switches" min="0" required>
+                    <input type="number" id="switches" name="switches" min="0"
+                           value="<?php echo $labDataExists ? htmlspecialchars($labData['switches']) : ''; ?>"
+                           required>
                 </div>
             </div>
 
