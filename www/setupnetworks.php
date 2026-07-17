@@ -243,11 +243,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             |
         <a href="/index.php">Home</a>
         <?php if ($queryStringSet && $validForm): ?>
-            | <a href="/setupservices.php<?php echo $queryString; ?>">Next (Setup Services)</a>
+            | <a href="/setupinterfaces.php<?php echo $queryString; ?>">Next (Setup Interfaces)</a>
         <?php elseif (!$validForm): ?>
-            | <span style="color: gray; cursor: not-allowed;" title="One or more fields are not valid">Next (Setup Services)</span>
+            | <span style="color: gray; cursor: not-allowed;" title="One or more fields are not valid">Next (Setup Interfaces)</span>
         <?php else: ?>
-            | <span style="color: gray; cursor: not-allowed;" title="Submit networks fist">Next (Setup Services)</span>
+            | <span style="color: gray; cursor: not-allowed;" title="Submit networks fist">Next (Setup Interfaces)</span>
         <?php endif; ?>
     </div>
 
