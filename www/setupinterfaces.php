@@ -26,7 +26,7 @@ if (file_exists($networksPath)) {
   die("Error: Laboratory networks have not been created or initialized.");
 }
 
-$labInterfacesExists = false;
+$labServicesExists = false;
 $queryStringSet      = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     die("Error: Laboratory has not been created or initialized.");
   }
 
-  $interfaces = [];
+  $services = [];
 
   /* Retrieve routers data */
 
@@ -64,11 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $routers[$formKey] = [
           "name"       => $name,
-          "if_number"  => $if_number
+          "if_number"  => $if_number,
+          "if_list"    => []
         ];
       }
     }
-    $interfaces['routers'] = $routers;
+    $services['routers'] = $routers;
   }
 
   /* Retrieve servers data */
@@ -87,11 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $servers[$formKey] = [
           "name"       => $name,
-          "if_number"  => $if_number
+          "if_number"  => $if_number,
+          "if_list"    => []
         ];
       }
     }
-    $interfaces['servers'] = $servers;
+    $services['servers'] = $servers;
   }
 
   /* Retrieve computers data */
@@ -110,14 +112,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $computers[$formKey] = [
           "name"       => $name,
-          "if_number"  => $if_number
+          "if_number"  => $if_number,
+          "if_list"    => []
         ];
       }
     }
-    $interfaces['computers'] = $computers;
+    $services['computers'] = $computers;
   }
 
-  file_put_contents($labDir . '/interfaces.json', json_encode($interfaces, JSON_PRETTY_PRINT));
+  file_put_contents($labDir . '/services.json', json_encode($services, JSON_PRETTY_PRINT));
 
   /* Redirect to myself */
   header("Location: " . $_SERVER['PHP_SELF'] . "?laboratory=" . urlencode($labNameNormalized) . "&submitted");
@@ -125,11 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else if (isset($_GET['laboratory']) && isset($_GET['submitted'])) {
 
   $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $_GET['laboratory']);
-  $jsonPath          = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/interfaces.json';
+  $jsonPath          = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
 
   if (file_exists($jsonPath)) {
-    $labInterfacesExists = true;
-    $labInterfaces       = json_decode(file_get_contents($jsonPath), true);
+    $labServicesExists = true;
+    $labServices       = json_decode(file_get_contents($jsonPath), true);
     $queryStringSet      = true;
     $queryString         = '?laboratory=' . urlencode($labNameNormalized);
   }
@@ -187,8 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="router_name_<?php echo $i; ?>">Name:</label>
                     <input type="text"
                            value="<?php
-                                      echo ($labInterfacesExists && isset($labInterfaces['routers']['router' . $i]['name']))
-                                          ? htmlspecialchars($labInterfaces['routers']['router' . $i]['name'])
+                                      echo ($labServicesExists && isset($labServices['routers']['router' . $i]['name']))
+                                          ? htmlspecialchars($labServices['routers']['router' . $i]['name'])
                                           : '';
                                   ?>"
                            id="router_name_<?php echo $i; ?>"
@@ -203,8 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             required>
 
                     <?php
-                        $savedInterface = ($labInterfacesExists && isset($labInterfaces['routers']['router' . $i]['if_number']))
-                            ? $labInterfaces['routers']['router' . $i]['if_number']
+                        $savedInterface = ($labServicesExists && isset($labServices['routers']['router' . $i]['if_number']))
+                            ? $labServices['routers']['router' . $i]['if_number']
                             : null;
                     ?>
 
@@ -239,8 +242,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="server_name_<?php echo $i; ?>">Name:</label>
                     <input type="text"
                            value="<?php
-                                      echo ($labInterfacesExists && isset($labInterfaces['servers']['server' . $i]['name']))
-                                          ? htmlspecialchars($labInterfaces['servers']['server' . $i]['name'])
+                                      echo ($labServicesExists && isset($labServices['servers']['server' . $i]['name']))
+                                          ? htmlspecialchars($labServices['servers']['server' . $i]['name'])
                                           : '';
                                   ?>"
                            id="server_name_<?php echo $i; ?>"
@@ -255,8 +258,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             required>
 
                     <?php
-                        $savedInterface = ($labInterfacesExists && isset($labInterfaces['servers']['server' . $i]['if_number']))
-                            ? $labInterfaces['servers']['server' . $i]['if_number']
+                        $savedInterface = ($labServicesExists && isset($labServices['servers']['server' . $i]['if_number']))
+                            ? $labServices['servers']['server' . $i]['if_number']
                             : null;
                     ?>
 
@@ -291,8 +294,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="computer_name_<?php echo $i; ?>">Name:</label>
                     <input type="text"
                            value="<?php
-                                      echo ($labInterfacesExists && isset($labInterfaces['computers']['computer' . $i]['name']))
-                                          ? htmlspecialchars($labInterfaces['computers']['computer' . $i]['name'])
+                                      echo ($labServicesExists && isset($labServices['computers']['computer' . $i]['name']))
+                                          ? htmlspecialchars($labServices['computers']['computer' . $i]['name'])
                                           : '';
                                   ?>"
                            id="computer_name_<?php echo $i; ?>"
@@ -307,8 +310,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             required>
 
                     <?php
-                        $savedInterface = ($labInterfacesExists && isset($labInterfaces['computers']['computer' . $i]['if_number']))
-                            ? $labInterfaces['computers']['computer' . $i]['if_number']
+                        $savedInterface = ($labServicesExists && isset($labServices['computers']['computer' . $i]['if_number']))
+                            ? $labServices['computers']['computer' . $i]['if_number']
                             : null;
                     ?>
 
@@ -333,20 +336,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div style="padding-top: 15px;">
             <button type="submit">Submit</button>
             <?php
-                $interfacesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/interfaces.json';
+                $interfacesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
                 if (file_exists($interfacesFile)) {
                     echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load from file)" . "</a>";
                 }
             ?>
         </div>
+        <?php
+            $interfacesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
+            if (file_exists($interfacesFile) && $labServicesExists) {
+                echo '<div style="padding-top: 10px;">';
+                echo '    <strong style="color:chocolate;">Warning: Submitting new configurations will undo changes made on the services editor (step 4).</strong>';
+                echo '</div>';
+        }
+        ?>
+        <div style="padding-top: 10px;">
+            <?php>
+        </div>
     </form>
 
-    <?php if ($labInterfacesExists): ?>
+    <?php if ($labServicesExists): ?>
 
         <h2>Interfaces loaded</h2>
         <p>The following configuration has been saved. To update its values, fill the form and submit it again.</p>
 
-        <?php for ($i = 1; $i <= sizeof($labInterfaces['routers']); $i++): ?>
+        <?php for ($i = 1; $i <= sizeof($labServices['routers']); $i++): ?>
 
             <hr>
             <div id="results_routers">
@@ -360,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Name:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labInterfaces['routers'][$key]['name']); ?>
+                            <?php echo htmlspecialchars($labServices['routers'][$key]['name']); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php echo '<strong style="color:green";>OK</strong>' ?>
@@ -373,11 +387,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Interfaces:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labInterfaces['routers'][$key]['if_number']); ?>
+                            <?php echo htmlspecialchars($labServices['routers'][$key]['if_number']); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if ($labInterfaces['routers'][$key]['if_number'] == 0) {
+                                if ($labServices['routers'][$key]['if_number'] == 0) {
                                   echo '<strong style="color:chocolate;">DEFAULT</strong>';
                                 } else {
                                   echo '<strong style="color:green;">OK</strong>';
@@ -389,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php endfor; ?>
 
-        <?php for ($i = 1; $i <= sizeof($labInterfaces['servers']); $i++): ?>
+        <?php for ($i = 1; $i <= sizeof($labServices['servers']); $i++): ?>
 
             <hr>
             <div id="results_servers">
@@ -403,7 +417,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Name:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labInterfaces['servers'][$key]['name']); ?>
+                            <?php echo htmlspecialchars($labServices['servers'][$key]['name']); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php echo '<strong style="color:green";>OK</strong>' ?>
@@ -416,11 +430,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Interfaces:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labInterfaces['servers'][$key]['if_number']); ?>
+                            <?php echo htmlspecialchars($labServices['servers'][$key]['if_number']); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if ($labInterfaces['servers'][$key]['if_number'] == 0) {
+                                if ($labServices['servers'][$key]['if_number'] == 0) {
                                   echo '<strong style="color:chocolate;">DEFAULT</strong>';
                                 } else {
                                   echo '<strong style="color:green;">OK</strong>';
@@ -432,7 +446,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php endfor; ?>
 
-        <?php for ($i = 1; $i <= sizeof($labInterfaces['computers']); $i++): ?>
+        <?php for ($i = 1; $i <= sizeof($labServices['computers']); $i++): ?>
 
             <hr>
             <div id="results_computers">
@@ -446,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Name:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labInterfaces['computers'][$key]['name']); ?>
+                            <?php echo htmlspecialchars($labServices['computers'][$key]['name']); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php echo '<strong style="color:green";>OK</strong>' ?>
@@ -459,11 +473,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Interfaces:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labInterfaces['computers'][$key]['if_number']); ?>
+                            <?php echo htmlspecialchars($labServices['computers'][$key]['if_number']); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if ($labInterfaces['computers'][$key]['if_number'] == 0) {
+                                if ($labServices['computers'][$key]['if_number'] == 0) {
                                   echo '<strong style="color:chocolate;">DEFAULT</strong>';
                                 } else {
                                   echo '<strong style="color:green;">OK</strong>';
