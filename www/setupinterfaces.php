@@ -410,7 +410,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <?php $key = "server" . $i; ?>
 
-                <p>Router <?php echo $i; ?></p>
+                <p>Server <?php echo $i; ?></p>
 
                 <div style="display: table; width: 30%;">
 
@@ -453,7 +453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <?php $key = "computer" . $i; ?>
 
-                <p>Router <?php echo $i; ?></p>
+                <p>Computer <?php echo $i; ?></p>
 
                 <div style="display: table; width: 30%;">
 
