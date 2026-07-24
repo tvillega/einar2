@@ -1,72 +1,58 @@
 <?php
 
-$validForm = true;
-
-$labName           = $_GET['laboratory'];
-$labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $labName);
-$labPath           = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName;
-$labDataFile       = $labPath . "/lab.json";
-
-$jsonRaw = file_get_contents($labDataFile);
-$labData = json_decode($jsonRaw, true);
-
-$switchesNumber = $labData['switches'];
-
+/* Global variables */
+$validForm         = true;
 $labNetworksExists = false;
 $queryStringSet    = false;
+$queryString       = null;
+
+/* Laboratory configurations */
+$labName           = $_GET['laboratory'];
+$labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $labName);
+$labPath           = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized;
+$labFile           = $labPath . "/lab.json";
+$jsonRaw           = file_get_contents($labFile);
+$labData           = json_decode($jsonRaw, true);
+
+$switchesNumber = $labData['switches']-1;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  $labName           = $_GET['laboratory'] ?? '';
-  $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $labName);
-  $labDir            = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized;
+  $queryStringSet = true;
+  $queryString    = '?laboratory=' . urlencode($labNameNormalized);
 
-  $jsonPath          = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/lab.json';
-
-  if (file_exists($jsonPath)) {
-    $labDataExists  = true;
-    $labData        = json_decode(file_get_contents($jsonPath), true);
-    $queryStringSet = true;
-    $queryString    = '?laboratory=' . urlencode($labNameNormalized);
-  } else {
-    die("Error: Laboratory has not been created or initialized.");
-  }
-
-  $switchesNumber = $labData['switches'];
   $networks = [];
 
-  for ($i = 1; $i <= $switchesNumber; $i++) {
+  for ($i = 0; $i <= $switchesNumber; $i++) {
 
-    $formKey = "switch" . $i;
-    if (isset($_POST[$formKey])) {
-      $prefix  = trim($_POST[$formKey]['prefix']  ?? '');
-      $mask    = trim($_POST[$formKey]['mask']    ?? '');
-      $gateway = trim($_POST[$formKey]['gateway'] ?? '');
+    $switch = "switch" . $i;
+    if (isset($_POST[$switch])) {
+      $network = trim($_POST[$switch]['network'] ?? '');
+      $mask    = trim($_POST[$switch]['mask']    ?? '');
+      $gateway = trim($_POST[$switch]['gateway'] ?? '');
 
-      $networks[$formKey] = [
-        "prefix"  => $prefix,
+      $networks[$switch] = [
+        "network" => $network,
         "mask"    => $mask,
         "gateway" => $gateway
       ];
     }
   }
 
-  file_put_contents($labDir . '/networks.json', json_encode($networks, JSON_PRETTY_PRINT));
+  file_put_contents($labPath . '/networks.json', json_encode($networks, JSON_PRETTY_PRINT));
 
   /* Redirect to myself */
   header("Location: " . $_SERVER['PHP_SELF'] . "?laboratory=" . urlencode($labNameNormalized) . "&submitted");
 
-} else if (isset($_GET['laboratory']) && isset($_GET['submitted'])) {
+} else if (isset($_GET['submitted'])) {
 
-  $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $_GET['laboratory']);
-  $jsonPath          = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/networks.json';
+  $jsonFile          = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/networks.json';
+  $jsonRaw           = file_get_contents($jsonFile, true);
+  $networksData      = json_decode($jsonRaw, true);
 
-  if (file_exists($jsonPath)) {
-    $labNetworksExists  = true;
-    $labNetworks        = json_decode(file_get_contents($jsonPath), true);
-    $queryStringSet     = true;
-    $queryString        = '?laboratory=' . urlencode($labNameNormalized);
-  }
+  $queryStringSet    = true;
+  $queryString       = '?laboratory=' . urlencode($labNameNormalized);
+  $labNetworksExists = true;
 
 }
 ?>
@@ -99,56 +85,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Send POST with form data to myself (executes the code at the top)  -->
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?laboratory=" . $_GET['laboratory']; ?>" method="post">
 
+        <?php
+            $labDataName = $labData['lab_name'];
+        ?>
+
         <?php if ($queryStringSet): ?>
-            <h1>Editing <?php echo $labData['lab_name']; ?> networks</h1>
+            <h1>Editing <?php echo $labDataName ?> networks</h1>
         <?php else: ?>
-            <h1>Setup <?php echo $labData['lab_name']; ?> networks</h1>
+            <h1>Setup <?php echo $labDataName; ?> networks</h1>
         <?php endif; ?>
 
         <h2>Step 2 of 4</h2>
 
-        <?php for ($i = 1; $i <= $switchesNumber; $i++): ?>
+        <?php for ($i = 0; $i <= $switchesNumber; $i++): ?>
             <fieldset>
-                <legend>Switch<?php echo $i; ?></legend>
-                
+
+                <?php
+                    $switch                = "switch" . $i;
+
+                    $netTagLabelAttrFor    = "network" . $i;
+                    $netTagInputAttrValue  = ($labNetworksExists && isset($networksData[$switch]['network']))
+                                                ? htmlspecialchars($networksData[$switch]['network'])
+                                                : '';
+                    $netTagInputAttrName   = $switch . "[network]";
+
+                    $maskTagLabelAttrFor   = "mask" . $i;
+                    $maskTagInputAttrValue = ($labNetworksExists && isset($networksData[$switch]['mask']))
+                                                ? htmlspecialchars($networksData[$switch]['mask'])
+                                                : '';
+                    $maskTagInputAttrName  = $switch . "[mask]";
+
+                    $gwTagLabelAttrFor     = "gateway" . $i;
+                    $gwTagInputAttrValue   = ($labNetworksExists && isset($networksData[$switch]['gateway']))
+                                                ? htmlspecialchars($networksData[$switch]['gateway'])
+                                                : '';
+                    $gwTagInputAttrName    = $switch . "[gateway]";
+                ?>
+
+                <legend><?php echo $switch; ?></legend>
+
                 <div class="form-group">
-                    <label for="prefix_<?php echo $i; ?>">Prefix:</label>
+                    <label for="<?php echo $netTagLabelAttrFor; ?>">Network:</label>
                     <input type="text"
-                           value="<?php
-                                      echo ($labNetworksExists && isset($labNetworks['switch' . $i]['prefix']))
-                                          ? htmlspecialchars($labNetworks['switch' . $i]['prefix'])
-                                          : '';
-                                  ?>"
-                           id="prefix_<?php echo $i; ?>"
-                           name="switch<?php echo $i; ?>[prefix]"
+                           value="<?php echo $netTagInputAttrValue; ?>"
+                           id="<?php echo $netTagLabelAttrFor; ?>"
+                           name="<?php echo $netTagInputAttrName; ?>"
                            required>
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="mask_<?php echo $i; ?>">Mask:</label>
+                    <label for="<?php echo $maskTagLabelAttrFor; ?>">Mask:</label>
                     <input type="text"
-                           value="<?php
-                                      echo ($labNetworksExists && isset($labNetworks['switch' . $i]['mask']))
-                                          ? htmlspecialchars($labNetworks['switch' . $i]['mask'])
-                                          : '';
-                                  ?>"
-                           id="mask_<?php echo $i; ?>"
-                           name="switch<?php echo $i; ?>[mask]"
+                           value="<?php echo $maskTagInputAttrValue; ?>"
+                           id="<?php echo $maskTagLabelAttrFor; ?>"
+                           name="<?php echo $maskTagInputAttrName; ?>"
                            required>
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="gateway_<?php echo $i; ?>">Gateway:</label>
+                    <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
                     <input type="text"
-                           value="<?php
-                                      echo ($labNetworksExists && isset($labNetworks['switch' . $i]['gateway']))
-                                          ? htmlspecialchars($labNetworks['switch' . $i]['gateway'])
-                                          : '';
-                                  ?>"
-                           id="gateway_<?php echo $i; ?>"
-                           name="switch<?php echo $i; ?>[gateway]"
+                           value="<?php echo $gwTagInputAttrValue; ?>"
+                           id="<?php echo $gwTagLabelAttrFor; ?>"
+                           name="<?php echo $gwTagInputAttrName; ?>"
                            required>
                 </div>
+
             </fieldset>
         <?php endfor; ?>
 
@@ -157,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php
                 $networksFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/networks.json';
                 if (file_exists($networksFile)) {
-                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load from file)" . "</a>";
+                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load saved configuration)" . "</a>";
                 }
             ?>
         </div>
@@ -168,13 +170,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Networks loaded</h2>
         <p>The following configuration has been saved. To update its values, fill the form and submit it again.</p>
 
-        <?php for ($i = 1; $i <= sizeof($labNetworks); $i++): ?>
+        <?php for ($i = 0; $i <= $switchesNumber; $i++): ?>
             <hr>
             <div id="results">
 
                 <?php
-                    $key = "switch" . $i;
-
+                    $switch      = "switch" . $i;
+                    $networkNet  = $networksData[$switch]['network'];
+                    $networkMask = $networksData[$switch]['mask'];
+                    $networkGw   = $networksData[$switch]['gateway'];
                 ?>
 
                 <p>Switch <?php echo $i; ?></p>
@@ -182,13 +186,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div style="display: table; width: 30%;">
 
                     <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Prefix:</div>
+                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Network:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labNetworks[$key]['prefix']); ?>
+                            <?php echo htmlspecialchars($networkNet); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if (filter_var($labNetworks[$key]['prefix'], FILTER_VALIDATE_IP)) {
+                                if (filter_var($networkNet, FILTER_VALIDATE_IP)) {
                                     echo '<strong style="color:green";>OK</strong>';
                                 } else {
                                     echo '<strong style="color:red;">Invalid</strong>';
@@ -201,11 +205,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Mask:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labNetworks[$key]['mask']); ?>
+                            <?php echo htmlspecialchars($networkMask); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if ($labNetworks[$key]['mask'] < 0 || $labNetworks[$key]['mask'] > 32) {
+                                if ($networkMask < 0 || $networkMask > 32) {
                                     echo '<strong style="color:red;">Invalid</strong>';
                                     $validForm = false;
                                 } else {
@@ -219,11 +223,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Gateway:</div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($labNetworks[$key]['gateway']); ?>
+                            <?php echo htmlspecialchars($networkGw); ?>
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if (filter_var($labNetworks[$key]['gateway'], FILTER_VALIDATE_IP)) {
+                                if (filter_var($networkGw, FILTER_VALIDATE_IP)) {
                                     echo '<strong style="color:green;">OK</strong>';
                                 } else {
                                     echo '<strong style="color:red;">Invalid</strong>';
