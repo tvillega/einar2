@@ -23,7 +23,7 @@ check_dir() {
 
 edit_services() {
   check_dir "services" "${1-}"
-  $EDITOR "${1%%/}/docker-compose-services.yml"
+  $EDITOR "${1%%/}/docker-compose.yml"
 }
 
 edit_networks() {

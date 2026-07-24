@@ -34,7 +34,7 @@ Edits the section of a laboratory.
   <lab> is a relative directory with the following structure:
 
        XX-labname
-       ├── docker-compose-services.yml
+       ├── docker-compose.yml
        └── docker-compose-networks.yml
 
 Examples are provided in the labs directory.
@@ -48,14 +48,13 @@ usage: einar2 gen <archetype>
 
 Prints a service or network block from an archetype.
 
-  <archetype> := bridge   <network> <mask> <gateway>
+  <archetype> := network  <network> <mask> <gateway>
                | compose  <section>
-               | computer <address> <network>
-               | ipvlan   <network> <mask> <gateway> <subint>
+               | computer <name>
                | join-network <address> <network>
                | laboratory <name>
-               | router   <address> <network>
-               | server   <address> <network>
+               | router   <name>
+               | server   <name>
 
   <section> := services
              | networks
@@ -68,7 +67,6 @@ Prints a service or network block from an archetype.
             leading slash is ignored if present.
   <gateway> is an IPv4 address that acts as gateway,
                  the x.x.x.1 corresponds to docker's guest:host bind.
-  <subint>  is a subinterface from the eth0 interface e.g. eth0.10
 
   <section> fills compose with Einar2 custom images and networks
             to use as base for new laboratories
@@ -95,21 +93,13 @@ Run a docker command. Requires a privileged user or sudo|doas.
   <container> := registry
                | <lab>
 
-  <config> := sysctl
-
-      sysctl injects to the host system the following rules:
-
-        -> net.ipv4.conf.all.rp_filter=0
-        -> net.ipv4.conf.default.rp_filter=0
-        -> net.ipv4.ip_forward=1
-
   <section> := services
              | networks
 
   <lab> is a relative directory with the following structure:
 
        XX-labname
-       ├── docker-compose-services.yml
+       ├── docker-compose.yml
        └── docker-compose-networks.yml
 
   <utility> is a script under the utils directory, you must

@@ -5,69 +5,48 @@ IFS=$'\n\t'
 
 gen_computer() {
 
-  local address="${1-}"
-  local network="${2-}"
+  local name="${1-}"
 
-  if [[ -z "$address" || -z "$network" ]] ; then
-    echo "usage: gen computer <address> <network>"
+  if [[ -z "$name" ]] ; then
+    echo "usage: gen computer <name>"
     exit
   fi
 
-  address_dashed=$(echo $address | sed 's|\.|-|g')
-  network_dashed=$(echo $network | sed 's|\.|-|g')
-
   cat "archetypes/service-computer.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ .Address }}|$address|g" \
-    | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
-    | sed "s|{{ .Network }}|$network|g" \
-    | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
+    | sed "s|{{ Name }}|$name|g" 
 
 }
 
 gen_server() {
 
-  local address="${1-}"
-  local network="${2-}"
-  local port="${3-}"
+  local name="${1-}"
+  local port="${2-}"
 
-  if [[ -z "$address" || -z "$network" || -z "$port" ]] ; then
-    echo "usage: gen server <address> <network> <port>"
+  if [[ -z "$name" || -z "$port" ]] ; then
+    echo "usage: gen server <name> <port>"
     exit
   fi
 
-  address_dashed=$(echo $address | sed 's|\.|-|g')
-  network_dashed=$(echo $network | sed 's|\.|-|g')
-
   cat "archetypes/service-server.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ .Address }}|$address|g" \
-    | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
-    | sed "s|{{ .Port }}|$port|g" \
-    | sed "s|{{ .Network }}|$network|g" \
-    | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
+    | sed "s|{{ Name }}|$name|g" \
+    | sed "s|{{ Port }}|$port|g"
 
 }
 
 gen_router() {
 
-  local address="${1-}"
-  local network="${2-}"
+  local name="${1-}"
 
-  if [[ -z "$address" || -z "$network" ]] ; then
-    echo "usage: gen router <address> <network>"
+  if [[ -z "$name" ]] ; then
+    echo "usage: gen router <name>"
     exit
   fi
 
-  address_dashed=$(echo $address | sed 's|\.|-|g')
-  network_dashed=$(echo $network | sed 's|\.|-|g')
-
   cat "archetypes/service-router.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ .Address }}|$address|g" \
-    | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
-    | sed "s|{{ .Network }}|$network|g" \
-    | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
+    | sed "s|{{ Name }}|$name|g"
 
 }
 
@@ -86,10 +65,10 @@ join_network() {
 
   cat "archetypes/join-network.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ .Address }}|$address|g" \
-    | sed "s|{{ .AddressDashed }}|$address_dashed|g" \
-    | sed "s|{{ .Network }}|$network|g" \
-    | sed "s|{{ .NetworkDashed }}|$network_dashed|g"
+    | sed "s|{{ Address }}|$address|g" \
+    | sed "s|{{ AddressDashed }}|$address_dashed|g" \
+    | sed "s|{{ Network }}|$network|g" \
+    | sed "s|{{ NetworkDashed }}|$network_dashed|g"
 
 }
 
@@ -109,36 +88,11 @@ gen_network_bridge() {
 
   cat "archetypes/network-bridge.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ .Network }}|$network|g" \
-    | sed "s|{{ .NetworkDashed }}|$network_dashed|g" \
-    | sed "s|{{ .Mask }}|$mask_no_leading_slash|g" \
-    | sed "s|{{ .Gateway }}|$gateway|g"
+    | sed "s|{{ Network }}|$network|g" \
+    | sed "s|{{ NetworkDashed }}|$network_dashed|g" \
+    | sed "s|{{ Mask }}|$mask_no_leading_slash|g" \
+    | sed "s|{{ Gateway }}|$gateway|g"
 
-}
-
-gen_network_ipvlan() {
-
-  local network="${1-}"
-  local mask="${2-}"   
-  local gateway="${3-}"
-  local subinterface="${4-}"
-
-  if [[ -z "$network" || -z "$mask" || -z "$gateway" || -z "$subinterface" ]] ; then
-    echo "usage: gen ipvlan <network> <mask> <gateway> <subinterface>"
-    exit
-  fi
-
-  network_dashed=$(echo $network | sed 's|\.|-|g')
-  mask_no_leading_slash="${mask##/}"
-
-  cat "archetypes/network-ipvlan.yml" \
-    | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ .Network }}|$network|g" \
-    | sed "s|{{ .NetworkDashed }}|$network_dashed|g" \
-    | sed "s|{{ .Mask }}|$mask_no_leading_slash|g" \
-    | sed "s|{{ .Gateway }}|$gateway|g" \
-    | sed "s|{{ .Subinterface }}|$subinterface|g"
- 
 }
 
 gen_compose_services() {
@@ -189,7 +143,7 @@ gen_laboratory() {
 
   mkdir -p "$dir"
   echo "$(gen_compose_networks)" > "$dir/docker-compose-networks.yml"
-  echo "$(gen_compose_services)" > "$dir/docker-compose-services.yml"
+  echo "$(gen_compose_services)" > "$dir/docker-compose.yml"
 
 }
 
@@ -217,11 +171,6 @@ while [[ "$1" != "--" ]]; do case $1 in
   bridge|b|network|n)
     shift
     gen_network_bridge "${@}"
-    exit
-    ;;
-  ipvlan|v)
-    shift
-    gen_network_ipvlan "${@}"
     exit
     ;;
   compose)
