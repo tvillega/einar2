@@ -18,6 +18,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $switches  = isset($_POST['switches'])  ? (int)$_POST['switches']  : 0;
   $computers = isset($_POST['computers']) ? (int)$_POST['computers'] : 0;
 
+  if ($switches == 0) {
+    $switches = 1;
+  }
+
   $data = [
     'lab_name'            => $labName,
     'lab_dir'             => $labDir,
