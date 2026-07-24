@@ -1,7 +1,7 @@
 
-  e2-computer-{{ .AddressDashed }}:
+  e2-computer-{{ Name }}:
     image: tvillega/einar2:latest
-    container_name: e2-computer-{{ .AddressDashed }}
+    container_name: e2-computer-{{ Name }}
     entrypoint: /computer/entrypoint.sh
     stdin_open: true
     tty: true
@@ -10,7 +10,5 @@
     sysctls:
       - net.ipv4.conf.all.rp_filter=0 {# if per interface: net.ipv4.conf.ethX.rp_filter=0 #}
       - net.ipv4.conf.default.rp_filter=0
-    hostname: computer-{{ .AddressDashed }}
+    hostname: computer-{{ Name }}
     networks:
-      switch-{{ .NetworkDashed }}:
-        ipv4_address: {{ .Address }}

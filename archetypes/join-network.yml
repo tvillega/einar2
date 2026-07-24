@@ -1,2 +1,2 @@
-      switch-{{ .NetworkDashed }}:
-        ipv4_address: {{ .Address }}
+      switch-{{ NetworkDashed }}:
+        ipv4_address: {{ Address }}

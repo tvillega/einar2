@@ -1,7 +1,7 @@
 
-  e2-router-{{ .AddressDashed }}:
+  e2-router-{{ Name }}:
     image: tvillega/einar2:latest
-    container_name: e2-router-{{ .AddressDashed }}
+    container_name: e2-router-{{ Name }}
     entrypoint: /router/entrypoint.sh
     stdin_open: true
     tty: true
@@ -12,9 +12,7 @@
       - net.ipv4.conf.all.rp_filter=0 {# if per interface: net.ipv4.conf.ethX.rp_filter=0 #}
       - net.ipv4.conf.default.rp_filter=0
       {# - net.ipv4.conf.eth0.rp_filter=0 #}
-    hostname: router-{{ .AddressDashed }}
+    hostname: router-{{ Name }}
     volumes:
-      - ./e2-router-{{ .AddressDashed }}-quagga:/etc/quagga
+      - ./e2-router-{{ Name }}-quagga:/etc/quagga
     networks:
-      switch-{{ .NetworkDashed }}:
-        ipv4_address: {{ .Address }}

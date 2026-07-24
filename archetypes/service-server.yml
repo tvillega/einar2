@@ -1,7 +1,7 @@
 
-  e2-server-{{ .AddressDashed }}:
+  e2-server-{{ Name }}:
     image: tvillega/einar2:latest
-    container_name: e2-server-{{ .AddressDashed }}
+    container_name: e2-server-{{ Name }}
     entrypoint: /server/entrypoint.sh
     stdin_open: true
     tty: true
@@ -10,9 +10,7 @@
     sysctls:
       - net.ipv4.conf.all.rp_filter=0 {# if per interface: net.ipv4.conf.ethX.rp_filter=0 #}
       - net.ipv4.conf.default.rp_filter=0
-    hostname: server-{{ .AddressDashed }}
+    hostname: server-{{ Name }}
     ports:
-      - "{{ .Port }}:80"
+      - "{{ Port }}:80"
     networks:
-      switch-{{ .NetworkDashed }}:
-        ipv4_address: {{ .Address }}
