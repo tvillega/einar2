@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             : null;
                     ?>
 
-                    <?php for ($j = 0; $j <= $switchesNumber; $j++): ?>
+                    <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
 
                         <?php $isSelected = ($savedInterface !== null && $savedInterface == $j) ? 'selected' : ''; ?>
 
@@ -263,7 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             : null;
                     ?>
 
-                    <?php for ($j = 0; $j <= $switchesNumber; $j++): ?>
+                    <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
 
                         <?php $isSelected = ($savedInterface !== null && $savedInterface == $j) ? 'selected' : ''; ?>
 
@@ -315,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             : null;
                     ?>
 
-                    <?php for ($j = 0; $j <= $switchesNumber; $j++): ?>
+                    <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
 
                         <?php $isSelected = ($savedInterface !== null && $savedInterface == $j) ? 'selected' : ''; ?>
 
