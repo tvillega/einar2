@@ -2,7 +2,7 @@
 
 /* Global variables */
 $validForm         = true;
-$labServicesExists = false;
+$formSubmitted = false;
 $queryStringSet    = false;
 $queryString       = null;
 
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $queryStringSet    = true;
   $queryString       = '?laboratory=' . urlencode($labNameNormalized);
-  $labServicesExists = true;
+  $formSubmitted = true;
 
 }
 ?>
@@ -97,19 +97,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h3><?php echo $deviceTitle; ?></h3>
 
             <?php for ($i = 0; $i <= $deviceNumber-1; $i++): ?>
-                <fieldset>
+                <fieldset style="background-color: #F8F8FF;">
 
                     <?php
                         $deviceID                     = $device . $i;
 
                         $nameTagLabelAttrFor          = $device . "_name";
-                        $nameTagInputAttrValue        = ($labServicesExists && isset($servicesData[$deviceType][$deviceID]['name']))
+                        $nameTagInputAttrValue        = ($formSubmitted && isset($servicesData[$deviceType][$deviceID]['name']))
                                                             ? htmlspecialchars($servicesData[$deviceType][$deviceID]['name'])
                                                             : '';
                         $nameTagInputAttrName         = $deviceType . "[" . $deviceID . "][name]";
 
                         $ifnumberTagLabelAttrFor      = $deviceID . "_ifnumber";
-                        $ifnumberSavedValue           = ($labServicesExists && isset($servicesData[$deviceType][$deviceID]['if_number']))
+                        $ifnumberSavedValue           = ($formSubmitted && isset($servicesData[$deviceType][$deviceID]['if_number']))
                                                             ? $servicesData[$deviceType][$deviceID]['if_number']
                                                             : null;
                         $ifnumberTagInputAttrName     = $deviceType . "[" . $deviceID . "][if_number]";
@@ -157,13 +157,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php
                 $servicesFileFound = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
                 if (file_exists($servicesFileFound)) {
-                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load from file)" . "</a>";
+                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load saved configurations)" . "</a>";
                 }
             ?>
         </div>
         <?php
             $servicesFileFound = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
-            if (file_exists($servicesFileFound) && $labServicesExists) {
+            if (file_exists($servicesFileFound) && $formSubmitted) {
                 echo '<div style="padding-top: 10px;">';
                 echo '    <strong style="color:chocolate;">Warning: Submitting new configurations will undo changes made on the services editor (step 4).</strong>';
                 echo '</div>';
@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </form>
 
-    <?php if ($labServicesExists): ?>
+    <?php if ($formSubmitted): ?>
 
         <h2>Interfaces loaded</h2>
         <p>To update its values, fill the form and submit it again.</p>
