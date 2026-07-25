@@ -1,6 +1,7 @@
 <?php
 
 $queryStringSet    = false;
+$formSubmitted     = false;
 
 $labName           = $_GET['laboratory'];
 $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $labName);
@@ -39,10 +40,6 @@ $queryStringSet      = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  echo '<pre>';
-  print_r($_POST);
-  echo '</pre>';
-
   /* All output files */
   $outputComposeServicesFile = $labPath . '/docker-compose.yml';
   $outputComposeNetworksFile = $labPath . '/docker-compose-networks.yml';
@@ -54,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $archetypeDirComposeNetworks  = $archetypesDir . '/compose-networks.yml';
   $archetypeDirComposeServices  = $archetypesDir . '/compose-services.yml';
   $archetypeDirJoinNetwork      = $archetypesDir . '/join-network.yml';
+  $archetypeDirNetworkBridge    = $archetypesDir . '/network-bridge.yml';
   $archetypeDirServiceComputer  = $archetypesDir . '/service-computer.yml';
   $archetypeDirServiceRouter    = $archetypesDir . '/service-router.yml';
   $archetypeDirServiceServer    = $archetypesDir . '/service-server.yml';
@@ -75,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $archetypeVarComposeNetworks  = stripComments(file_get_contents($archetypeDirComposeNetworks));
   $archetypeVarComposeServices  = stripComments(file_get_contents($archetypeDirComposeServices));
   $archetypeVarJoinNetwork      = stripComments(file_get_contents($archetypeDirJoinNetwork));
+  $archetypeVarNetworkBridge    = stripComments(file_get_contents($archetypeDirNetworkBridge));
   $archetypeVarServiceComputer  = stripComments(file_get_contents($archetypeDirServiceComputer));
   $archetypeVarServiceRouter    = stripComments(file_get_contents($archetypeDirServiceRouter));
   $archetypeVarServiceServer    = stripComments(file_get_contents($archetypeDirServiceServer));
@@ -90,14 +89,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     string $outputFile
   ) {
 
+    $port = 8080;
+
     foreach ($devices as $device) {
-      // $serviceBlock = str_replace('{{NAME}}', $deviceName, $content);
-      file_put_contents($outputFile, $serviceBlock, FILE_APPEND);
+
+      global $networks;
+
+      $myServiceBlock = $serviceBlock;
+
+      $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
+
+      if ($deviceType == "server") {
+        $myServiceBlock = str_replace('{{ Port }}', $port, $myServiceBlock);
+        $port++;
+      }
+
+      file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
+
       $ifCount     = $device['if_number'];
       if ($ifCount != 0) {
           for ($i = 0; $i < $ifCount; $i++) {
+
+            $myServiceJoinNetwork = $serviceJoinNetwork;
+
+            $switch             = "switch" . $i;
+            $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
+            $address            = $device['if_list'][$i]['ip'];
+
+            $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
+            $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
+
             // $netBlock = str_replace('{{IF}}', $deviceIf, $content);
-            file_put_contents($outputFile, $serviceJoinNetwork, FILE_APPEND);
+            file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
           }
       }
     }
@@ -133,9 +156,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
   }
 
+  function networkBlockAppender(
+    array  $switches,
+    string $networkBlock,
+    string $outputFile
+  ) {
 
+    foreach ($switches as $switch) {
 
-  // file_put_contents($labPath . '/docker-compose.json', json_encode($compose, JSON_PRETTY_PRINT));
+      $myNetworkBlock = $networkBlock;
+
+      $dashedNetwork = str_replace('.', '-', $switch['network']);
+
+      $myNetworkBlock = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myNetworkBlock);
+      $myNetworkBlock = str_replace('{{ Network }}', $switch['network'], $myNetworkBlock);
+      $myNetworkBlock = str_replace('{{ Mask }}', $switch['mask'], $myNetworkBlock);
+      $myNetworkBlock = str_replace('{{ Gateway }}', $switch['gateway'], $myNetworkBlock);
+
+      file_put_contents($outputFile, $myNetworkBlock, FILE_APPEND);
+    }
+  }
+
+  networkBlockAppender(
+    $networks,
+    $archetypeVarNetworkBridge,
+    $outputComposeNetworksFile
+  );
 
   /* Redirect to myself */
   header("Location: " . $_SERVER['PHP_SELF'] . "?laboratory=" . urlencode($labNameNormalized) . "&submitted");
@@ -146,6 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $_GET['laboratory']);
   $outputComposeServicesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/docker-compose.yml';
   $outputComposeNetworksFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/docker-compose-networks.yml';
+  $formSubmitted = true;
 
 }
 ?>
@@ -185,15 +232,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Submit</button>
         </div>
 
+        <div style="margin-top: 15px;">
+            <a href="/setupservices.php<?php echo "?laboratory=" . $_GET['laboratory'] . "&submitted"; ?>">Previous (Edit Services)</a>
+            <a href="/index.php"> | Home</a>
+        </div>
+
+    <?php if ($formSubmitted): ?>
     <div>
-        <pre>
-<!-- <pre> captures the indentation -->
-<?php
-    echo file_get_contents($outputComposeServicesFile);
-    echo file_get_contents($outputComposeNetworksFile);
-?>
-        </pre>
+    <hr>
+    <p>Files have been saved on directory <?php echo $labPath; ?></p>
+    <div style="width: 100%; display: table;">
+        <div style="display: table-row">
+            <div style="width: 500px; display: table-cell;">
+                <h4>docker-compose.yml</h4>
+<pre>
+<?php echo file_get_contents($outputComposeServicesFile); ?>
+</pre>
+            </div>
+            <div style="display: table-cell;">
+                <h4>docker-compose-networks.yml</h4>
+<pre>
+<?php echo file_get_contents($outputComposeNetworksFile); ?>
+</pre>
+            </div>
+        </div>
     </div>
+    <?php endif; ?>
 
 
 </body>
