@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/ip_in_range.php';
+
 /* Global variables */
 $validForm         = true;
 $labNetworksExists = false;
@@ -179,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $networkNet  = $networksData[$switch]['network'];
                     $networkMask = $networksData[$switch]['mask'];
                     $networkGw   = $networksData[$switch]['gateway'];
+                    $networkCidr = $networkNet . "/" . $networkMask;
                 ?>
 
                 <p>Switch <?php echo $i; ?></p>
@@ -227,11 +230,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
-                                if (filter_var($networkGw, FILTER_VALIDATE_IP)) {
-                                    echo '<strong style="color:green;">OK</strong>';
-                                } else {
+                                if (!filter_var($networkGw, FILTER_VALIDATE_IP)) {
                                     echo '<strong style="color:red;">Invalid</strong>';
                                     $validForm = false;
+                                } else if (!ipv4_in_range($networkGw,$networkCidr)) {
+                                    echo '<strong style="color:red;">Failed</strong>';
+                                    $validForm = false;
+                                } else {
+                                    echo '<strong style="color:green;">OK</strong>';
                                 }
                             ?>
                         </div>
