@@ -4,7 +4,7 @@ require __DIR__ . '/ip_in_range.php';
 
 /* Global variables */
 $validForm         = true;
-$formSubmitted       = false;
+$formSubmitted     = false;
 $queryStringSet    = false;
 $queryString       = null;
 
