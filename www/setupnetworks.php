@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 if (filter_var($networkNet, FILTER_VALIDATE_IP)) {
                                     echo '<strong style="color:green";>OK</strong>';
                                 } else {
-                                    echo '<strong style="color:red;">Invalid</strong>';
+                                    echo '<strong style="color:red;">INVALID</strong>';
                                     $validForm = false;
                                 }
                             ?>
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
                                 if ($networkMask < 0 || $networkMask > 32) {
-                                    echo '<strong style="color:red;">Invalid</strong>';
+                                    echo '<strong style="color:red;">INVALID</strong>';
                                     $validForm = false;
                                 } else {
                                     echo '<strong style="color:green;">OK</strong>';
@@ -231,10 +231,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div style="display: table-cell; padding: 5px; width: 30%">
                             <?php
                                 if (!filter_var($networkGw, FILTER_VALIDATE_IP)) {
-                                    echo '<strong style="color:red;">Invalid</strong>';
+                                    echo '<strong style="color:red;">INVALID</strong>';
                                     $validForm = false;
                                 } else if (!ipv4_in_range($networkGw,$networkCidr)) {
-                                    echo '<strong style="color:red;">Failed</strong>';
+                                    echo '<strong style="color:red;">FAILED</strong>';
                                     $validForm = false;
                                 } else {
                                     echo '<strong style="color:green;">OK</strong>';
