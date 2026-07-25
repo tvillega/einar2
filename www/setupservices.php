@@ -2,98 +2,46 @@
 
 require __DIR__ . '/ip_in_range.php';
 
+/* Global variables */
 $validForm         = true;
+$formSubmitted       = false;
 $queryStringSet    = false;
+$queryString       = null;
 
+/* Laboratory configurations */
 $labName           = $_GET['laboratory'];
 $labNameNormalized = preg_replace('/[^a-zA-Z0-9-]/', '_', $labName);
-$labPath           = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName;
-$labDataFile       = $labPath . "/lab.json";
+$labPath           = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized;
+$labFile           = $labPath . "/lab.json";
+$jsonRaw           = file_get_contents($labFile);
+$labData           = json_decode($jsonRaw, true);
 
-if (file_exists($labDataFile)) {
-  $jsonRaw = file_get_contents($labDataFile);
-  $labData = json_decode($jsonRaw, true);
-} else {
-  die("Error: Laboratory has not been created or initialized.");
-}
+$deviceCount             = [];
+$deviceCount['router']   = $labData['routers'];
+$deviceCount['server']   = $labData['servers'];
+$deviceCount['computer'] = $labData['computers'];
 
-$routersNumber   = $labData['routers'];
-$serversNumber   = $labData['servers'];
-$computersNumber = $labData['computers'];
-$switchesNumber  = $labData['switches'];
+$switchesNumber          = $labData['switches'];
 
 $networksPath    = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName . '/networks.json';
 $servicesPath    = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName . '/services.json';
 
-if (file_exists($networksPath)) {
-  $networks = json_decode(file_get_contents($networksPath), true);
-} else {
-  die("Error: Laboratory networks have not been created or initialized.");
-}
+$networks = json_decode(file_get_contents($networksPath), true);
+$services = json_decode(file_get_contents($servicesPath), true);
 
-if (file_exists($servicesPath)) {
-  $services = json_decode(file_get_contents($servicesPath), true);
-} else {
-  die("Error: Laboratory services have not been created or initialized.");
-}
-
-$formSubmitted       = false;
-$queryStringSet      = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  echo '<pre>';
-  print_r($_POST);
-  echo '</pre>';
+  // echo '<pre>';
+  // print_r($_POST);
+  // echo '</pre>';
 
-  /* Update routers data */
+  /* Retrieve devices data */
 
-  $routersNumber   = $labData['routers'];
-
-  if ($routersNumber != 0) {
-
-    for ($i = 1; $i <= $routersNumber; $i++) {
-
-      $key = "router" . $i;
-      $if_number = $services['routers'][$key]['if_number'];
-
-      if (($if_number != 0) && (isset($_POST[$key]['if_list']))) {
-          $services["routers"][$key]['if_list'] = $_POST[$key]['if_list'];
-      }
-    }
-  }
-
-  /* Update servers data */
-
-  $serversNumber   = $labData['servers'];
-
-  if ($serversNumber != 0) {
-
-    for ($i = 1; $i <= $serversNumber; $i++) {
-
-      $key = "server" . $i;
-      $if_number = $services['servers'][$key]['if_number'];
-
-      if (($if_number != 0) && (isset($_POST[$key]['if_list']))) {
-        $services["servers"][$key]['if_list'] = $_POST[$key]['if_list'];
-      }
-    }
-  }
-
-  /* Update computers data */
-
-  $computersNumber   = $labData['computers'];
-
-  if ($computersNumber != 0) {
-
-    for ($i = 1; $i <= $computersNumber; $i++) {
-
-      $key = "computer" . $i;
-      $if_number = $services['computers'][$key]['if_number'];
-
-      if (($if_number != 0) && (isset($_POST[$key]['if_list']))) {
-        $services["computers"][$key]['if_list'] = $_POST[$key]['if_list'];
-      }
+  foreach (['router', 'server', 'computer'] as $device) {
+    $deviceType = $device . "s";
+    if ($deviceCount[$device] != 0 && isset($_POST[$deviceType])) {
+      $services[$deviceType] = array_replace_recursive($services[$deviceType], $_POST[$deviceType]);
     }
   }
 
@@ -145,269 +93,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Send POST with form data to myself (executes the code at the top)  -->
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?laboratory=" . $_GET['laboratory']; ?>" method="post">
 
-    <?php if ($queryStringSet): ?>
-        <h1>Editing <?php echo $labData['lab_name']; ?> services</h1>
-    <?php else: ?>
-        <h1>Setup <?php echo $labData['lab_name']; ?> services</h1>
-    <?php endif; ?>
-
+    <h1><?php echo (($queryStringSet) ? "Editing " : "Setup ") . $labData['lab_name'] . " services"; ?></h1>
     <h2>Step 4 of 4</h2>
 
-    <!-- Form for routers -->
+    <?php
+        foreach (['router', 'server', 'computer'] as $device):
 
-    <?php if ($routersNumber != 0): ?>
+          $deviceNumber = isset($deviceCount[$device]) ? $deviceCount[$device] : 0;
 
-        <h3>Routers</h3>
+          if ($deviceNumber != 0):
 
-        <?php for ($i = 1; $i <= $routersNumber; $i++): ?>
-            <fieldset>
-                <legend>Router <?php echo $i; ?></legend>
+            $deviceType  = $device . "s";
+            $deviceTitle = ucfirst($deviceType);
+    ?>
 
-                 <?php
-                    $router                = 'router' . $i;
-                    $routerInterfaceNumber = $services['routers'][$router]['if_number']-1;
-                 ?>
+        <h3><?php echo $deviceTitle; ?></h3>
 
-                 <?php for ($j = 0; $j <= $routerInterfaceNumber; $j++): ?>
-
-                    <?php
-                        $eth = "eth" . $j;
-                    ?>
-
-                    <hr style="border: 1.3px dashed; margin: 0.1em;">
-                    <div class="form-group">
-                        <?php echo "<strong>" . $eth . "</strong>"; ?>
-                    </div>
-
-                    <!-- Selector for interfaces  -->
-
-                    <div class="form-group">
-                        <?php
-                            $ifconnTagLabelAttrFor    = $router . "_if_" . $j;
-                            $ifconnTagSelectAttrName  = $router . "[if_list][" . $j . "][if]";
-                            $ifconnTagSelectValue     = (isset($services['routers'][$router]['if_list'][$j]['if']))
-                                                          ? $services['routers'][$router]['if_list'][$j]['if']
-                                                          : null;
-                        ?>
-                        <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
-                        <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
-                                name="<?php echo $ifconnTagSelectAttrName; ?>"
-                                required>
-
-                        <?php for ($k = 0; $k <= $routerInterfaceNumber; $k++): ?>
-
-                            <?php
-                                $isSelected = ($ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
-                                $switch     = 'switch' . ($k+1);
-                                $cidr       = $networks[$switch]['prefix'] . "/" . $networks[$switch]['mask'];
-                            ?>
-
-                            <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
-                                <?php echo $cidr ?>
-                            </option>
-
-                        <?php endfor; ?>
-
-                        </select>
-                    </div>
-
-                    <!-- Input for ip -->
-
-                    <div class="form-group">
-                        <?php
-                            $ipTagLabelAttrFor   = $router . "_ip_" . $j;
-                            $ipTagInputAttrName  = $router . "[if_list][" . $j . "][ip]";
-                            $ipTagInputAttrValue = (isset($services['routers'][$router]['if_list'][$j]["ip"]))
-                                                        ? htmlspecialchars($services['routers'][$router]['if_list'][$j]["ip"])
-                                                        : '';
-                        ?>
-                        <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
-                        <input type="text"
-                               value="<?php echo $ipTagInputAttrValue ?>"
-                               id="<?php echo $ipTagLabelAttrFor; ?>"
-                               name="<?php echo $ipTagInputAttrName; ?>"
-                               required>
-                    </div>
-
-                 <?php endfor; ?>
-
-            </fieldset>
-        <?php endfor; ?>
-
-    <?php endif; ?>
-
-    <!-- Form for servers -->
-
-    <?php if ($serversNumber != 0): ?>
-
-        <h3>Servers</h3>
-
-        <?php for ($i = 1; $i <= $serversNumber; $i++): ?>
-            <fieldset>
-                <legend>Server <?php echo $i; ?></legend>
-
-                <?php
-                  $server                = 'server' . $i;
-                  $serverInterfaceNumber = $services['servers'][$server]['if_number']-1;
-                ?>
-
-                <?php for ($j = 0; $j <= $serverInterfaceNumber; $j++): ?>
+            <?php for ($i = 0; $i <= $deviceNumber-1; $i++): ?>
+                <fieldset style="background-color: #F8F8FF;">
 
                     <?php
-                        $eth = "eth" . $j;
+                        $deviceID                     = $device . $i;
+                        $deviceName                   = $services[$deviceType][$deviceID]['name'];
+                        $deviceIfnumber               = $services[$deviceType][$deviceID]['if_number']-1;
                     ?>
 
-                    <hr style="border: 1.3px dashed; margin: 0.1em;">
-                    <div class="form-group">
-                        <?php echo "<strong>" . $eth . "</strong>"; ?>
-                    </div>
+                    <legend><?php echo $deviceName; ?></legend>
 
-                    <!-- Selector for interfaces  -->
+                    <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
 
-                    <div class="form-group">
-                        <?php
-                            $ifconnTagLabelAttrFor    = $server . "_if_" . $j;
-                            $ifconnTagSelectAttrName  = $server . "[if_list][" . $j . "][if]";
-                            $ifconnTagSelectValue     = (isset($services['servers'][$server]['if_list'][$j]['if']))
-                                                          ? $services['servers'][$server]['if_list'][$j]['if']
-                                                          : null;
-                        ?>
-                        <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
-                        <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
-                                name="<?php echo $ifconnTagSelectAttrName; ?>"
-                                required>
+                        <?php $eth = "eth" . $j; ?>
 
-                        <?php for ($k = 0; $k <= $serverInterfaceNumber; $k++): ?>
+                        <?php if ($j != 0): ?>
+                            <hr style="border: 1.3px dashed; margin: 0.1em;">
+                        <?php endif; ?>
 
+                        <div class="form-group">
+                            <?php echo "<strong>" . $eth . "</strong>"; ?>
+                        </div>
+
+                        <div class="form-group">
                             <?php
-                                $isSelected = ($ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
-                                $switch     = 'switch' . ($k+1);
-                                $cidr       = $networks[$switch]['prefix'] . "/" . $networks[$switch]['mask'];
+                                $ifconnTagLabelAttrFor    = $deviceID . "_if" . $j;
+                                $ifconnTagSelectAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][if]";
+                                $ifconnTagSelectValue     = (isset($services[$deviceType][$deviceID]['if_list'][$j]['if']))
+                                                              ? $services[$deviceType][$deviceID]['if_list'][$j]['if']
+                                                              : null;
                             ?>
+                            <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
+                            <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
+                                    name="<?php echo $ifconnTagSelectAttrName; ?>"
+                                    required>
 
-                            <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
-                                <?php echo $cidr ?>
-                            </option>
+                            <?php for ($k = 0; $k <= $deviceIfnumber; $k++): ?>
 
-                        <?php endfor; ?>
+                                <?php
+                                    $isSelected = ($ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
+                                    $switch     = 'switch' . $k;
+                                    $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                ?>
 
-                        </select>
-                    </div>
+                                <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
+                                    <?php echo $cidr ?>
+                                </option>
 
-                    <!-- Input for ip -->
+                            <?php endfor; ?>
 
-                    <div class="form-group">
-                        <?php
-                            $ipTagLabelAttrFor   = $server . "_ip_" . $j;
-                            $ipTagInputAttrName  = $server . "[if_list][" . $j . "][ip]";
-                            $ipTagInputAttrValue = (isset($services['servers'][$server]['if_list'][$j]["ip"]))
-                                                        ? htmlspecialchars($services['servers'][$server]['if_list'][$j]["ip"])
-                                                        : '';
-                        ?>
-                        <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
-                        <input type="text"
-                              value="<?php echo $ipTagInputAttrValue ?>"
-                              id="<?php echo $ipTagLabelAttrFor; ?>"
-                              name="<?php echo $ipTagInputAttrName; ?>"
-                              required>
-                    </div>
+                            </select>
+                        </div>
 
-                <?php endfor; ?>
-
-            </fieldset>
-        <?php endfor; ?>
-
-    <?php endif; ?>
-
-    <!-- Form for computers -->
-
-    <?php if ($computersNumber != 0): ?>
-
-        <h3>Computers</h3>
-
-        <?php for ($i = 1; $i <= $computersNumber; $i++): ?>
-            <fieldset>
-                <legend>Computer <?php echo $i; ?></legend>
-
-                <?php
-                  $computer                = 'computer' . $i;
-                  $computerInterfaceNumber = $services['computers'][$computer]['if_number']-1;
-                ?>
-
-                <?php for ($j = 0; $j <= $computerInterfaceNumber; $j++): ?>
-
-                    <?php
-                        $eth = "eth" . $j;
-                    ?>
-
-                    <hr style="border: 1.3px dashed; margin: 0.1em;">
-                    <div class="form-group">
-                        <?php echo "<strong>" . $eth . "</strong>"; ?>
-                    </div>
-
-                    <!-- Selector for interfaces  -->
-
-                    <div class="form-group">
-                        <?php
-                            $ifconnTagLabelAttrFor    = $computer . "_if_" . $j;
-                            $ifconnTagSelectAttrName  = $computer . "[if_list][" . $j . "][if]";
-                            $ifconnTagSelectValue     = (isset($services['computers'][$computer]['if_list'][$j]['if']))
-                                                          ? $services['computers'][$computer]['if_list'][$j]['if']
-                                                          : null;
-                        ?>
-                        <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
-                        <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
-                                name="<?php echo $ifconnTagSelectAttrName; ?>"
-                                required>
-
-                        <?php for ($k = 0; $k <= $computerInterfaceNumber; $k++): ?>
-
+                        <div class="form-group">
                             <?php
-                                $isSelected = ($ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
-                                $switch     = 'switch' . ($k+1);
-                                $cidr       = $networks[$switch]['prefix'] . "/" . $networks[$switch]['mask'];
+                                $ipTagLabelAttrFor   = $deviceID . "_ip" . $j;
+                                $ipTagInputAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][ip]";
+                                $ipTagInputAttrValue = (isset($services[$deviceType][$deviceID]['if_list'][$j]["ip"]))
+                                                            ? htmlspecialchars($services[$deviceType][$deviceID]['if_list'][$j]["ip"])
+                                                            : '';
                             ?>
+                            <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
+                            <input type="text"
+                                  value="<?php echo $ipTagInputAttrValue ?>"
+                                  id="<?php echo $ipTagLabelAttrFor; ?>"
+                                  name="<?php echo $ipTagInputAttrName; ?>"
+                                  required>
+                        </div>
 
-                            <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
-                                <?php echo $cidr ?>
-                            </option>
-
-                        <?php endfor; ?>
-
-                        </select>
-                    </div>
-
-                    <!-- Input for ip -->
-
-                    <div class="form-group">
-                        <?php
-                            $ipTagLabelAttrFor   = $computer . "_ip_" . $j;
-                            $ipTagInputAttrName  = $computer . "[if_list][" . $j . "][ip]";
-                            $ipTagInputAttrValue = (isset($services['computers'][$computer]['if_list'][$j]["ip"]))
-                                                        ? htmlspecialchars($services['computers'][$computer]['if_list'][$j]["ip"])
-                                                        : '';
-                        ?>
-                        <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
-                        <input type="text"
-                              value="<?php echo $ipTagInputAttrValue ?>"
-                              id="<?php echo $ipTagLabelAttrFor; ?>"
-                              name="<?php echo $ipTagInputAttrName; ?>"
-                              required>
-                    </div>
-
-                <?php endfor; ?>
-
-            </fieldset>
-        <?php endfor; ?>
-
-    <?php endif; ?>
+                    <?php endfor; ?>
+                </fieldset>
+            <?php endfor; ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
 
         <div style="padding-top: 15px;">
             <button type="submit">Submit</button>
             <?php
                 $servicesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
                 if (file_exists($servicesFile)) {
-                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load from file)" . "</a>";
+                    echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load saved configurations)" . "</a>";
                 }
             ?>
         </div>
@@ -418,206 +200,134 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Services loaded</h2>
         <p>The following configuration has been saved. To update its values, fill the form and submit it again.</p>
 
-        <?php for ($i = 1; $i <= sizeof($services['routers']); $i++): ?>
+        <?php
+            foreach (['router', 'server', 'computer'] as $device):
 
-            <hr>
-            <div id="results_routers">
+              $deviceNumber = isset($deviceCount[$device]) ? $deviceCount[$device] : 0;
 
-            <?php
-                $router                = 'router' . $i;
-                $routerInterfaceNumber = $services['routers'][$router]['if_number']-1;
-                $routerInterfaces      = $services['routers'][$router]['if_list'];
-            ?>
+              if ($deviceNumber != 0):
 
-                <p>Router <?php echo $i; ?></p>
+                $deviceType  = $device . "s";
+                $deviceTitle = ucfirst($deviceType);
+        ?>
 
-                <div style="display: table; width: 40%;">
+            <h3><?php echo $deviceTitle; ?></h3>
 
-                    <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            Interface
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            CIDR
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            IP
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            Check
-                        </div>
-                    </div>
+                <?php for ($i = 0; $i <= $deviceNumber-1; $i++): ?>
 
-                    <?php for ($j = 0; $j <= $routerInterfaceNumber; $j++): ?>
+                <fieldset style="background-color: #F8F8FF;">
+                <legend><?php echo $deviceTitle; ?></legend>
 
-                        <?php
-                            $ip     = $routerInterfaces[$j]['ip'];
-                            $if     = $routerInterfaces[$j]['if'];
-                            $switch = 'switch' . ($if+1);
-                            $prefix = $networks[$switch]['prefix'];
-                            $mask   = $networks[$switch]['mask'];
-                            $cidr   = $prefix . "/" . $mask;
-                            $check  = ipv4_in_range($ip, $cidr);
-                        ?>
+                    <?php
+                        $deviceID                     = $device . $i;
+                        $deviceName                   = $services[$deviceType][$deviceID]['name'];
+                        $deviceIfnumber               = $services[$deviceType][$deviceID]['if_number']-1;
+                        $deviceIflist                 = $services[$deviceType][$deviceID]['if_list'];
+                    ?>
+
+                    <p>
+                        <style>
+                            .device-wrap:hover .device-id,
+                            .device-wrap:hover .port-id {
+                                opacity: 1 !important;
+                                visibility: visible !important;
+                            }
+                        </style>
+
+                        <span class="device-wrap">
+                            <?php echo "Name: <i>" . $deviceName . "</i>"; ?>
+                            <span class="device-id" style="color: #4169E1; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;">
+                                (<?php echo $deviceID; ?>)
+                            </span>
+
+                            <?php if ($device == 'server'): ?>
+                                <?php
+                                    $portNumber = 8080 + $i;
+                                    $serverAddress    = "http://127.0.0.1:" . $portNumber;
+                                ?>
+                                <span class="port-id" style="color: #4169E1; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; margin-left: 2px;">
+                                    -> <a target="_blank"
+                                       href="<?php echo $serverAddress; ?>"
+                                       style="color: #4169E1;">
+                                          <i><?php echo $serverAddress; ?></i>
+                                    </a>
+                                </span>
+                            <?php endif; ?>
+                        </span>
+                    </p>
+
+                    <div style="display: table; width: 70%;">
+
+                        <style>
+                            /* Reveal the gateway column on hover of the entire table wrapper */
+                            .table-wrap:hover .gateway-col {
+                                opacity: 1 !important;
+                                visibility: visible !important;
+                            }
+                        </style>
 
                         <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; font-style:italic; width: 20%">
-                                <?php echo htmlspecialchars("eth" . $j); ?>
+                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                                Interface
                             </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php echo htmlspecialchars($cidr); ?>
+                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                                CIDR
                             </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php echo htmlspecialchars($ip); ?>
+                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                                IP
                             </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php
-                                    if ($check) {
-                                        echo '<strong style="color:green">OK</strong>';
-                                    } else {
-                                        echo '<strong style="color:red;">FAILED</strong>';
-                                        $validForm = false;
-                                    }
-                                ?>
+                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                                GW
                             </div>
+                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                                Check
+                            </div>
+
                         </div>
-                    <?php endfor; ?>
-                </div>
-        <?php endfor; ?>
 
-        <?php for ($i = 1; $i <= sizeof($services['servers']); $i++): ?>
+                        <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
 
-            <hr>
-            <div id="results_servers">
+                            <?php
+                                $ip     = $deviceIflist[$j]['ip'];
+                                $if     = $deviceIflist[$j]['if'];
+                                $switch = 'switch' . $if;
+                                $net    = $networks[$switch]['network'];
+                                $mask   = $networks[$switch]['mask'];
+                                $gw     = $networks[$switch]['gateway'];
+                                $cidr   = $net . "/" . $mask;
+                                $check  = ipv4_in_range($ip, $cidr);
+                            ?>
 
-            <?php
-                $server                = 'server' . $i;
-                $serverInterfaceNumber = $services['servers'][$server]['if_number']-1;
-                $serverInterfaces      = $services['servers'][$server]['if_list'];
-            ?>
-
-                <p>Server <?php echo $i; ?></p>
-
-                <div style="display: table; width: 40%;">
-
-                    <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            Interface
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            CIDR
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            IP
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            Check
-                        </div>
+                            <div style="display: table-row;">
+                                <div style="display: table-cell; padding: 5px; font-style:italic; width: 10%">
+                                    <?php echo htmlspecialchars("eth" . $j); ?>
+                                </div>
+                                <div style="display: table-cell; padding: 5px; width: 10%">
+                                    <?php echo htmlspecialchars($cidr); ?>
+                                </div>
+                                <div style="display: table-cell; padding: 5px; width: 10%">
+                                    <?php echo htmlspecialchars($ip); ?>
+                                </div>
+                                <div style="display: table-cell; padding: 5px; width: 10%">
+                                    <?php echo htmlspecialchars($gw) ?>
+                                </div>
+                                <div style="display: table-cell; padding: 5px; width: 10%">
+                                    <?php
+                                        if (!$check) {
+                                            echo '<strong style="color:red;">FAILED</strong>';
+                                            $validForm = false;
+                                        } else {
+                                            echo '<strong style="color:green">OK</strong>';
+                                        }
+                                    ?>
+                                </div>
+                            </div>
+                        <?php endfor; ?>
                     </div>
-
-                    <?php for ($j = 0; $j <= $serverInterfaceNumber; $j++): ?>
-
-                        <?php
-                            $ip     = $serverInterfaces[$j]['ip'];
-                            $if     = $serverInterfaces[$j]['if'];
-                            $switch = 'switch' . ($if+1);
-                            $prefix = $networks[$switch]['prefix'];
-                            $mask   = $networks[$switch]['mask'];
-                            $cidr   = $prefix . "/" . $mask;
-                            $check  = ipv4_in_range($ip, $cidr);
-                        ?>
-
-                        <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; font-style:italic; width: 20%">
-                                <?php echo htmlspecialchars("eth" . $j); ?>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php echo htmlspecialchars($cidr); ?>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php echo htmlspecialchars($ip); ?>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php
-                                    if ($check) {
-                                        echo '<strong style="color:green">OK</strong>';
-                                    } else {
-                                        echo '<strong style="color:red;">FAILED</strong>';
-                                        $validForm = false;
-                                    }
-                                ?>
-                            </div>
-                        </div>
-                    <?php endfor; ?>
-                </div>
-        <?php endfor; ?>
-
-        <?php for ($i = 1; $i <= sizeof($services['computers']); $i++): ?>
-
-            <hr>
-            <div id="results_computers">
-
-            <?php
-                $comuter                 = 'computer' . $i;
-                $computerInterfaceNumber = $services['computers'][$computer]['if_number']-1;
-                $computerInterfaces      = $services['computers'][$computer]['if_list'];
-            ?>
-
-                <p>Computer <?php echo $i; ?></p>
-
-                <div style="display: table; width: 40%;">
-
-                    <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            Interface
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            CIDR
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            IP
-                        </div>
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 20%">
-                            Check
-                        </div>
-                    </div>
-
-                    <?php for ($j = 0; $j <= $computerInterfaceNumber; $j++): ?>
-
-                        <?php
-                            $ip     = $computerInterfaces[$j]['ip'];
-                            $if     = $computerInterfaces[$j]['if'];
-                            $switch = 'switch' . ($if+1);
-                            $prefix = $networks[$switch]['prefix'];
-                            $mask   = $networks[$switch]['mask'];
-                            $cidr   = $prefix . "/" . $mask;
-                            $check  = ipv4_in_range($ip, $cidr);
-                        ?>
-
-                        <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; font-style:italic; width: 20%">
-                                <?php echo htmlspecialchars("eth" . $j); ?>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php echo htmlspecialchars($cidr); ?>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php echo htmlspecialchars($ip); ?>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; width: 20%">
-                                <?php
-                                    if ($check) {
-                                        echo '<strong style="color:green">OK</strong>';
-                                    } else {
-                                        echo '<strong style="color:red;">FAILED</strong>';
-                                        $validForm = false;
-                                    }
-                                ?>
-                            </div>
-                        </div>
-                    <?php endfor; ?>
-                </div>
-        <?php endfor; ?>
+                    </fieldset>
+                <?php endfor; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
     <?php endif; ?>
 
     <div style="margin-top: 15px;">
