@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Step 2 of 4</h2>
 
         <?php for ($i = 0; $i <= $switchesNumber; $i++): ?>
-            <fieldset>
+            <fieldset style="background-color: #F8F8FF;">
 
                 <?php
                     $switch                = "switch" . $i;
