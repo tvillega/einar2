@@ -16,7 +16,7 @@ RUN apk add --no-cache \
       lighttpd \
       php-cgi
 
-RUN mkdir -pv /einar2/{archetypes,docs,labs,www} /server/www /var/lib/php/sessions /etc/quagga
+RUN mkdir -pv /server/www /var/lib/php/sessions /etc/quagga
 
 COPY archetypes/ /einar2/archetypes/
 COPY docs/       /einar2/docs/
