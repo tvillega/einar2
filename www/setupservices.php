@@ -109,12 +109,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php
                         $deviceID                     = $device . $i;
                         $deviceName                   = $services[$deviceType][$deviceID]['name'];
+                        $deviceIflist                 = $services[$deviceType][$deviceID]['if_list'];
                         $deviceIfnumber               = $services[$deviceType][$deviceID]['if_number']-1;
                     ?>
 
                     <legend><?php echo $deviceName; ?></legend>
 
                     <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
+
+                    <?php
+                        $allSubmittedIfs = [];
+                        foreach ($deviceIflist as $deviceIf) {
+                          $allSubmittedIfs[] = $deviceIf['if'];
+                        }
+                        $duplicatedIfs = array_diff_assoc($allSubmittedIfs, array_unique($allSubmittedIfs));
+                    ?>
 
                         <?php $eth = "eth" . $j; ?>
 
@@ -161,6 +170,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     </select>
                                 </div>
+
+                                <?php if ($formSubmitted): ?>
+
+                                    <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                        <?php
+                                            if (in_array($ifconnTagSelectValue,$duplicatedIfs)) {
+                                              echo '<strong style="color:chocolate;">DUP</strong>';
+                                              $validForm = false;
+                                            } else {
+                                              echo '<strong style="color:green;">OK</strong>';
+                                            }
+                                        ?>
+                                    </div>
+
+                                <?php endif; ?>
+
                             </div>
 
                             <div style="display: table-row;">
