@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     ?>
                                     <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
                                 </div>
-                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                     <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
                                             name="<?php echo $ifconnTagSelectAttrName; ?>"
                                             required>
@@ -174,13 +174,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     ?>
                                     <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
                                 </div>
-                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                     <input type="text"
                                           value="<?php echo $ipTagInputAttrValue ?>"
                                           id="<?php echo $ipTagLabelAttrFor; ?>"
                                           name="<?php echo $ipTagInputAttrName; ?>"
                                           required>
                                 </div>
+
+                            <?php if ($formSubmitted): ?>
+
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                    <?php
+                                        $switch = 'switch' . $ifconnTagSelectValue;
+                                        $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                        if (!filter_var($ipTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                          echo '<strong style="color:red";>INVALID</strong>';
+                                          $validForm = false;
+                                        } else if (!ipv4_in_range($ipTagInputAttrValue,$cidr)) {
+                                          echo '<strong style="color:red;">FAILED</strong>';
+                                          $validForm = false;
+                                        } else {
+                                          echo '<strong style="color:green">OK</strong>';
+                                        }
+                                    ?>
+                                </div>
+
+
+                            <?php endif; ?>
+
                             </div>
 
                         </div>
