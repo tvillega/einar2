@@ -92,6 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $deviceType  = $device . "s";
             $deviceTitle = ucfirst($deviceType);
+
+            $allsubmittedNames = [];
+            foreach ($servicesData[$deviceType] as $deviceData) {
+              $allSubmittedNames[] = $deviceData['name'];
+            }
+            $duplicatedNames = array_diff_assoc($allSubmittedNames, array_unique($allSubmittedNames));
     ?>
 
         <h3><?php echo $deviceTitle; ?></h3>
@@ -117,6 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ?>
 
 
+
+
                     <legend><?php echo $device . $i; ?></legend>
 
                     <div style="display: table; width: 30%;">
@@ -125,20 +133,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                                 <label for="<?php echo $nameTagLabelAttrFor; ?>">Name:</label>
                             </div>
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                                 <input type="text"
                                       value="<?php echo $nameTagInputAttrValue; ?>"
                                       id="<?php echo $nameTagLabelAttrFor; ?>"
                                       name="<?php echo $nameTagInputAttrName; ?>"
                                       required>
                             </div>
+
+                            <?php if ($formSubmitted): ?>
+
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                                <?php
+                                    if (in_array($nameTagInputAttrValue,$duplicatedNames)) {
+                                      echo '<strong style="color:chocolate;">DUP</strong>';
+                                      $validForm = false;
+                                    } else {
+                                      echo '<strong style="color:green;">OK</strong>';
+                                    }
+                                ?>
+                            </div>
+
+                            <?php endif; ?>
+
                         </div>
 
                         <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                                 <label for="<?php echo $ifnumberTagLabelAttrFor; ?>">Interfaces:</label>
                             </div>
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                                 <select id="<?php echo $ifnumberTagLabelAttrFor; ?>"
                                         name="<?php echo $ifnumberTagInputAttrName; ?>"
                                         required>
