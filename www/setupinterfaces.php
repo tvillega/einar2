@@ -2,7 +2,7 @@
 
 /* Global variables */
 $validForm         = true;
-$formSubmitted = false;
+$formSubmitted     = false;
 $queryStringSet    = false;
 $queryString       = null;
 
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $queryStringSet    = true;
   $queryString       = '?laboratory=' . urlencode($labNameNormalized);
-  $formSubmitted = true;
+  $formSubmitted     = true;
 
 }
 ?>
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
 
-                            <?php $isSelected = ($ifnumberSavedValue !== null && $ifnumberSavedValue == $j) ? 'selected' : ''; ?>
+                            <?php $isSelected = ($formSubmitted && $ifnumberSavedValue !== null && $ifnumberSavedValue == $j) ? 'selected' : ''; ?>
 
                             <option value="<?php echo $j; ?>" <?php echo $isSelected; ?>>
                                 <?php echo $j; ?>
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <div style="margin-top: 15px;">
-        <a href="/setupnetworks.php<?php echo "?laboratory=" . $_GET['laboratory'] . "&submitted"; ?>">Previous (Edit Networks)</a>
+        <a href="/setupnetworks.php<?php echo "?laboratory=" . $_GET['laboratory']; ?>">Previous (Edit Networks)</a>
         |
         <a href="/index.php">Home</a>
         <?php if ($queryStringSet && $validForm): ?>

@@ -233,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div style="margin-top: 15px;">
-            <a href="/setupservices.php<?php echo "?laboratory=" . $_GET['laboratory'] . "&submitted"; ?>">Previous (Edit Services)</a>
+            <a href="/setupservices.php<?php echo "?laboratory=" . $_GET['laboratory']; ?>">Previous (Edit Services)</a>
             <a href="/index.php"> | Home</a>
         </div>
 

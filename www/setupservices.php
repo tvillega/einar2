@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php
                                 $ifconnTagLabelAttrFor    = $deviceID . "_if" . $j;
                                 $ifconnTagSelectAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][if]";
-                                $ifconnTagSelectValue     = (isset($services[$deviceType][$deviceID]['if_list'][$j]['if']))
+                                $ifconnTagSelectValue     = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]['if']))
                                                               ? $services[$deviceType][$deviceID]['if_list'][$j]['if']
                                                               : null;
                             ?>
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php for ($k = 0; $k <= $switchesNumber-1; $k++): ?>
 
                                 <?php
-                                    $isSelected = ($ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
+                                    $isSelected = ($formSubmitted && $ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
                                     $switch     = 'switch' . $k;
                                     $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
                                 ?>
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php
                                 $ipTagLabelAttrFor   = $deviceID . "_ip" . $j;
                                 $ipTagInputAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][ip]";
-                                $ipTagInputAttrValue = (isset($services[$deviceType][$deviceID]['if_list'][$j]["ip"]))
+                                $ipTagInputAttrValue = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]["ip"]))
                                                             ? htmlspecialchars($services[$deviceType][$deviceID]['if_list'][$j]["ip"])
                                                             : '';
                             ?>
@@ -331,7 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <div style="margin-top: 15px;">
-        <a href="/setupinterfaces.php<?php echo "?laboratory=" . $_GET['laboratory'] . "&submitted"; ?>">Previous (Edit Interfaces)</a>
+        <a href="/setupinterfaces.php<?php echo "?laboratory=" . $_GET['laboratory']; ?>">Previous (Edit Interfaces)</a>
         |
         <a href="/index.php">Home</a>
         <?php if ($queryStringSet && $validForm): ?>
