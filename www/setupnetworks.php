@@ -134,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       $duplicatedNets = array_diff_assoc($allSubmittedNets, array_unique($allSubmittedNets));
 
+                      $validMask = true;
                     }
                 ?>
 
@@ -192,6 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 if ($maskTagInputAttrValue < 0 || $maskTagInputAttrValue > 32) {
                                     echo '<strong style="color:red;">INVALID</strong>';
                                     $validForm = false;
+                                    $validMask = false;
                                 } else {
                                     echo '<strong style="color:green;">OK</strong>';
                                 }
@@ -219,7 +221,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%">
                            <?php
                                 $networkCidr = $netTagInputAttrValue . "/" . $maskTagInputAttrValue;
-                                if (!filter_var($gwTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                if (!$validMask) {
+                                    echo '<strong style="color:red;">ERROR</strong>';
+                                    $validForm = false;
+                                } else if (!filter_var($gwTagInputAttrValue, FILTER_VALIDATE_IP)) {
                                     echo '<strong style="color:red;">INVALID</strong>';
                                     $validForm = false;
                                 } else if (!ipv4_in_range($gwTagInputAttrValue,$networkCidr)) {
