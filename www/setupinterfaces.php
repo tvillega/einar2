@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $deviceType  = $device . "s";
             $deviceTitle = ucfirst($deviceType);
 
-            $allsubmittedNames = [];
+            $allSubmittedNames = [];
             foreach ($servicesData[$deviceType] as $deviceData) {
               $allSubmittedNames[] = $deviceData['name'];
             }
