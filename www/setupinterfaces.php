@@ -93,11 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $deviceType  = $device . "s";
             $deviceTitle = ucfirst($deviceType);
 
-            $allSubmittedNames = [];
-            foreach ($servicesData[$deviceType] as $deviceData) {
-              $allSubmittedNames[] = $deviceData['name'];
+            if ($formSubmitted) {
+              $allSubmittedNames = [];
+              foreach ($servicesData[$deviceType] as $deviceData) {
+                $allSubmittedNames[] = $deviceData['name'];
+              }
+              $duplicatedNames = array_diff_assoc($allSubmittedNames, array_unique($allSubmittedNames));
+            } else {
+              $duplicatedNames = ["1.2.3.4"]; // Garbage to not crash the code below
             }
-            $duplicatedNames = array_diff_assoc($allSubmittedNames, array_unique($allSubmittedNames));
     ?>
 
         <h3><?php echo $deviceTitle; ?></h3>
