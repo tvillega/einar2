@@ -119,32 +119,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <legend><?php echo $device . $i; ?></legend>
 
-                    <div class="form-group">
-                        <label for="<?php echo $nameTagLabelAttrFor; ?>">Name:</label>
-                        <input type="text"
-                              value="<?php echo $nameTagInputAttrValue; ?>"
-                              id="<?php echo $nameTagLabelAttrFor; ?>"
-                              name="<?php echo $nameTagInputAttrName; ?>"
-                              required>
-                    </div>
+                    <div style="display: table; width: 30%;">
 
-                    <div class="form-group">
-                        <label for="<?php echo $ifnumberTagLabelAttrFor; ?>">Interfaces:</label>
-                        <select id="<?php echo $ifnumberTagLabelAttrFor; ?>"
-                                name="<?php echo $ifnumberTagInputAttrName; ?>"
-                                required>
+                        <div style="display: table-row;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                                <label for="<?php echo $nameTagLabelAttrFor; ?>">Name:</label>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                                <input type="text"
+                                      value="<?php echo $nameTagInputAttrValue; ?>"
+                                      id="<?php echo $nameTagLabelAttrFor; ?>"
+                                      name="<?php echo $nameTagInputAttrName; ?>"
+                                      required>
+                            </div>
+                        </div>
 
-                        <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
+                        <div style="display: table-row;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <label for="<?php echo $ifnumberTagLabelAttrFor; ?>">Interfaces:</label>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                                <select id="<?php echo $ifnumberTagLabelAttrFor; ?>"
+                                        name="<?php echo $ifnumberTagInputAttrName; ?>"
+                                        required>
 
-                            <?php $isSelected = ($formSubmitted && $ifnumberSavedValue !== null && $ifnumberSavedValue == $j) ? 'selected' : ''; ?>
+                                    <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
 
-                            <option value="<?php echo $j; ?>" <?php echo $isSelected; ?>>
-                                <?php echo $j; ?>
-                            </option>
+                                        <?php $isSelected = ($formSubmitted && $ifnumberSavedValue !== null && $ifnumberSavedValue == $j) ? 'selected' : ''; ?>
 
-                        <?php endfor; ?>
+                                        <option value="<?php echo $j; ?>" <?php echo $isSelected; ?>>
+                                            <?php echo $j; ?>
+                                        </option>
 
-                        </select>
+                                    <?php endfor; ?>
+
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
                 </fieldset>
             <?php endfor; ?>

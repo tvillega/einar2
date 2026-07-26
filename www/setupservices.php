@@ -132,50 +132,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php echo "<strong>" . $eth . "</strong>"; ?>
                         </div>
 
-                        <div class="form-group">
-                            <?php
-                                $ifconnTagLabelAttrFor    = $deviceID . "_if" . $j;
-                                $ifconnTagSelectAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][if]";
-                                $ifconnTagSelectValue     = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]['if']))
-                                                              ? $services[$deviceType][$deviceID]['if_list'][$j]['if']
-                                                              : null;
-                            ?>
-                            <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
-                            <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
-                                    name="<?php echo $ifconnTagSelectAttrName; ?>"
-                                    required>
 
-                            <?php for ($k = 0; $k <= $switchesNumber-1; $k++): ?>
+                        <div style="display: table; width: 30%;">
 
-                                <?php
-                                    $isSelected = ($formSubmitted && $ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
-                                    $switch     = 'switch' . $k;
-                                    $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
-                                ?>
+                            <div style="display: table-row;">
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                    <?php
+                                        $ifconnTagLabelAttrFor    = $deviceID . "_if" . $j;
+                                        $ifconnTagSelectAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][if]";
+                                        $ifconnTagSelectValue     = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]['if']))
+                                                                    ? $services[$deviceType][$deviceID]['if_list'][$j]['if']
+                                                                    : null;
+                                    ?>
+                                    <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
+                                </div>
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                                    <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
+                                            name="<?php echo $ifconnTagSelectAttrName; ?>"
+                                            required>
 
-                                <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
-                                    <?php echo $cidr ?>
-                                </option>
+                                        <?php for ($k = 0; $k <= $switchesNumber-1; $k++): ?>
 
-                            <?php endfor; ?>
+                                            <?php
+                                                $isSelected = ($formSubmitted && $ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
+                                                $switch     = 'switch' . $k;
+                                                $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                            ?>
 
-                            </select>
-                        </div>
+                                            <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
+                                                <?php echo $cidr ?>
+                                            </option>
 
-                        <div class="form-group">
-                            <?php
-                                $ipTagLabelAttrFor   = $deviceID . "_ip" . $j;
-                                $ipTagInputAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][ip]";
-                                $ipTagInputAttrValue = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]["ip"]))
-                                                            ? htmlspecialchars($services[$deviceType][$deviceID]['if_list'][$j]["ip"])
-                                                            : '';
-                            ?>
-                            <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
-                            <input type="text"
-                                  value="<?php echo $ipTagInputAttrValue ?>"
-                                  id="<?php echo $ipTagLabelAttrFor; ?>"
-                                  name="<?php echo $ipTagInputAttrName; ?>"
-                                  required>
+                                        <?php endfor; ?>
+
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="display: table-row;">
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                    <?php
+                                        $ipTagLabelAttrFor   = $deviceID . "_ip" . $j;
+                                        $ipTagInputAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][ip]";
+                                        $ipTagInputAttrValue = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]["ip"]))
+                                                                    ? htmlspecialchars($services[$deviceType][$deviceID]['if_list'][$j]["ip"])
+                                                                    : '';
+                                    ?>
+                                    <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
+                                </div>
+                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                                    <input type="text"
+                                          value="<?php echo $ipTagInputAttrValue ?>"
+                                          id="<?php echo $ipTagLabelAttrFor; ?>"
+                                          name="<?php echo $ipTagInputAttrName; ?>"
+                                          required>
+                                </div>
+                            </div>
+
                         </div>
 
                     <?php endfor; ?>

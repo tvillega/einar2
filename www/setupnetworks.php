@@ -4,7 +4,7 @@ require __DIR__ . '/ip_in_range.php';
 
 /* Global variables */
 $validForm         = true;
-$labNetworksExists = false;
+$formSubmitted = false;
 $queryStringSet    = false;
 $queryString       = null;
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $queryStringSet    = true;
   $queryString       = '?laboratory=' . urlencode($labNameNormalized);
-  $labNetworksExists = true;
+  $formSubmitted = true;
 
 }
 ?>
@@ -106,19 +106,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $switch                = "switch" . $i;
 
                     $netTagLabelAttrFor    = "network" . $i;
-                    $netTagInputAttrValue  = ($labNetworksExists && isset($networksData[$switch]['network']))
+                    $netTagInputAttrValue  = ($formSubmitted && isset($networksData[$switch]['network']))
                                                 ? htmlspecialchars($networksData[$switch]['network'])
                                                 : '';
                     $netTagInputAttrName   = $switch . "[network]";
 
                     $maskTagLabelAttrFor   = "mask" . $i;
-                    $maskTagInputAttrValue = ($labNetworksExists && isset($networksData[$switch]['mask']))
+                    $maskTagInputAttrValue = ($formSubmitted && isset($networksData[$switch]['mask']))
                                                 ? htmlspecialchars($networksData[$switch]['mask'])
                                                 : '';
                     $maskTagInputAttrName  = $switch . "[mask]";
 
                     $gwTagLabelAttrFor     = "gateway" . $i;
-                    $gwTagInputAttrValue   = ($labNetworksExists && isset($networksData[$switch]['gateway']))
+                    $gwTagInputAttrValue   = ($formSubmitted && isset($networksData[$switch]['gateway']))
                                                 ? htmlspecialchars($networksData[$switch]['gateway'])
                                                 : '';
                     $gwTagInputAttrName    = $switch . "[gateway]";
@@ -126,31 +126,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <legend><?php echo $switch; ?></legend>
 
-                <div class="form-group">
-                    <label for="<?php echo $netTagLabelAttrFor; ?>">Network:</label>
-                    <input type="text"
-                           value="<?php echo $netTagInputAttrValue; ?>"
-                           id="<?php echo $netTagLabelAttrFor; ?>"
-                           name="<?php echo $netTagInputAttrName; ?>"
-                           required>
-                </div>
+                <div style="display: table; width: 40%;">
 
-                <div class="form-group">
-                    <label for="<?php echo $maskTagLabelAttrFor; ?>">Mask:</label>
-                    <input type="text"
-                           value="<?php echo $maskTagInputAttrValue; ?>"
-                           id="<?php echo $maskTagLabelAttrFor; ?>"
-                           name="<?php echo $maskTagInputAttrName; ?>"
-                           required>
-                </div>
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <label for="<?php echo $netTagLabelAttrFor; ?>">Network:</label>
+                        </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                            <input type="text"
+                                  value="<?php echo $netTagInputAttrValue; ?>"
+                                  id="<?php echo $netTagLabelAttrFor; ?>"
+                                  name="<?php echo $netTagInputAttrName; ?>"
+                                  required>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
-                    <input type="text"
-                           value="<?php echo $gwTagInputAttrValue; ?>"
-                           id="<?php echo $gwTagLabelAttrFor; ?>"
-                           name="<?php echo $gwTagInputAttrName; ?>"
-                           required>
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <label for="<?php echo $maskTagLabelAttrFor; ?>">Mask:</label>
+                        </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                            <input type="text"
+                                  value="<?php echo $maskTagInputAttrValue; ?>"
+                                  id="<?php echo $maskTagLabelAttrFor; ?>"
+                                  name="<?php echo $maskTagInputAttrName; ?>"
+                                  required>
+                        </div>
+                    </div>
+
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
+                        </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                            <input type="text"
+                                  value="<?php echo $gwTagInputAttrValue; ?>"
+                                  id="<?php echo $gwTagLabelAttrFor; ?>"
+                                  name="<?php echo $gwTagInputAttrName; ?>"
+                                  required>
+                        </div>
+                    </div>
+
                 </div>
 
             </fieldset>
@@ -167,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </form>
 
-    <?php if ($labNetworksExists): ?>
+    <?php if ($formSubmitted): ?>
 
         <h2>Networks loaded</h2>
         <p>The following configuration has been saved. To update its values, fill the form and submit it again.</p>
