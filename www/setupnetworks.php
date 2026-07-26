@@ -124,6 +124,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $gwTagInputAttrName    = $switch . "[gateway]";
                 ?>
 
+                <?php
+                    if ($formSubmitted) {
+
+                      $allSubmittedNets = [];
+                      foreach ($networksData as $switchData) {
+                        $allSubmittedNets[] = $switchData['network'];
+                      }
+
+                      $duplicatedNets = array_diff_assoc($allSubmittedNets, array_unique($allSubmittedNets));
+
+                    }
+                ?>
+
                 <legend><?php echo $switch; ?></legend>
 
                 <div style="display: table; width: 30%;">
@@ -144,11 +157,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%">
                             <?php
-                                if (filter_var($netTagInputAttrValue, FILTER_VALIDATE_IP)) {
-                                    echo '<strong style="color:green";>OK</strong>';
-                                } else {
-                                    echo '<strong style="color:red;">INVALID</strong>';
+                                if (!filter_var($netTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                    echo '<strong style="color:red";>INVALID</strong>';
                                     $validForm = false;
+                                } else if (in_array($netTagInputAttrValue, $duplicatedNets)) {
+                                    echo '<strong style="color:chocolate;">DUP</strong>';
+                                    $validForm = false;
+                                } else {
+                                    echo '<strong style="color:green;">OK</strong>';
                                 }
                             ?>
                         </div>
