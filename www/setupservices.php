@@ -275,6 +275,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php endif; ?>
 
+        <?php if (false): ?>
+
         <?php
             foreach (['router', 'server', 'computer'] as $device):
 
@@ -400,6 +402,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endfor; ?>
             <?php endif; ?>
         <?php endforeach; ?>
+    <?php endif; ?>
+
     <?php endif; ?>
 
     <div style="margin-top: 15px;">
