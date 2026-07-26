@@ -3,6 +3,7 @@
 require __DIR__ . '/ip_in_range.php';
 
 /* Global variables */
+$devicesHaveIflistSet   = false;
 $validForm         = true;
 $formSubmitted     = false;
 $queryStringSet    = false;
@@ -109,8 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php
                         $deviceID                     = $device . $i;
                         $deviceName                   = $services[$deviceType][$deviceID]['name'];
-                        $deviceIflist                 = $services[$deviceType][$deviceID]['if_list'];
                         $deviceIfnumber               = $services[$deviceType][$deviceID]['if_number']-1;
+
+                        if (isset($services[$deviceType][$deviceID]['if_list'])) {
+                          $deviceIflist         = $services[$deviceType][$deviceID]['if_list'];
+                          $devicesHaveIflistSet = true;
+                        }
+
                     ?>
 
                     <legend><?php echo $deviceName; ?></legend>
@@ -175,7 +181,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                         <?php
-                                            if (in_array($ifconnTagSelectValue,$duplicatedIfs)) {
+                                            if (!$devicesHaveIflistSet) {
+                                              echo '<strong style="color:#8A2BE2;">UNSET</strong>';
+                                              $validForm = false;
+                                            } else if (in_array($ifconnTagSelectValue,$duplicatedIfs)) {
                                               echo '<strong style="color:chocolate;">DUP</strong>';
                                               $validForm = false;
                                             } else {
@@ -213,7 +222,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php
                                         $switch = 'switch' . $ifconnTagSelectValue;
                                         $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
-                                        if (!filter_var($ipTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                        if (!$devicesHaveIflistSet) {
+                                          echo '<strong style="color:#8A2BE2;">UNSET</strong>';
+                                          $validForm = false;
+                                        } else if (!filter_var($ipTagInputAttrValue, FILTER_VALIDATE_IP)) {
                                           echo '<strong style="color:red";>INVALID</strong>';
                                           $validForm = false;
                                         } else if (!ipv4_in_range($ipTagInputAttrValue,$cidr)) {
@@ -251,8 +263,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if ($formSubmitted): ?>
 
-        <h2>Services loaded</h2>
-        <p>The following configuration has been saved. To update its values, fill the form and submit it again.</p>
+        <?php if ($devicesHaveIflistSet): ?>
+
+            <h2>Services loaded</h2>
+            <p>To update its values, fill the form and submit it again.</p>
+
+        <?php else: ?>
+
+            <h2>Interfaces changed</h2>
+            <p>Please fill the form and submit it again.</p>
+
+        <?php endif; ?>
 
         <?php
             foreach (['router', 'server', 'computer'] as $device):
@@ -263,6 +284,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $deviceType  = $device . "s";
                 $deviceTitle = ucfirst($deviceType);
+
+                // If user re-configured interfaces, we shortcircuit to avoid null
+                if (!isset($services[$deviceType][$device . "0"]['if_list'])) {
+                  break;
+                }
         ?>
 
             <h3><?php echo $deviceTitle; ?></h3>
