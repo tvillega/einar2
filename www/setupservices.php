@@ -32,12 +32,6 @@ $services = json_decode(file_get_contents($servicesPath), true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  // echo '<pre>';
-  // print_r($_POST);
-  // echo '</pre>';
-
-  /* Retrieve devices data */
-
   foreach (['router', 'server', 'computer'] as $device) {
     $deviceType = $device . "s";
     if ($deviceCount[$device] != 0 && isset($_POST[$deviceType])) {
@@ -270,14 +264,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </p>
 
                     <div style="display: table; width: 70%;">
-
-                        <style>
-                            /* Reveal the gateway column on hover of the entire table wrapper */
-                            .table-wrap:hover .gateway-col {
-                                opacity: 1 !important;
-                                visibility: visible !important;
-                            }
-                        </style>
 
                         <div style="display: table-row;">
                             <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
