@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     name="<?php echo $ifconnTagSelectAttrName; ?>"
                                     required>
 
-                            <?php for ($k = 0; $k <= $deviceIfnumber; $k++): ?>
+                            <?php for ($k = 0; $k <= $switchesNumber-1; $k++): ?>
 
                                 <?php
                                     $isSelected = ($ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';

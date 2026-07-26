@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $myServiceJoinNetwork = $serviceJoinNetwork;
 
-            $switch             = "switch" . $i;
+            $switch             = "switch" . $device['if_list'][$i]['if'];
             $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
             $address            = $device['if_list'][$i]['ip'];
 
