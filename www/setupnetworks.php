@@ -126,45 +126,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <legend><?php echo $switch; ?></legend>
 
-                <div style="display: table; width: 40%;">
+                <div style="display: table; width: 30%;">
 
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                             <label for="<?php echo $netTagLabelAttrFor; ?>">Network:</label>
                         </div>
-                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                             <input type="text"
                                   value="<?php echo $netTagInputAttrValue; ?>"
                                   id="<?php echo $netTagLabelAttrFor; ?>"
                                   name="<?php echo $netTagInputAttrName; ?>"
                                   required>
                         </div>
+
+                        <?php if ($formSubmitted): ?>
+
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%">
+                            <?php
+                                if (filter_var($netTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                    echo '<strong style="color:green";>OK</strong>';
+                                } else {
+                                    echo '<strong style="color:red;">INVALID</strong>';
+                                    $validForm = false;
+                                }
+                            ?>
+                        </div>
+
+                        <?php endif; ?>
+
                     </div>
 
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                             <label for="<?php echo $maskTagLabelAttrFor; ?>">Mask:</label>
                         </div>
-                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                             <input type="text"
                                   value="<?php echo $maskTagInputAttrValue; ?>"
                                   id="<?php echo $maskTagLabelAttrFor; ?>"
                                   name="<?php echo $maskTagInputAttrName; ?>"
                                   required>
                         </div>
+
+                        <?php if ($formSubmitted): ?>
+
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%">
+                            <?php
+                                if ($maskTagInputAttrValue < 0 || $maskTagInputAttrValue > 32) {
+                                    echo '<strong style="color:red;">INVALID</strong>';
+                                    $validForm = false;
+                                } else {
+                                    echo '<strong style="color:green;">OK</strong>';
+                                }
+                            ?>
+                        </div>
+
+                        <?php endif; ?>
+
                     </div>
 
                     <div style="display: table-row;">
                         <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                             <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
                         </div>
-                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 70%;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
                             <input type="text"
                                   value="<?php echo $gwTagInputAttrValue; ?>"
                                   id="<?php echo $gwTagLabelAttrFor; ?>"
                                   name="<?php echo $gwTagInputAttrName; ?>"
                                   required>
                         </div>
+
+                        <?php if ($formSubmitted): ?>
+
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%">
+                           <?php
+                                $networkCidr = $netTagInputAttrValue . "/" . $maskTagInputAttrValue;
+                                if (!filter_var($gwTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                    echo '<strong style="color:red;">INVALID</strong>';
+                                    $validForm = false;
+                                } else if (!ipv4_in_range($gwTagInputAttrValue,$networkCidr)) {
+                                    echo '<strong style="color:red;">FAILED</strong>';
+                                    $validForm = false;
+                                } else {
+                                    echo '<strong style="color:green;">OK</strong>';
+                                }
+                            ?>
+                        </div>
+
+                        <?php endif; ?>
+
                     </div>
 
                 </div>
@@ -186,82 +238,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($formSubmitted): ?>
 
         <h2>Networks loaded</h2>
-        <p>The following configuration has been saved. To update its values, fill the form and submit it again.</p>
+        <p>To update its values, fill the form and submit it again.</p>
 
-        <?php for ($i = 0; $i <= $switchesNumber; $i++): ?>
-            <hr>
-            <div id="results">
-
-                <?php
-                    $switch      = "switch" . $i;
-                    $networkNet  = $networksData[$switch]['network'];
-                    $networkMask = $networksData[$switch]['mask'];
-                    $networkGw   = $networksData[$switch]['gateway'];
-                    $networkCidr = $networkNet . "/" . $networkMask;
-                ?>
-
-                <p>Switch <?php echo $i; ?></p>
-
-                <div style="display: table; width: 30%;">
-
-                    <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Network:</div>
-                        <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($networkNet); ?>
-                        </div>
-                        <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php
-                                if (filter_var($networkNet, FILTER_VALIDATE_IP)) {
-                                    echo '<strong style="color:green";>OK</strong>';
-                                } else {
-                                    echo '<strong style="color:red;">INVALID</strong>';
-                                    $validForm = false;
-                                }
-                            ?>
-                        </div>
-                    </div>
-
-                    <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Mask:</div>
-                        <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($networkMask); ?>
-                        </div>
-                        <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php
-                                if ($networkMask < 0 || $networkMask > 32) {
-                                    echo '<strong style="color:red;">INVALID</strong>';
-                                    $validForm = false;
-                                } else {
-                                    echo '<strong style="color:green;">OK</strong>';
-                                }
-                            ?>
-                        </div>
-                    </div>
-
-
-                    <div style="display: table-row;">
-                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 30%">Gateway:</div>
-                        <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php echo htmlspecialchars($networkGw); ?>
-                        </div>
-                        <div style="display: table-cell; padding: 5px; width: 30%">
-                            <?php
-                                if (!filter_var($networkGw, FILTER_VALIDATE_IP)) {
-                                    echo '<strong style="color:red;">INVALID</strong>';
-                                    $validForm = false;
-                                } else if (!ipv4_in_range($networkGw,$networkCidr)) {
-                                    echo '<strong style="color:red;">FAILED</strong>';
-                                    $validForm = false;
-                                } else {
-                                    echo '<strong style="color:green;">OK</strong>';
-                                }
-                            ?>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        <?php endfor; ?>
     <?php endif; ?>
 
     <div style="margin-top: 15px;">
