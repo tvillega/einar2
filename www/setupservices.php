@@ -124,11 +124,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
 
                     <?php
-                        $allSubmittedIfs = [];
-                        foreach ($deviceIflist as $deviceIf) {
-                          $allSubmittedIfs[] = $deviceIf['if'];
+                        if ($formSubmitted) {
+                          $allSubmittedIfs = [];
+                          foreach ($deviceIflist as $deviceIf) {
+                            $allSubmittedIfs[] = $deviceIf['if'];
+                          }
+                          $duplicatedIfs = array_diff_assoc($allSubmittedIfs, array_unique($allSubmittedIfs));
+                        } else {
+                          $duplicatedIfs =  = ["99"]; // Garbage to not crash the code below
                         }
-                        $duplicatedIfs = array_diff_assoc($allSubmittedIfs, array_unique($allSubmittedIfs));
                     ?>
 
                         <?php $eth = "eth" . $j; ?>
