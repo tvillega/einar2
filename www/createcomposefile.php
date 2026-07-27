@@ -1,5 +1,19 @@
 <?php
 
+// DEVEL MODE
+$develMode = false;
+$develFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . '.develmode';
+$develData = [];
+if (file_exists($develFile)) {
+  $develMode    = true;
+  $develJsonRaw = file_get_contents($develFile);
+  $develData    = json_decode($develJsonRaw, true);
+  echo "<pre>";
+  echo "DEVEL MODE => ";
+  print_r($develData);
+  echo "</pre>";
+}
+
 $queryStringSet    = false;
 $formSubmitted     = false;
 
@@ -94,6 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($devices as $device) {
 
       global $networks;
+      global $develMode;
+      global $develData;
 
       $myServiceBlock = $serviceBlock;
 
@@ -102,6 +118,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if ($deviceType == "server") {
         $myServiceBlock = str_replace('{{ Port }}', $port, $myServiceBlock);
         $port++;
+      }
+
+      // DEVEL FLAG
+      if ($develMode) {
+        $customImage    = $develData["einar2"]["image"];
+        $myServiceBlock = str_replace('tvillega/einar2:latest', $customImage, $myServiceBlock);
       }
 
       file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
@@ -119,7 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
             $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
 
-            // $netBlock = str_replace('{{IF}}', $deviceIf, $content);
             file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
           }
       }
@@ -182,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $archetypeVarNetworkBridge,
     $outputComposeNetworksFile
   );
+
 
   /* Redirect to myself */
   header("Location: " . $_SERVER['PHP_SELF'] . "?laboratory=" . urlencode($labNameNormalized) . "&submitted");
