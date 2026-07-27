@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
 
                     <?php
-                        if ($formSubmitted) {
+                        if ($formSubmitted && $devicesHaveIflistSet) {
                           $allSubmittedIfs = [];
                           foreach ($deviceIflist as $deviceIf) {
                             $allSubmittedIfs[] = $deviceIf['if'];
@@ -224,8 +224,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                     <?php
-                                        $switch = 'switch' . $ifconnTagSelectValue;
-                                        $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                        if ($devicesHaveIflistSet) {
+                                          $switch = 'switch' . $ifconnTagSelectValue;
+                                          $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                        }
                                         if (!$devicesHaveIflistSet) {
                                           echo '<strong style="color:#8A2BE2;">UNSET</strong>';
                                           $validForm = false;
