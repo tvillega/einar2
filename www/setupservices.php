@@ -92,6 +92,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Step 4 of 4</h2>
 
     <?php
+        if ($formSubmitted) {
+          $allSubmittedIpAddresses = [];
+          foreach ($services as $deviceType) {
+            foreach ($deviceType as $deviceID) {
+              if (!isset($deviceID['if_list'])) {
+                $allSubmittedIfs[] = "127.0.0.1"; // Garbage to avoid a crash
+              } else {
+                foreach ($deviceID['if_list'] as $interface) {
+                  $allSubmittedIpAddresses[] = $interface['ip'];
+                }
+              }
+            }
+          }
+          $duplicatedIpAddresses = array_diff_assoc($allSubmittedIpAddresses, array_unique($allSubmittedIpAddresses));
+        }
+
+    ?>
+
+    <?php
         foreach (['router', 'server', 'computer'] as $device):
 
           $deviceNumber = isset($deviceCount[$device]) ? $deviceCount[$device] : 0;
@@ -236,6 +255,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                           $validForm = false;
                                         } else if (!ipv4_in_range($ipTagInputAttrValue,$cidr)) {
                                           echo '<strong style="color:red;">FAILED</strong>';
+                                          $validForm = false;
+                                        } else if (in_array($ipTagInputAttrValue,$duplicatedIpAddresses)) {
+                                          echo '<strong style="color:chocolate;">DUP</strong>';
                                           $validForm = false;
                                         } else {
                                           echo '<strong style="color:green">OK</strong>';
