@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           }
                           $duplicatedIfs = array_diff_assoc($allSubmittedIfs, array_unique($allSubmittedIfs));
                         } else {
-                          $duplicatedIfs =  = ["99"]; // Garbage to not crash the code below
+                          $duplicatedIfs = ["99"]; // Garbage to not crash the code below
                         }
                     ?>
 
