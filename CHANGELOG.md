@@ -1,5 +1,12 @@
 # Changelog
 
+## [alpha.5](https://github.com/tvillega/einar2/releases/tag/alpha.5) (2026-08-04)
+## What's Changed
+* Upgraded docker image to `tvillega/einar2:alpha.5`
+* Fixed routers crashing on first launch
+* Added developer mode to use custom Einar2 images
+* Added docker image as variable of service archetypes
+
 ## [alpha.4](https://github.com/tvillega/einar2/releases/tag/alpha.4) (2026-07-27)
 ## What's Changed
 * Upgraded docker image to `tvillega/einar2:alpha.4`
