@@ -82,6 +82,17 @@
             </div>
         </div>
         <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <p><a href="/docs/index.php">Documentation</a></p>
+                </div>
+                <div style="display: table-cell;">
+                    <p>A snapshot of the Einar2 website</p>
+                </div>
+            </div>
+        </div>
+        <hr>
         <br>
 
         <center><p><b>Configurations</b></p></center>

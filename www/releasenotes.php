@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/vendor/Michelf/MarkdownExtra.inc.php';
 
-$markdownText = file_get_contents(__DIR__ . '/mdsites/releasenotes.md');
+$markdownText = file_get_contents(__DIR__ . '/docs/md/releasenotes.md');
 $htmlContent = Michelf\MarkdownExtra::defaultTransform($markdownText);
 
 ?>
