@@ -1,6 +1,6 @@
 
   e2-server-{{ Name }}:
-    image: tvillega/einar2:latest
+    image: {{ Image }}
     container_name: e2-server-{{ Name }}
     entrypoint: /server/entrypoint.sh
     stdin_open: true

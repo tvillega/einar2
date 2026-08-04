@@ -1,6 +1,6 @@
 
   e2-router-{{ Name }}:
-    image: tvillega/einar2:latest
+    image: {{ Image }}
     container_name: e2-router-{{ Name }}
     entrypoint: /router/entrypoint.sh
     stdin_open: true
