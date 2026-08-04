@@ -123,7 +123,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       // DEVEL FLAG
       if ($develMode) {
         $customImage    = $develData["einar2"]["image"];
-        $myServiceBlock = str_replace('tvillega/einar2:latest', $customImage, $myServiceBlock);
+        $myServiceBlock = str_replace('{{ Image }}', $customImage, $myServiceBlock);
+      } else {
+        $myServiceBlock = str_replace('{{ Image }}', 'tvillega/einar2:latest', $myServiceBlock);
       }
 
       file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
