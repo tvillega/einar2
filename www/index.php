@@ -71,6 +71,17 @@
             </div>
         </div>
         <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <p><a href="/releasenotes.php">Release notes</a></p>
+                </div>
+                <div style="display: table-cell;">
+                    <p>View the release notes for this release</p>
+                </div>
+            </div>
+        </div>
+        <hr>
         <br>
 
         <center><p><b>Configurations</b></p></center>
