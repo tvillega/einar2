@@ -3,6 +3,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+_image="tvillega/einar2:latest"
+
 gen_computer() {
 
   local name="${1-}"
@@ -14,6 +16,7 @@ gen_computer() {
 
   cat "archetypes/service-computer.yml" \
     | sed 's/{#[^}]*#}//g' \
+    | sed "s|{{ Image }}|$_image|g" \
     | sed "s|{{ Name }}|$name|g" 
 
 }
@@ -30,6 +33,7 @@ gen_server() {
 
   cat "archetypes/service-server.yml" \
     | sed 's/{#[^}]*#}//g' \
+    | sed "s|{{ Image }}|$_image|g" \
     | sed "s|{{ Name }}|$name|g" \
     | sed "s|{{ Port }}|$port|g"
 
@@ -46,6 +50,7 @@ gen_router() {
 
   cat "archetypes/service-router.yml" \
     | sed 's/{#[^}]*#}//g' \
+    | sed "s|{{ Image }}|$_image|g" \
     | sed "s|{{ Name }}|$name|g"
 
 }
