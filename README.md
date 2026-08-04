@@ -28,31 +28,7 @@ services:
 
 Now you can go to `localhost` or `127.0.0.1:80` on your web browser to start using Einar2.
 
-## Development Environment
-
-The following instructions will guide you on how to deploy the project locally,
-build custom einar2 images and push the limits on how much a laboratory can do.
-
-Start a local registry on your computer:
-
-```
-einar2 run up registry
-```
-
-Build the `einar2` image and tag it as local at the same time:
-
-```
-docker build -t localhost:5000/einar2 .
-```
-
-Save the image to the local registry:
-
-```
-docker push localhost:5000/einar2
-```
-
-Now you can make folders under `build/` to create new kinds of machines, the default machines are provided as examples..
-Remember to always use `localhost:5000/einar2` for the base image, that will query your local registry.
+## CLI Usage
 
 Learn more about the CLI by running:
 
@@ -60,7 +36,7 @@ Learn more about the CLI by running:
 einar2
 ```
 
-## Network Namespaces
+### Network Namespaces
 
 Docker saves its network namespaces in `/run/docker/netns`, separated to the system's `/run/netns`.
 Einar2 provides a utility to attach those namespaces to your system.
