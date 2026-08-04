@@ -282,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Submit</button>
             <?php
                 $servicesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
-                if (file_exists($servicesFile)) {
+                if (file_exists($servicesFile) && $devicesHaveIflistSet) {
                     echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load saved configurations)" . "</a>";
                 }
             ?>
