@@ -12,9 +12,6 @@ run_start()     {
     echo "usage: run start <lab>"
     exit
 
-  elif [[ "$what" == "registry" ]] ; then
-    docker compose -f "compose/docker-compose-registry.yml" up -d
-
   else
     docker compose -f "${1%%/}/docker-compose.yml" up
   fi
@@ -27,9 +24,6 @@ run_stop()      {
   if [[ -z "$what" ]] ; then
     echo "usage: run stop <lab>"
     exit
-
-  elif [[ "$what" == "registry" ]] ; then
-    docker compose -f "compose/docker-compose-registry.yml" down
 
   else
     docker compose -f "${1%%/}/docker-compose.yml" down
