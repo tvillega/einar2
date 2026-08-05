@@ -76,3 +76,7 @@ if [[ ! -d "$linksdir" ]] ; then
 fi
 
 cp -rv --remove-destination docs/links/* "${linksdir}/"
+
+## SYNC SETTINGS
+
+cp -v  --remove-destination config/settings.json www/settings.json

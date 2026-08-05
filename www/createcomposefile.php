@@ -1,18 +1,11 @@
 <?php
 
-// DEVEL MODE
-$develMode = false;
-$develFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . '.develmode';
-$develData = [];
-if (file_exists($develFile)) {
-  $develMode    = true;
-  $develJsonRaw = file_get_contents($develFile);
-  $develData    = json_decode($develJsonRaw, true);
-  echo "<pre>";
-  echo "DEVEL MODE => ";
-  print_r($develData);
-  echo "</pre>";
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/settings.json';
+if (!file_exists($settingsFile)) {
+  die("File settings.json missing at document root");
 }
+$settingsRaw   = file_get_contents($settingsFile);
+$settingsData  = json_decode($settingsRaw, true);
 
 $queryStringSet    = false;
 $formSubmitted     = false;
@@ -108,8 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($devices as $device) {
 
       global $networks;
-      global $develMode;
-      global $develData;
+      global $settingsData;
 
       $myServiceBlock = $serviceBlock;
 
@@ -120,13 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $port++;
       }
 
-      // DEVEL FLAG
-      if ($develMode) {
-        $customImage    = $develData["einar2"]["image"];
-        $myServiceBlock = str_replace('{{ Image }}', $customImage, $myServiceBlock);
-      } else {
-        $myServiceBlock = str_replace('{{ Image }}', 'tvillega/einar2:latest', $myServiceBlock);
-      }
+      $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
 
       file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
 
