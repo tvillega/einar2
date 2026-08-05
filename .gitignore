@@ -2,5 +2,9 @@ registry/
 e2
 labs
 www/archetypes
+www/docs/advguide/md
+www/docs/contact/md
+www/docs/download/md
+www/docs/links/md
 www/docs/md
 www/labs
