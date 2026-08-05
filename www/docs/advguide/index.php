@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '../../vendor/Michelf/MarkdownExtra.inc.php';
+require_once __DIR__ . '../../../vendor/Michelf/MarkdownExtra.inc.php';
 
 $markdownText = file_get_contents(__DIR__ . '/md/index.md');
 $htmlContent = Michelf\MarkdownExtra::defaultTransform($markdownText);
@@ -12,11 +12,11 @@ $htmlContent = Michelf\MarkdownExtra::defaultTransform($markdownText);
     <head>
         <meta charset="UTF-8">
         <title>Einar2</title>
-        <link rel="stylesheet" type="text/css" href="stylesheet.css">
+        <link rel="stylesheet" type="text/css" href="../stylesheet.css">
         <style>
             .image-frame {
               display: inline-block;
-              background: url("digging.png") no-repeat center;
+              background: url("../digging.png") no-repeat center;
               width: calc(4vw + 4vh);
               height: calc(4vw + 4vh);
               background-size: cover;
@@ -36,12 +36,12 @@ $htmlContent = Michelf\MarkdownExtra::defaultTransform($markdownText);
 
             <center>
                 <div class="topnav">
-                    <a class="active" href="/docs/index.php">Home</a>
-                    <a href="/docs/userguide/index.php">User guide</a>
-                    <a href="/docs/advguide/index.php">Advanced user guide</a>
-                    <a href="/docs/links/index.php">Links</a>
-                    <a href="/docs/download/index.php">Download</a>
-                    <a href="/docs/contact/index.php">Contact</a>
+                <a href="/docs/index.php">Home</a>
+                <a href="/docs/userguide/index.php">User guide</a>
+                <a class="active"  href="/docs/advguide/index.php">Advanced user guide</a>
+                <a href="/docs/links/index.php">Links</a>
+                <a href="/docs/download/index.php">Download</a>
+                <a href="/docs/contact/index.php">Contact</a>
                 </div>
             </center>
         </div>
