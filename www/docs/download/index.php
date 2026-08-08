@@ -2,54 +2,38 @@
 
 require_once __DIR__ . '../../../vendor/Michelf/MarkdownExtra.inc.php';
 
-$markdownText = file_get_contents(__DIR__ . '/md/index.md');
-$htmlContent = Michelf\MarkdownExtra::defaultTransform($markdownText);
+$downloadIndex          = true;
+$markdownTextChangelog  = file_get_contents(__DIR__ . '/../assets/releasenotes.md');
+$markdownTextChangelog2 = str_replace("# Changelog", '', $markdownTextChangelog);
+$markdownTextChangelog3 = str_replace("##", "###", $markdownTextChangelog2);
+
+include(__DIR__ . '/../assets/header.php');
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Einar2</title>
-        <link rel="stylesheet" type="text/css" href="../stylesheet.css">
-        <style>
-            .image-frame {
-              display: inline-block;
-              background: url("../digging.png") no-repeat center;
-              width: calc(4vw + 4vh);
-              height: calc(4vw + 4vh);
-              background-size: cover;
-            }
-        </style>
-    </head>
-    <body>
+<h2>Index</h2>
+<ul>
+    <li><a href="#latest">Latest build</a></li>
+    <li><a href="#demo">Demo movie</a></li>
+    <li><a href="#changelog">Changelog</a></li>
+</ul>
 
-        <div>
+<h2 id="latest">Latest build</h2>
+<p>The image <a href="https://hub.docker.com/r/tvillega/einar2">tvillega/einar2:latest</a> is available on Docker Hub.</p>
+<p>You will need a Linux device with enough privileged permissions to run the simulations,
+instructions to generated an Einar2 VM are provided in the advanced user guide.</p>
 
-            <div>
-                <div class="header-frame">
-                    <span class="image-frame"></span>
-                    <h5 class="text-frame">Einar2</h5><br>
-                </div>
-            </div>
+<h2 id="demo">Demo movie</h2>
+<p>Coming soon!</p>
 
-            <center>
-                <div class="topnav">
-                <a href="/docs/index.php">Home</a>
-                <a href="/docs/userguide/index.php">User guide</a>
-                <a href="/docs/advguide/index.php">Advanced user guide</a>
-                <a href="/docs/links/index.php">Links</a>
-                <a class="active" href="/docs/download/index.php">Download</a>
-                <a href="/docs/contact/index.php">Contact</a>
-                </div>
-            </center>
-        </div>
+<h2 id="warning">Warning!</h2>
+<p>If you are using an Einar2 VM, you'll have complete control over the Linux system.
+For security reasons please only perform activities related to your simulations (this IS NOT a distro).</p>
 
+<?php
 
+echo '<h2 id="changelog">Changelog</h2>';
+echo Michelf\MarkdownExtra::defaultTransform($markdownTextChangelog3);
+include(__DIR__ . '/../assets/footer.php');
 
-        <div>
-            <?php echo $htmlContent; ?>
-        </div>
-    </body>
-</html>
+?>

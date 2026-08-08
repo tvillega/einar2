@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<html>
+<head>
+	 <style type="text/css">
+  h3 {
+       margin-bottom: 0px;
+     }
+  h2 {
+       margin-bottom: 0px;
+     }
+		     
+  p {
+       margin-top: 2px;
+       margin-bottom: 4px;
+     }
+		     
+ </style>
+ <title>Release notes</title>
+	<link rel="stylesheet" type="text/css" href="main.css"/>
+</head>
+<body>
+<center>
+<table border="0">
+	<tr>
+		<td>[Logo]</td>
+	</tr>
+	<tr>
+		<td style="text-align: center">| <a href="index.html">Home</a> | <a href="userguide.html">User guide</a> | <a href="advguide.html">Advanced user guide</a> | 
+		<a href="links.html">Links</a> | <a href="download.html">Download</a> | <a href="contact.html">Contact</a> |</td>
+	</tr>
+	<tr>
+		<td style="text-align: center"><h1>Contact</h1></td>
+	</tr>
+	<tr>
+		<td>
+		<h1>Release notes Beta 3</h1>
+  <h2>Preface</h2>
+   <p>The new functionality in this release is the ability to save and download labs and set bandwidth and delay on the interfaces. Other than that there has been some minor changes for better performance and stability.</p>
+   <h2>Glossary</h2>
+   <p>dom0 is the physical machine, domU is a virtual machine.</p>
+  <h2>Limitations</h2>
+    <h3>Links</h3>
+    <p>It is only possible to have 3 interfaces on a router, this is why we have modified the lab KTH-LAN. The reason for this is a bug in Xen.</p>
+    <h3>Run custom labs</h3>
+    <p>In a later release it will be possible to choose USB stick from the lab menu.</p>
+  <h2>Known bugs</h2>
+   <h3>Monitor is not detected</h3>
+    <p>The monitor is not detected in 2.6.15 kernel.</p>
+   <h3>Computer is not automatically shut down</h3>
+    <p>Shutdown locks the CD in the drive. Hit reset</p>
+   <h3>More in domU shows only first page</h3>
+    <p>This bug is inherited from Crab.</p>
+   <h3>Unsupported harware</h3>
+   <p>Xfce doesn't want to start on Nvidia TNT2, this can be mitigated by appending the kernel parameter <code>xmodule=nv</code></p>
+  <h2>To do</h2>
+  <ul>
+   <li>Fix bugs and limitations mentioned above</li>
+   <li>Design a logo</li>
+   <li>Make it possible to load a custom lab from USB-stick</li>
+   <li>Create a new lab</li>
+   <li>Install Flash player plugin in Firefox</li>
+   <li>Add more labs</li>
+   <li>Increase the screensaver timeout</li>
+   <li>Testing, testing and testing</li>
+  </ul>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+	</tr>
+</table>
+</center>
+</body>
+</html>
+
+ 

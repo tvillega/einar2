@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<html>
+<head>
+	 <title>Einar</title>
+	 <link rel="stylesheet" type="text/css" href="main.css"/>
+</head>
+<body>
+<center>
+<table border="0">
+        <tr>
+	  <td style="text-align: center"><img src="logo.png" alt="logo"/></td>
+	</tr>
+				
+        <tr>
+		<td style="text-align: center">| <a href="index.html">Home</a> | <a href="userguide.html">User guide</a> | <a href="advguide.html">Advanced user guide</a> | 
+		<a href="links.html">Links</a> | <a href="download.html">Download</a> | <a href="contact.html">Contact</a> |</td>
+	</tr>
+	<tr>
+		<td style="text-align: center"><h1>Advanced user guide</h1></td>
+	</tr>
+
+	<tr>
+		<td>
+			<h2>Index</h2>
+			<ul>
+				<li><a href="#manual">Starting a lab manually</a></li>
+				<li><a href="#remaster">Remastering</a></li>
+				<li><a href="#kernel">Kernel customizing and Xen upgrading</a></li>
+			</ul>
+			<hr/>
+			<h2><a name="manual"/>Starting a lab maually</h2>
+			<h3>Creating a domain</h3>
+			Create a new domain and attach to it
+			<div class="code">
+			xm create -c /einar/xen/einar-domU.cfg name=domU memory=11
+			</div>
+			<code>xm</code> is the tool to manage Xen domains. <code>-c</code> attaches a console to the new domU, <code>name=</code> sets the name
+			and <code>memory=</code> sets the memory (in MB). The minumum memory required to boot a webserver is 6MB, minimum for a router is 11MB. The default is 12.<br/>
+			To leave the console, press <code>ctrl+]</code>. We don't know how to do this on swedish keyboard<br/>
+			To reconnect the console, first find the domain ID
+			<div class="code">
+			xm list
+			</div>
+			and type
+			<div class="code">
+			xm console &lt;dom-ID&gt;
+			</div>
+			<h3>Networking</h3>
+			In this example we will connect eth0 of domU to the physical network and eth1 to a virtual switch.<br/>
+			First create the switch
+			<div class="code">
+			brctl addbr switch1<br/>
+			ifconfig switch1 up
+			</div>
+			then create the new domain
+			<div class="code">
+			xm create -c /einar/xen/einar-domU.cfg name=domU vif=bridge=xenbr0 vif=bridge=switch1
+			</div>
+			<code>xenbr0</code> is created on startup of dom0 and is attached to the physical eth0
+			<h3>Configuring domU</h3>
+			Kernel parameters can be passed to domU with the <code>extra=''</code> parameter to <code>xm</code>
+			<div class="code">
+			xm create -c /einarc/xen/einar-domU.cfg name=domU vif=bridge=xenbr0 vif=bridge=switch1 extra='hostname=domU eth0=dhcp eth0bw=1mbit,10ms eth1=10.0.0.1/8 eth1bw=100mbit,100ms dhttp=yes vtysh=yes ospfd=yes bgpd=yes ripd=yes isisd=yes'
+			</div>
+			<code>hostname=domU</code> sets the hostname to domU, <code>eth0=dhcp</code> will use dhcp to set the ip of eth0, <br/>
+			<code>eth0bw=1mit,10ms</code> limits the outgoing bandwidth to 1Mbit and sets delay to 10ms, <br/>
+			<code>eth1=10.0.0.1/8</code> sets the ip of eth1, <code>dhttpd=yes</code> starts the webserver, <br/>
+			<code>vtysh=yes</code> starts Quagga and it's interface, <code>ospfd=yes</code> configures quagga to start the ospf daemon.<br/>
+			<p>The bw setting can be eth[0-2]bw=\d{1,6}[k|m]bit,\d{1,6}ms. Specifying <code>100mbit</code> will not set bandwidth, only delay.<br/>
+			Sepcifying <code>0ms</code> will not set delay, only bandwidth</p>
+			<p>The kernel parameters are read by <code>/etc/rcS.d/S40hostname.sh</code>, <code>/etc/rcS.d/S41configquagga</code> and <code>/etc/rc2.d/S40setupifs</code> in domU.
+			<p>All or any of the <code>extra=</code> parameters can be omitted and configured manually after domU has started</p>
+			<h3>Cleaning up</h3>
+			Destroy the started domain
+			<div class="code">
+			xm destroy &lt;dom-ID&gt;
+			</div>
+			Remove the switch
+			<div class="code">
+			ifconfig switch1 down<br/>
+			brctl delbr switch1
+			</div>
+			Clean up storage
+			<div class="code">
+			for i in `seq 1 31`; do losetup -d /dev/loop$i; done
+			</div>
+			This will only remove unused loopback devices.
+			
+			<hr/>
+			<h2><a name="remaster"/>Remastering</h2>
+			<p>These instructions are based on the <a href="http://www.knoppix.net/wiki/Knoppix_Remastering_Howto">Knoppix Remastering Howto</a> at knoppix.net. 
+			The main difference is that we use grub so the boot image has to be <code>stage2_eltorito.</code></p>
+			<p>In this example <code>/dev/sda1</code> is used for storage, change it to whatever partition you are using.</p>
+			<h3>Preparing</h3>
+			Boot from the live cd and mount the harddrive. The partition needs to be at least 3,2GB
+			<div class="code">mount /dev/sda1</div>
+			Create a directory to work in
+			<div class="code">mkdir /mnt/sda1/knx</div>
+			You will need up to 1GB of memory to do the compression. If you don't have that much RAM, use swap.<br/>
+			If you don't have enough memory the compressed KNOPPIX file will be smaller and it will not be possible to boot. You will not get any error message!
+			<div class="code">
+			cd /mnt/sda1/knx<br/>
+			dd if=/dev/zero of=swapfile bs=1M count=750<br/>
+			mkswap swapfile<br/>
+			swapon swapfile<br/>
+			</div>
+			We will create two directories, <code>source</code> will contain the uncompressed files and <code>master</code> will contain the big compressed file
+			and other things that need to be uncompressed.
+			<div class="code">
+			mkdir -p /mnt/sda1/knx/master/KNOPPIX<br/>
+			mkdir -p /mnt/sda1/knx/source/KNOPPIX<br/>
+			</div>
+			Copy the files from the compressed filesystem (this will take some time)
+			<div class="code">
+			cp -Rp /KNOPPIX/* /mnt/sda1/knx/source/KNOPPIX
+			</div>
+			Copy all files that will not be compressed (skipping the big compressed KNOPPIX file)
+			<div class="code">
+			cd /cdrom && find . -size -200000k -type f -exec cp -p --parents '{}' /mnt/sda1/knx/master/ \;
+			</div>
+			Now you are ready to start customization. See the Knoppix Remastering Howto for more information about that
+			
+			<h3>Creating the iso</h3>
+			Compress the contents of <code>/mnt/sda1/knx/source</code> to <code>/mnt/sda1/knx/master/KNOPPIX</code>
+			<div class="code">
+			mkisofs -R -U -V "KNOPPIX.net filesystem" -publisher "KNOPPIX www.knoppix.net" \<br/>
+			-hide-rr-moved -cache-inodes -no-bak -pad /mnt/sda1/knx/source/KNOPPIX \<br/>
+			| nice -5 /usr/bin/create_compressed_fs - 65536 > /mnt/sda1/knx/master/KNOPPIX/KNOPPIX<br/>
+			</div>
+			Update the md5 hashes. This is used when giving the <code>testcd</code> kernel parameter to verify the cd
+			<div class="code">
+			cd /mnt/sda1/knx/master<br/>
+			find -type f -not -name md5sums -not -name boot.cat -not -name isolinux.bin \<br/>
+			-exec md5sum '{}' \; > KNOPPIX/md5sums<br/>
+   			</div>
+			Now create the iso file
+			<div class="code">
+			mkisofs -pad -l -r -J -v -V "KNOPPIX" -no-emul-boot -boot-load-size 4 \<br/>
+			-boot-info-table -b <b>boot/grub/stage2_eltorito</b> -c boot/isolinux/boot.cat \<br/>
+			-hide-rr-moved -o /mnt/sda1/knx/einar.iso /mnt/sda1/knx/master<br/>
+			</div>
+			Your new iso is now in <code>/mnt/sda1/knx/einar.iso</code>
+			
+			<h3>Script</h3>
+			I created a script that will create the ISO and copy it to an samba share. You must do the preparations above first. Use at own risk.
+			<div class="code">
+<pre>
+#!/bin/bash
+#==============================================================================
+# Example script to remaster Einar.
+# It takes one argument that will be part of the filename for the iso
+#
+# Anders Siverby 2006, siverby@kth.se
+#=============================================================================
+echo turning on swap
+swapon /mnt/sda1/swapfile
+echo renewing ip
+pump
+echo removing old .iso
+rm -f /mnt/sda1/knx/einar*
+echo compressing filesystem
+mkisofs -R -U -V "KNOPPIX.net filesystem" -publisher "KNOPPIX www.knoppix.net" \
+-hide-rr-moved -cache-inodes -no-bak -pad /mnt/sda1/knx/source/KNOPPIX \
+| nice -5 /usr/bin/create_compressed_fs - 65536 > /mnt/sda1/knx/master/KNOPPIX/KNOPPIX
+echo calculation checksum
+cd /mnt/sda1/knx/master
+find -type f -not -name md5sums -not -name boot.cat -not -name isolinux.bin \
+   -exec md5sum '{}' \; > KNOPPIX/md5sums
+echo creating iso
+mkisofs -pad -l -r -J -v -V "KNOPPIX" -no-emul-boot -boot-load-size 4 \
+	  -boot-info-table -b boot/grub/stage2_eltorito -c boot/isolinux/boot.cat \
+		 -hide-rr-moved -o /mnt/sda1/knx/einar$1.iso /mnt/sda1/knx/master
+echo connecting with smb
+mkdir /mnt/knx
+cp --reply=yes /usr/share/samba/smb.conf /etc/samba/smb.conf
+mount -t smbfs -o username=johnsmith,password=fivebananas //192.168.222.1/knx /mnt/knx
+echo copying to smb
+cp /mnt/sda1/knx/einar$1.iso /mnt/knx/
+echo Done.
+</pre>
+			</div>
+			
+			<hr/>
+			<h2><a name="kernel"/>Kernel customizing and Xen upgrading</h2>
+			<p>Domain 0 and domain U run different kernels. Altough it is possible to create a kernel that will work within both domains, it is not a desirable solution. All the hardware support needed for domain 0 is useless and a waste of space and resources in domain U. The domain U kernel is further customized from default domain U config. Most stuff that is not explicitly needed is removed, while features like traffic shaping is added. The domain 0 is also a bit customized. Sound support and other unneccessary parts have been stripped to keep memory usage down.</p>
+			<p>Kernel configuration files are included in the CD[1][2] for future customization or upgrading purposes. Please note that these kernel and their config files are xen-patched version 2.6.15. If you upgrade to a later kernel, make sure to pay attention to any newly added kernel options/modules. Everything that is added to the kernel will make it's size increase, and with that, may render the kernel unbootable within the configured memory limits. Also note that you cannot use a standard kernel from kernel.org, you need the xen-patched sources[3][4].</p>
+			<h3>Upgrading the domain 0 kernel</h3>
+			<p>Kernel modules reside in their normal place, /lib/modules when running the CD. Altough, since this is a LiveCD system, some modules need to be accessible in an early startup phase. These modules are SCSI/SATA provide access to the device containing the Einar boot media. Additionally, cloop[5] (Compressed loopback filesystem) and unionfs[6] modules are needed here. These modules reside within the miniroot filesystem. The miniroot is a gzipped ext2 filesystem within a file, and is placed together with the domain 0 kernel[1]. To modify this filesystem, gunzip it and mount it. Remember to unmount and gzip again when done. If the kernel is renamed (typically due to new version), remember to update the bootloader config file.[7]</p>
+			<h3>Upgrading the domain U kernel</h3>
+			<p>Kernel modules (if any) reside within the domain U filesystem[8]. Remember to unmount when done. If the kernel is renamed (typically due to new version), remember to update the domain U virtual machine config file[9].</p>
+			<h3>General note about loopback filesystems (filesystem within a file)</h3>
+			<p>You mount a loopback filesystem like this: "mount -o loop einar-domU.img /path/to/something". <br/>
+			Also, it's a good idea to run fsck before mastering a CD if the filesystem has been altered. If you need to create a new, larger filesystem, remember to set it's options not to auto-check itself every n mounts/n days.</p>
+			<h3>Kernel/Xen Hypervisor Version:</h3>
+			<p>The current kernel (aswell as the xen hypervisor and applications itself) is taken from xen-unstable[3][4] as of 2006-02-03. At the time, the latest stable version of Xen (3.0.1) was bundled with kernel 2.6.12.6. With this kernel version, it seemed impossible to get a domain U running with less than 17 MB memory assigned.<br/>
+			<br/>
+			Since the kernel used cannot be any older than the Xen hypervisor, we were forced to move up to xen-unstable. Next stable release of Xen is likely to include sources for a 2.6.15 or 2.6.16 kernel, but project deadline prevented us from waiting for this.</p>
+			<p>
+			[1] Domain 0 kernel, kernel config and miniroot is stored in the native cdrom filesystem,<br/>
+				available as /mnt/cdrom/boot/xen when running the system from CD.<br/>
+			[2] Domain U kernel and config is stored within the compressed Knoppix filesystem, available as<br/>
+				/boot when running the system from CD.<br/>
+			[3] Available from the Xen repository at http://xenbits.xensource.com/xen-unstable.hg<br/>
+			[4] Use the mercurial client ( http://www.selenic.com/mercurial/ )<br/>
+			[5] http://www.knoppix.net/wiki/Cloop<br/>
+			[6] http://www.fsl.cs.sunysb.edu/project-unionfs.html<br/>
+			[7] The bootloader config file is stored in the native cdrom filesystem, available as<br/>
+				/mnt/cdrom/boot/grub/menu.lst when running the sytem from CD.<br/>
+			[8] The domain U filesystem is stored in the native cdrom filesystem, available as<br/>
+				/mnt/cdrom/einar-domU.img when running the sytem from CD.<br/>
+			[9] The domain U virtual machine config file is stored within the compressed Knoppix filesystem,<br/>
+				available as /einar/xen/einar-domU.cfg when running the system from CD.<br/>
+			</p>		
+			
+		</td>
+	</tr>
+</table>
+</center>
+</body>
+</html>

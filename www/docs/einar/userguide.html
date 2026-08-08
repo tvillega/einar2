@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<html>
+<head>
+	 <title>Einar</title>
+	 <link rel="stylesheet" type="text/css" href="main.css"/>
+</head>
+<body>
+<center>
+<table border="0">
+        <tr>
+	  <td style="text-align: center"><img src="logo.png" alt="logo"/></td>
+	</tr>
+				
+	<tr>
+		<td style="text-align: center">| <a href="index.html">Home</a> | <a href="userguide.html">User guide</a> | <a href="advguide.html">Advanced user guide</a> | 
+		<a href="links.html">Links</a> | <a href="download.html">Download</a> | <a href="contact.html">Contact</a> |</td>
+	</tr>
+	<tr>
+		<td style="text-align: center"><h1>User guide</h1></td>
+	</tr>
+	<tr>
+		<td>
+			<h2>Index</h2>
+			<ul>
+				<li><a href="#glossary">Glossary</a></li>
+				<li><a href="#networking">Virtual networking</a></li>
+				<li><a href="#ui">User interface</a></li>
+				<ul>
+					<li><a href="#startlab">Starting a lab</a></li>
+					<li><a href="#stoplab">Stopping a lab</a></li>
+					<li><a href="#createlab">Creating a lab</a></li>
+					<li><a href="#savelab">Saving a lab</a></li>
+					<li><a href="#importlab">Importing a lab</a></li>
+				</ul>
+				<li><a href="#quagga">Quagga</a></li>
+				<ul>
+					<li><a href="#confifs">Configure interfaces</a></li>
+					<li><a href="#confprot">Configure routing protocols</a></li>
+				</ul>
+				<li><a href="#ethereal">Ethereal</a></li>
+				<ul>
+					<li><a href="#startethereal">Starting Ethereal</a></li>
+					<li><a href="#capture">Capturing</a></li>
+				</ul>
+				<li><a href="#linux">Linux</a></li>
+				<ul>
+					<li><a href="#ftp">ftp</a></li>
+					<li><a href="#ifconfig">ifconfig</a></li>
+					<li><a href="#route">route</a></li>
+					<li><a href="#lynx">lynx</a></li>
+				</ul>
+			</ul>
+			<hr/>
+			<h2><a name="glossary"/>Glossary</h2>
+			<p>In Xen terminology dom0 is the physical computer and domU is a virtual computer</p>
+			<hr/>
+			<h2><a name="networking"/>Virtual networking</h2>
+			<p>Networking in Xen is rather complicated and a common source of confusion for developers but more about that in the advanced user guide.<br/> 
+			This is how it works from the users point of view:<br/>
+			When a lab is started a number of virtual switches are created in dom0 that the domUs will connect to. 
+			domUs are newer connected directly to eachother, there is always a switch between them.<br/>
+			eth0 of domU is always connected to the switch xenbr0</p>
+			<hr/>
+			<h2><a name="ui"/>User interface</h2>
+			<h3><a name="startlab"/>Starting a lab</h3>
+			<p>When the computer starts you will automatically reach the user interface as shown above.</p>
+			<p>To start a lab, simply click "start a lab". You will see a list of categories, click one one of them and you will se the names of all the labs in that category.
+			Click on the lab you want to start and you will see a topology map. Click on "start lab" and the routers and computers will automatically start.</p>
+			<h3><a name="stoplab"/>Stopping a lab</h3>
+			<p>When the lab has started there is a link at the end of the page in Firefox that says "Stop lab", simply click it. There is no need to power down the virtual computers first.</p>
+			<p>If you loose the webpage the lab can be stopped from "running labs" on the homepage.</p>
+			<h3><a name="createlab"/>Creating a lab</h3>
+			<p>Click "Create a lab" on the startpage and follow the dialog. You can create 16 virtual machines at most if you have enough memory. 
+			With 256MB of RAM, 8 virtual machines (routers and computers) is the max recommended, trying to start more might cause your computer to crash.</p>
+			<p>Your new lab will be reachable from from "start a lab" under the category "custom".</p>
+			<h3><a name="savelab"/>Saving a lab</h3>
+			<p>Browse to your lab and click "save lab". The lab will be saved in /home/root/labs/, you can upload it by ftp from a dom0 terminal (see the Linux section below)</p>
+			<h3><a name="importlab"/>Importing a lab</h3>
+			<p>First make sure you have internet connectivity. If you use DHCP, click "renew IP" from the startpage</p>
+			<p>Click on "start a lab" and then "import lab". Write a URL in the textfield and click submit. 
+			Your new lab will be accessible from "imported" under "create a lab"</p>
+			<hr/>
+			<h2><a name="quagga"/>Quagga</h2>
+			<p>Quagga is very similar to IOS but there are some diefferences. I will only discuss the most importent commands, check the Quagga documentation for more info</p>
+			<h3><a name="confifs"/>Configure interfaces</h3>
+			<p>When a routers starts you will be at the equivalent of an enable prompt on IOS</p>
+			<p>The interfaces are always named eth0, eth1 and eth2 (if 3 interfaces are specifyed).</p>
+			<div class="code">Hello, this is Quagga (version 0.99.3).<br/>
+			Copyright 1996-2005 Kunihiro Ishiguro, et al.<br/>
+			<br/>
+			router1# configure terminal<br/>
+			router1(config)# interface eth0<br/>
+			router1(config-if)# ip address 192.168.0.1/24<br/></div>
+			Commands can be abbreviated just as in IOS<br/><div class="code">
+			router1(config-if)# exit<br/>
+			router1(config)# in eth1<br/>
+			router1(config-if)# ip add 192.168.1.1/24</div>
+			It is only possible to have one loopback interface but it can have multiple ip addresses
+			<div class="code">
+			router1(config)# interface lo<br/>
+			router1(config-if)# ip address 192.168.2.1/24<br/>
+			router1(config-if)# ip address 192.168.3.1/24<br/>
+			</div>
+			<h3><a name="confprot"/>Configure routing protocols</h3>
+			There can only be one OSPF routing process so the process number is not entered<br/><div class="code">
+			router1(config)# router ospf<br/>
+			router1(config-router)# network 192.168.0.0/24 area 0<br/></div>
+			<hr/>
+			<h2><a name="ethereal"/>Ethereal</h2>
+			<p>Ethereal is a very powerfull open source network protocol analyzer.<p>
+			<p>For more information see the <a href="http://www.ethereal.com">Ethereal website</a></p>
+			<h3><a name="startethereal"/>Starting Ethereal</h3>
+			<p>When you start a lab there will be a link "Start Ethereal" at the end of the page. 
+			It can also be started from the homepage</p>
+			<h3><a name="capture"/>Capturing</h3>
+			<p>Click on the top left icon, choose the interface you want to capture on and click OK.</p>
+			<p>To analyze the traffic between two routers you will capture on the switch that both routers are connected to. 
+			A virtual switch is also an interface in dom0. The switches in the preconfigured labs are named by the machines that are connected to it, 
+			e.g. the switch between router1 and router2 is named <code>r1-r2</code></p>
+			<hr/>
+			<h2><a name="linux"/>Linux</h2>
+			<h3><a name="ftp"/>ftp</h3>
+			<p>There is a simple ftp client, it's equivalent also exist on Windows. I will give an example on how to upload a lab to a server.</p>
+			<div class="code">
+			root@0[~]# cd /home/root/labs<br/>
+			root@0[labs]# ls<br/>
+			one_router.tar.gz<br/></div>
+			Connecting to the server
+			<div class="code">
+			root@0[labs]# ftp ftp.server.com<br/>
+			Connected to ftp.server.com.<br/>
+			220 ProFTPD 1.2.10 Server (server) [10.22.18.16]<br/></div>
+			Enter the username
+			<div class="code">
+			Name (ftp.server.com:root): username<br/>
+			331 Password required for xen.<br/>
+			</div>
+			Enter the password
+			<div class="code">
+			Password:<br/>
+			230 User username logged in.<br/>
+			Remote system type is UNIX.<br/>
+			Using binary mode to transfer files.<br/>
+			</div>
+			Create a directory
+			<div class="code">
+			ftp> mkdir labs<br/>
+			257 "/labs" - Directory successfully created<br/>
+			ftp> cd labs<br/>
+			250 CWD command successful<br/>
+			</div>
+			Uploading a file
+			<div class="code">
+			ftp> put one_router.tar.gz<br/>
+			local: one_router.tar.gz remote: one_router.tar.gz<br/>
+			200 PORT command successful<br/>
+			150 Opening BINARY mode data connection for one_router.tar.gz<br/>
+			226 Transfer complete.<br/>
+			1135 bytes sent in 0.00 secs (954.7 kB/s)<br/>
+			</div>
+			Exiting
+			<div class="code">
+			ftp> bye<br/>
+			221 Goodbye.<br/>
+			root@0[labs]#<br/>
+			</div>
+			
+			<h3><a name="ifconfig"/>ifconfig</h3>
+			Setting the ip address:<br/>
+			<div class="code">
+			ifconfig eth0 192.168.0.1 netmask 255.255.255.0 broadcast 192.168.0.255
+			</div>
+			
+			<h3><a name="route"/>route</h3>
+			Setting the default gateway:<br/>
+			<div class="code">
+			route add default gw 192.168.0.1
+			</div>
+			
+			<h3><a name="lynx"/>lynx</h3>
+			<p>There is a simple textbased webbrowser that can be used to test layer 7 connectivity between a virtual computer and a virtual webserver</p>
+			<div class="code">
+			lynx 192.168.01<br/>
+			</div>
+			<p>To exit just press <code>Q</code> and answer <code>Y</code></p>
+		</td>
+	</tr>
+</table>
+</center>
+</body>
+</html>

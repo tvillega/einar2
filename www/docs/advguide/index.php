@@ -1,55 +1,14 @@
 <?php
 
-require_once __DIR__ . '../../../vendor/Michelf/MarkdownExtra.inc.php';
-
-$markdownText = file_get_contents(__DIR__ . '/md/index.md');
-$htmlContent = Michelf\MarkdownExtra::defaultTransform($markdownText);
+$advguideIndex  = true;
+include(__DIR__ . '/../assets/header.php');
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Einar2</title>
-        <link rel="stylesheet" type="text/css" href="../stylesheet.css">
-        <style>
-            .image-frame {
-              display: inline-block;
-              background: url("../digging.png") no-repeat center;
-              width: calc(4vw + 4vh);
-              height: calc(4vw + 4vh);
-              background-size: cover;
-            }
-        </style>
-    </head>
-    <body>
+<h2>Index</h2>
+<ul>
+    <li><a href="netns.php">Attach network namespaces to host</a></li>
+    <li><a href="createvm.php">Create an Einar2 VM</a></li>
+</ul>
 
-        <div>
-
-            <div>
-                <div class="header-frame">
-                    <span class="image-frame"></span>
-                    <h5 class="text-frame">Einar2</h5><br>
-                </div>
-            </div>
-
-            <center>
-                <div class="topnav">
-                <a href="/docs/index.php">Home</a>
-                <a href="/docs/userguide/index.php">User guide</a>
-                <a class="active"  href="/docs/advguide/index.php">Advanced user guide</a>
-                <a href="/docs/links/index.php">Links</a>
-                <a href="/docs/download/index.php">Download</a>
-                <a href="/docs/contact/index.php">Contact</a>
-                </div>
-            </center>
-        </div>
-
-
-
-        <div>
-            <?php echo $htmlContent; ?>
-        </div>
-    </body>
-</html>
+<?php include(__DIR__ . '/../assets/footer.php'); ?>

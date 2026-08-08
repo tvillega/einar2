@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<html>
+<head>
+	<title>Einar</title>
+	<link rel="stylesheet" type="text/css" href="main.css"/>
+	<style type="text/css">
+		h3 {
+		   margin-bottom: 0px;
+		 }
+		h2 {
+		   margin-bottom: 0px;
+		 }
+		p {
+		   margin-top: 2px;
+		   margin-bottom: 4px;
+		 }
+    </style>
+</head>
+<body>
+<center>
+<table border="0">
+        <tr>
+                <td style="text-align: center"><img src="logo.png" alt="logo"/></td>
+        </tr>
+	<tr>
+		<td style="text-align: center">| <a href="index.html">Home</a> | <a href="userguide.html">User guide</a> | <a href="advguide.html">Advanced user guide</a> |
+		<a href="links.html">Links</a> | <a href="download.html">Download</a> | <a href="contact.html">Contact</a> |</td>
+	</tr>
+	<tr>
+		<td style="text-align: center"><h1>Download</h1></td>
+	</tr>
+	<tr>
+		<td>
+		<h2>Index</h2>
+		<ul>
+			<li><a href="#latest">Latest build</a></li>
+			<li><a href="#demo">Demo movie</a></li>
+			<li><a href="#relnotes">Release notes</a></li>
+			<li><a href="#changelog">Changelog</a></li>
+		</ul>
+		<hr/>
+		<h2><a name="latest"/>Latest build</h2>
+		<a href="einar62.iso">Einar build 62</a> (486MB) MD5: 52da56437567f3058d953d334db96541
+		<h2><a name="demo"/>Demo movie</h2>
+		<a href="einar_demo.avi">Einar demo</a> (13MB, 6min, divX)<br/>
+		A short demonstation of creating and performing a simple lab. It is recorded in VMware, the performance is better on a real computer.
+		<h2>Warning!</h2>
+		<p>This is experimental software. Use at own risk.</p>
+		<p>Security was not considered when developing this. The webserver (used for the user interface) is running as root.
+		If you are paranoid, unplug the network cable before booting.
+		<hr/>
+				<a name="relnotes"/>
+<h1>Release notes RC1</h1>
+   <h2>Glossary</h2>
+   <p>dom0 is the physical machine, domU is a virtual machine.</p>
+  <h2>Limitations</h2>
+    <h3>Links</h3>
+    <p>It is only possible to have 3 interfaces on a router, this is why we have modified the lab KTH-LAN. The reason for this is a bug in Xen.</p>
+  <h2>Known bugs</h2>
+   <h3>IS-IS does not work</h3>
+    <p>"Warning: Closing connection to isisd because of I/O error!". This is probably a bug in Quagga</p>
+   <h3>Lab CCNP 6.10.1 is missconfigured</h3>
+    <p>This will be a good troubleshooting execise. Locate the missconfiguration and edit /var/www/cgi-bin/labs/CCNP/6.10.1/startlab.sh to fix it. Run <code>xm destroy Workstation2</code> after stopping the lab</p>
+   <h3>Monitor is not detected</h3>
+    <p>The monitor is not detected in 2.6.15 kernel.</p>
+   <h3>Computer is not automatically shut down</h3>
+    <p>Shutdown locks the CD in the drive. Hit reset</p>
+   <h3>More in domU shows only first page</h3>
+    <p>This bug is inherited from Crab.</p>
+   <h3>Unsupported harware</h3>
+   <p>Xfce doesn't want to start on Nvidia TNT2, this can be mitigated by appending the kernel parameter <code>xmodule=nv</code></p>
+	
+		<hr/>
+		<a name="changelog"/><h2>Changelog</h2>
+		<h3>Build 68 (2006-03-06)</h3>
+		<p>Added labs</p>
+		<h3>Build 67 (2006-03-06)</h3>
+		<p>Fixed bugs introduced in last build</p>
+		<h3>Build 65-66 (2006-03-06)</h3>
+		<p>Experiment with autamated creation of links to external storage</p>
+		<h3>Build 64 (2006-03-06)</h3>
+		<p>Added automatic creation of links in /usr/sbin/rebuildfstab<br/>
+		Changed the name to Einar
+		</p>
+		<h3>Build 63 (2006-03-06)</h3>
+		<p>Commented /etc/resolv.conf in domU to prevent traceroute from querying DNS<br/>
+		Added explaining text to import lab and save lab<br/>
+		Improved USB support further and made it possible to save to USB<br/>
+		Istalled Flash player plugin in Firefox<br/>
+		</p>
+		<h3>Build 62 (2006-03-01)</h3>
+		<p>Changed to dynamic reallocation of memory when stopping lab kth-lan<br/>
+		Optimized dom0-min-men<br/>
+		Improved USB support in "Import lab"<br/>
+		Changed the startpage for Lynx in domU<br/>
+		</p>
+		<h3>Build 61 (2006-02-28)</h3>
+		<p>Minor cleanup. Released as beta 4</p>
+		<h3>Build 60 (2006-02-28)</h3>
+		<p>
+		Added documentation to the CD<br/>
+		Fixed bug in /usr/sbin/create_cow that didn't allow manual creation of domains<br/>
+		Added autodetection of USB in "Import lab" (not completed)<br/>
+		Fixed bug in "givemeaterminal"<br/>
+		</p>
+		<h3>Build 59 (2006-02-27)</h3>
+		<p>
+		Actually put the new domU kernel on the CD<br/>
+		cleanup of boot folders<br/>
+		new 2.6.15-xen0 kernel with USB and SCSI modules<br/>
+		</p>
+		<h3>Build 58 (2006-02-27)</h3>
+		<p>
+		Fixed bug in createlab script that didn't always set bandwidth<br/>
+		Fixed bug in startprogram that didn't include $HOME variable<br/>
+		Set bandwith in CCNP/case study 3 for the T1 and T3 lines<br/>
+		Added user interface option to set the keyboard layout to US<br/>
+		Fixed bug in "click to focus" <br/>
+		Added netem to domU kernel and changed the script in domU that sets bandwidth and delay<br/>
+		Added startup script that sets max_loop when running 2.6.12.6 kernel<br/>
+		</p>
+		</td>
+	</tr>
+</table>
+</center>
+</body>
+</html>

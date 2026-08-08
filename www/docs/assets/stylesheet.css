@@ -1,6 +1,14 @@
 body {
   padding: 20px;
   background: #FFF5EE;
+  width: 760px;
+  padding-left: 10px;
+  padding-right: 10px;
+  vertical-align: middle;
+}
+html {
+  display: table;
+  margin: auto;
 }
 code {
   background-color: #F8F8FF;
@@ -28,12 +36,6 @@ code {
 .image-container {
   float: left;
   margin-right: 20px;
-}
-.header-frame {
-  display: flex;
-  align-items: center;
-  top: 10%;
-  left: 50%;
 }
 .text-frame {
   font-size: calc(2.5vw + 2.5vh);
