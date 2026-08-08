@@ -1,5 +1,18 @@
 # Changelog
 
+## [alpha.6](https://github.com/tvillega/einar2/releases/tag/alpha.6) (2026-08-08)
+## What's Changed
+* Fixed prompt to load configurations when missing the interfaces list
+* Added Tera variable to use custom images on archetypes
+* Added a vendor php library to convert markdown files into html
+* Added changelog section to website main page
+* Added utility to sync markdown documentation between devel and prod
+* Added env file to setup local devel environment
+* Added documentation inside the docker image
+* Added documentation to attach docker netns into the host system
+* Added configuration file to change default docker image
+* Deprecated generation of registry for local devel
+
 ## [alpha.5](https://github.com/tvillega/einar2/releases/tag/alpha.5) (2026-08-04)
 ## What's Changed
 * Upgraded docker image to `tvillega/einar2:alpha.5`
