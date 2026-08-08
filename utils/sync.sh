@@ -16,20 +16,14 @@ fi
 
 cp -rv --remove-destination archetypes/*  "${archdir}/"
 
-## SYNC DOCS (ROOT)
+## SYNC DOCS INDEX + CHANGELOG
 
-docsdir="www/docs/md"
-
-if [[ ! -d "$docsdir" ]] ; then
-  mkdir -v "$docsdir"
-fi
-
-cp -rv --remove-destination docs/index.md  "${docsdir}/index.md"
-cp -v  --remove-destination CHANGELOG.md   "${docsdir}/releasenotes.md"
+cp -rv --remove-destination docs/index.md  www/docs/assets/index.md
+cp -v  --remove-destination CHANGELOG.md   www/docs/assets/releasenotes.md
 
 ## SYNC USER GUIDE
 
-guidedir="www/docs/userguide/md"
+guidedir="www/docs/assets/userguide"
 
 if [[ ! -d "$guidedir" ]] ; then
   mkdir -v "$guidedir"
@@ -39,43 +33,13 @@ cp -rv --remove-destination docs/userguide/* "${guidedir}/"
 
 ## SYNC ADVANCED USER GUIDE
 
-advguidedir="www/docs/advguide/md"
+advguidedir="www/docs/assets/advguide"
 
 if [[ ! -d "$advguidedir" ]] ; then
   mkdir -v "$advguidedir"
 fi
 
 cp -rv --remove-destination docs/advguide/* "${advguidedir}/"
-
-## SYNC CONTACT
-
-contactdir="www/docs/contact/md"
-
-if [[ ! -d "$contactdir" ]] ; then
-  mkdir -v "$contactdir"
-fi
-
-cp -rv --remove-destination docs/contact/* "${contactdir}/"
-
-## SYNC DOWNLOAD
-
-downloaddir="www/docs/download/md"
-
-if [[ ! -d "$downloaddir" ]] ; then
-  mkdir -v "$downloaddir"
-fi
-
-cp -rv --remove-destination docs/download/* "${downloaddir}/"
-
-## SYNC LINKS
-
-linksdir="www/docs/links/md"
-
-if [[ ! -d "$linksdir" ]] ; then
-  mkdir -v "$linksdir"
-fi
-
-cp -rv --remove-destination docs/links/* "${linksdir}/"
 
 ## SYNC SETTINGS
 
