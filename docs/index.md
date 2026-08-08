@@ -27,7 +27,7 @@ services:
       - "80:80"
     volumes:
       - ./labs:/einar2/labs
-    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2.conf
+    entrypoint: /einar2/entrypoint.sh
 ```
 
 You will get a startpage at `localhost:80` where you can get started. The license is AGPL.

@@ -10,7 +10,7 @@ Create a directory on your system and enter it:
 mkdir path/to/work && cd path/to/work
 ```
 
-Use the image [tvillega/einar2:latest](https://hub.docker.com/r/tvillega/einar2) to create the following `docker-compose.yaml`:
+Create the following `docker-compose.yaml`:
 
 ```
 services:
@@ -23,7 +23,7 @@ services:
       - "80:80"
     volumes:
       - ./labs:/einar2/labs
-    entrypoint: /usr/sbin/lighttpd -D -f /etc/lighttpd/einar2.conf
+    entrypoint: /einar2/entrypoint.sh
 ```
 
 Now you can go to `localhost` or `127.0.0.1:80` on your web browser to start using Einar2.
@@ -40,7 +40,7 @@ einar2
 
 ### Einar1.0
 
-Einar stands for Einar Is Not A Router and it's a custom Knoppix VM create by group of college students in Sweden circa 2003.
+Einar stands for Einar Is Not A Router and it's a custom Knoppix VM create by group of college students in Sweden circa 2006.
 All the credits of this invention, as well as the authorship of the name `Einar` goes to them.
 
 ### [michelf/php-markdown](https://github.com/michelf/php-markdown)
