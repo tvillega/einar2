@@ -3,7 +3,7 @@
 Create a `qcow2` image:
 
 ```
-qemu-img create -f qcow2 einar2.img 15G
+qemu-img create -f qcow2 einar2.img 4.7G
 ```
 
 Enable Network Block Device (nbd) on the kernel:
@@ -18,7 +18,7 @@ Connect the image to a nbd:
 qemu-nbd --connect=/dev/nbd0 einar2.img
 ```
 
-Now `/dev/nbd0` will act as a 15G disk device on the system.
+Now `/dev/nbd0` will act as a 4.7G disk device on the system.
 
 Partition the disk:
 
@@ -29,7 +29,7 @@ fdisk /dev/nbd0
 Follow the utility instructions for:
 
 * create a new empty GPT partition table
-* add a new partition (1G)
+* add a new partition (300M)
 * add a new partition (rest of device)
 * write table to disk and exit
 
@@ -46,16 +46,22 @@ Create a `ext4` filesystem on `*p2`:
 mkfs.ext4 -L ROOT /dev/nbd0p2
 ```
 
-Create a mount point:
+Create a mount point for `ROOT`:
 
 ```
-mkdir -p mnt/efi
+mkdir -p mnt
 ```
 
 Mount the `root` partition:
 
 ```
 mount /dev/nbd0p2 mnt
+```
+
+Create a mount point for `ESP`:
+
+```
+mkdir -p mnt/efi
 ```
 
 Mount the `esp` partition:
@@ -138,7 +144,20 @@ apt install -y \
   systemd-boot \
   dhcpcd \
   nano \
-  zstd
+  zstd \
+  wireshark \
+  dnsutils \
+  tcpdump \
+  ncat \
+  nmap \
+  hping3 \
+  lxde-core
+```
+
+Clean packages cache:
+
+```
+apt clean && apt autoclean && apt autoremove
 ```
 
 Set a hostname:
@@ -203,12 +222,6 @@ by explicitly specifing the kernel image as it read your host kernel instead:
 ```
 PATH=/usr/sbin:$PATH
 update-initramfs -c -k <real-kernel-version-as-seen-in-/boot>
-```
-
-Install a desktop environment:
-
-```
-apt install lxde-core
 ```
 
 Install firefox (multi-step, see resources).
