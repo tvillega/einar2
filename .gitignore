@@ -4,7 +4,7 @@ labs
 www/archetypes
 www/docs/assets/advguide
 www/docs/assets/userguide
-www/docs/index.md
-www/docs/releasenotes.md
+www/docs/assets/index.md
+www/docs/assets/releasenotes.md
 www/labs
 www/settings.json
