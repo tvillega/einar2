@@ -47,3 +47,17 @@ Docker will not re-use them, so you'll have to delete them by hand:
 ```
 ip netns delete <netns-basepath> <netns-pid>
 ```
+
+### Resources
+
+* https://mylinux.work/guides/docker-networking/
+* https://labs.iximiuz.com/tutorials/container-networking-from-scratch
+* https://4sysops.com/archives/macvlan-network-driver-assign-mac-address-to-docker-containers/
+* https://iximiuz.com/en/series/debunking-container-myths/
+* https://www.youtube.com/watch?v=6v_BDHIgOY8
+* https://github.com/oneuptime/blog/tree/master/posts/2026-03-20-list-all-network-namespaces-linux
+* https://stackoverflow.com/questions/67971506/use-unshare-to-start-process-in-existing-net-namespace
+* https://4stm4.website/linux/2026/06/13/linux_native_container_en.html
+* http://events17.linuxfoundation.org/sites/events/files/slides/MINCS_OSSJapan_2017_0602.pdf?trk=public_post_comment-text
+* https://github.com/alpinelinux/alpine-make-rootfs
+* https://oneuptime.com/blog/post/2026-03-20-route-traffic-between-namespaces/view
