@@ -145,10 +145,10 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Xterm</span></p>
+                    <p><a href="/startprogram.php?program=lxterminal">Terminal</a></p>
                 </div>
                 <div style="display: table-cell;">
-                    <p>Gives you a terminal to dom0</p>
+                    <p>Gives you a terminal to the host</p>
                 </div>
             </div>
         </div>
@@ -156,10 +156,10 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Ethereal</span></p>
+                    <p><a href="/startprogram.php?program=wireshark">Wireshark</a></p>
                 </div>
                 <div style="display: table-cell;"> 
-                    <p>Starts ethereal to analyze network traffic</p>
+                    <p>Starts wireshark to analyze network traffic</p>
                 </div>
             </div>
         </div>
@@ -167,10 +167,10 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Leafpad</span></p>
+                    <p><a href="/startprogram.php?program=featherpad">Featherpad</a></p>
                 </div>
                 <div style="display: table-cell;">
-                    <p>Starts a texteditor that looks a lot like notepad in Windows</p>
+                    <p>Starts a texteditor that looks a lot like old school notepad in Windows</p>
                 </div>
             </div>
         </div>
