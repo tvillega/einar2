@@ -82,17 +82,6 @@
             </div>
         </div>
         <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
-                    <p><a href="/docs/index.php">Documentation</a></p>
-                </div>
-                <div style="display: table-cell;">
-                    <p>A snapshot of the Einar2 website</p>
-                </div>
-            </div>
-        </div>
-        <hr>
         <br>
 
         <center><p><b>Configurations</b></p></center>
@@ -112,10 +101,10 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Documentation</span></p>
+                    <p><a href="/docs/index.php">Documentation</a></p>
                 </div>
                 <div style="display: table-cell;">
-                    <p>A snapshot of Einar2 website</p>
+                    <p>A snapshot of the Einar2 website</p>
                 </div>
             </div>
         </div>
