@@ -4,7 +4,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 LIBX="${E2_LIBEXEC-./libexec}"
-_image="tvillega/einar2:latest"
+IMG="${E2_IMAGE-tvillega/einar2:latest}"
 
 gen_computer() {
 
@@ -17,7 +17,7 @@ gen_computer() {
 
   cat "archetypes/service-computer.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ Image }}|$_image|g" \
+    | sed "s|{{ Image }}|$IMG|g" \
     | sed "s|{{ Name }}|$name|g" 
 
 }
@@ -34,7 +34,7 @@ gen_server() {
 
   cat "archetypes/service-server.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ Image }}|$_image|g" \
+    | sed "s|{{ Image }}|$IMG|g" \
     | sed "s|{{ Name }}|$name|g" \
     | sed "s|{{ Port }}|$port|g"
 
@@ -51,7 +51,7 @@ gen_router() {
 
   cat "archetypes/service-router.yml" \
     | sed 's/{#[^}]*#}//g' \
-    | sed "s|{{ Image }}|$_image|g" \
+    | sed "s|{{ Image }}|$IMG|g" \
     | sed "s|{{ Name }}|$name|g"
 
 }
