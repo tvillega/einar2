@@ -2,7 +2,7 @@ services:
 
   e2-computer:
     build: 
-      context: "../build/e2-computer"
+      context: "./e2-computer"
       dockerfile: Dockerfile
     image: e2-computer:latest
     container_name: e2-computer
@@ -16,7 +16,7 @@ services:
 
   e2-server:
     build:
-      context: "../build/e2-server"
+      context: "./e2-server"
       dockerfile: Dockerfile
     image: e2-server:latest
     container_name: e2-server
@@ -30,7 +30,7 @@ services:
 
   e2-router:
     build:
-      context: "../build/e2-router"
+      context: "./e2-router"
       dockerfile: Dockerfile
     image: e2-router:latest
     container_name: e2-router
