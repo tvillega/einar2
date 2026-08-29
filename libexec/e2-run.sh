@@ -87,6 +87,53 @@ run_utility() {
 
 }
 
+run_ipc_listener() {
+
+  local socket="/var/run/einar.socket"
+  local daemon="/opt/einar2/bin/einard"
+
+  if [[ -S "$socket" ]] ; then
+    echo "Closing previous session"
+    rm -f "$socket"
+  fi
+
+  echo "Listening on socket $socket"
+  socat UNIX-LISTEN:"$socket",fork,reuseaddr SYSTEM:"$daemon"
+
+}
+
+run_ipc_command() {
+
+  local cmd="${1-}"
+  local socket="/var/run/einar.socket"
+
+  if [[ ! -S "$socket" ]] ; then
+    echo "failed to connect to the einar API at unix://${socket}"
+    exit
+  fi
+
+  printf -- "$cmd" | socat - UNIX-CONNECT:"$socket"
+
+}
+
+run_ipc() {
+
+  local what="${1-}"
+
+  if [[ ! -d "/opt/einar2" ]] ; then
+    echo "Einar2 is not installed as a system program"
+    exit
+  elif [[ -z "$what" ]] ; then
+    echo "usage: run ipc listener|<command>"
+    exit
+  elif [[ "$what" == "listener" ]] ; then
+    run_ipc_listener
+  else
+    run_ipc_command "$what"
+  fi
+
+}
+
 [[ -z "${1-}" ]] && exit
 
 while [[ "$1" != "--" ]]; do case $1 in
@@ -123,6 +170,11 @@ while [[ "$1" != "--" ]]; do case $1 in
   util)
     shift
     run_utility "${@}"
+    exit
+    ;;
+  ipc)
+    shift
+    run_ipc "${@}"
     exit
     ;;
   *)

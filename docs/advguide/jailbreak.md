@@ -53,3 +53,6 @@ Now your jailbreaked einar2 is capable of running commands on your host machine.
 * https://stackoverflow.com/questions/4113986/example-of-using-named-pipes-in-linux-shell-bash
 * https://stackoverflow.com/questions/14066992/what-does-minus-mean-in-exec-3-and-how-do-i-use-it
 * https://stackoverflow.com/questions/3173131/redirect-copy-of-stdout-to-log-file-from-within-bash-script-itself
+* https://stackoverflow.com/questions/26965342/how-to-set-a-timeout-on-fopen-with-named-pipes
+* https://stackoverflow.com/questions/25249892/how-to-prevent-fopen-from-hanging-when-opening-up-a-named-pipe-in-php
+* https://www.php.net/manual/en/function.stream-set-blocking.php

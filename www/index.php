@@ -1,3 +1,15 @@
+<?php
+
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/settings.json';
+if (!file_exists($settingsFile)) {
+  die("File settings.json missing at document root");
+}
+$settingsRaw   = file_get_contents($settingsFile);
+$settingsData  = json_decode($settingsRaw, true);
+
+?>
+
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -19,7 +31,12 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Not available right now!">Start a lab<span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Start a lab<span></p>
+                    <?php else: ?>
+                        <p><a href="/startlab.php">Start a lab</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>Start a new lab</p>
@@ -52,7 +69,12 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Not available.">Running labs</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Running labs<span></p>
+                    <?php else: ?>
+                        <p><a href="/runninglabs.php">Running labs</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>View and stop running labs</p>
@@ -93,7 +115,7 @@
                     <p><a href="/archetypes/">Archetypes</a></p>
                 </div>
                 <div style="display: table-cell;">
-                    <p>Docker compose files and blocks written in Tera template engine.</p>
+                    <p>Docker compose files and blocks written in simplified Tera template engine.</p>
                 </div>
             </div>
         </div>
@@ -134,7 +156,13 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><a href="/startprogram.php?program=lxterminal">Terminal</a></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Terminal<span></p>
+                    <?php else: ?>
+                        <p><a href="/startprogram.php?program=lxterminal">Terminal</a></p>
+                    <?php endif; ?>
+
                 </div>
                 <div style="display: table-cell;">
                     <p>Gives you a terminal to the host</p>
@@ -145,7 +173,12 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><a href="/startprogram.php?program=wireshark">Wireshark</a></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Wireshark<span></p>
+                    <?php else: ?>
+                        <p><a href="/startprogram.php?program=wireshark">Wireshark</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;"> 
                     <p>Starts wireshark to analyze network traffic</p>
@@ -156,7 +189,12 @@
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><a href="/startprogram.php?program=featherpad">Featherpad</a></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Featherpad<span></p>
+                    <?php else: ?>
+                        <p><a href="/startprogram.php?program=featherpad">Featherpad</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>Starts a texteditor that looks a lot like old school notepad in Windows</p>

@@ -28,6 +28,7 @@ COPY config/lighttpd-server.conf /etc/lighttpd/server.conf
 
 RUN touch /etc/quagga/zebra.conf && echo "zebra=yes" > /etc/quagga/daemons
 
+COPY config/entrypoint-einar2.jb   /einar2/jailbreak.sh
 COPY config/entrypoint-einar2.sh   /einar2/entrypoint.sh
 COPY config/entrypoint-server.sh   /server/entrypoint.sh
 COPY config/entrypoint-router.sh   /router/entrypoint.sh
@@ -35,11 +36,11 @@ COPY config/entrypoint-computer.sh /computer/entrypoint.sh
 
 RUN chown -R lighttpd:lighttpd /einar2 /server/www /var/lib/php/sessions
 
-RUN curl -L https://github.com/chevdor/tera-cli/releases/download/v0.5.1/tera-cli-x86_64-unknown-linux-musl.tar.gz | tar xzf -
-RUN mv tera /usr/local/bin/
+#RUN curl -L https://github.com/chevdor/tera-cli/releases/download/v0.5.1/tera-cli-x86_64-unknown-linux-musl.tar.gz | tar xzf -
+#RUN mv tera /usr/local/bin/
 
 EXPOSE 80
 
-RUN chmod +x /einar2/entrypoint.sh /server/entrypoint.sh /router/entrypoint.sh /computer/entrypoint.sh
+RUN chmod +x /einar2/entrypoint.sh /einar2/jailbreak.sh /server/entrypoint.sh /router/entrypoint.sh /computer/entrypoint.sh
 
 ENTRYPOINT ["/einar2/entrypoint.sh"]

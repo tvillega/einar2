@@ -1,0 +1,30 @@
+#!/bin/bash
+
+IFS= read -r INS
+
+TS="$(date --utc +%Y-%m-%d-%I:%M:%S)"
+LOG_FILE="/einar2/einar.log"
+MSG=""
+
+case "$INS" in
+  open_terminal)
+    nohup lxterminal >/dev/null 2>&1 &
+    disown
+    MSG="${TS} Terminal window opened"
+    ;;
+  open_docs)
+    nohup firefox http://localhost/docs >/dev/null 2>&1 &
+    disown
+    MSG="${TS} Documentation site opened"
+    ;;
+  open_labs)
+    nohups firefox http://localhost >/dev/null 2>&1 &
+    disown
+    MSG="${TS} Laboratory site opened"
+    ;;
+  *)
+    MSG="${TS}: unknown: ${INS}"
+    ;;
+esac
+
+echo $MSG | tee $LOG_FILE

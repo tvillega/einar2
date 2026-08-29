@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [[ ! -p "/einar2/ch0" ]] ; then
+  echo "ERROR: Named pipe ch0 not available on host"
+  exit 1
+
+elif [[ ! -p "/einar2/ch1" ]] ; then
+  echo "ERROR: Named pipe ch1 not available on host"
+  exit 2
+fi
+
+echo "WARNING: Einar2 is jailbreaked and has shell access to your host system"
+
+sed -i 's|jailbreak": false|jailbreak": true|' /einar2/settings.json
+
+# Honestly? I already broke all security standards escaping a shell
+chown root:root /einar2/ch0 /einar2/ch1
+chmod 777 /einar2/ch0 /einar2/ch1
+
+exec lighttpd -D -f /etc/lighttpd/einar2.conf
