@@ -14,7 +14,7 @@ if [[ ! -d "$archdir" ]] ; then
   mkdir -v "$archdir"
 fi
 
-cp -rv --remove-destination archetypes/*  "${archdir}/"
+cp -rv --remove-destination share/archetypes/*  "${archdir}/"
 
 ## SYNC DOCS INDEX + CHANGELOG
 
