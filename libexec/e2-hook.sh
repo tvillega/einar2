@@ -1,6 +1,7 @@
 #!/bin/bash
 
-HOOKS_DIR="hooks"
+LIBX="${E2_LIBEXEC-./libexec}"
+HOOKS_DIR="${E2_HOOKS-./hooks}"
 
 hook_run() {
 

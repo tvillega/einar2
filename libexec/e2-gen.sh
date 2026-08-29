@@ -3,6 +3,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+LIBX="${E2_LIBEXEC-./libexec}"
 _image="tvillega/einar2:latest"
 
 gen_computer() {
@@ -189,7 +190,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    ./libexec/e2-help.sh gen
+    $LIBX/e2-help.sh gen
     exit
     ;;
 esac; shift; done

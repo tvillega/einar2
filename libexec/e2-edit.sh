@@ -3,6 +3,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+LIBX="${E2_LIBEXEC-./libexec}"
+
 check_dir() {
 
   local wht="${1-}"
@@ -45,7 +47,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    ./e2-help.sh edit
+    $LIBX/e2-help.sh edit
     exit
     ;;
 esac; shift; done

@@ -1,8 +1,10 @@
-
 #!/bin/bash
 
 set -euo pipefail
 IFS=$'\n\t'
+
+LIBX="${E2_LIBEXEC-./libexec}"
+UTIL="${E2_UTIL-./utils}"
 
 run_start()     {
 
@@ -82,7 +84,7 @@ run_utility() {
     echo "Utility not found."
     exit
   else
-    ./utils/"${what}.sh"
+    $UTIL/"${what}.sh"
   fi
 
 }
@@ -178,7 +180,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    ./libexec/e2-help.sh run
+    $LIBX/e2-help.sh run
     exit
     ;;
 esac; shift; done

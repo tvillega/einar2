@@ -1,0 +1,72 @@
+#!/bin/bash
+
+LIBX="${E2_LIBEXEC_PATH-./libexec}"
+
+cmd_run() {
+
+  local what="$1"
+
+  if [[ -z "$what" ]] ; then
+    $LIBX/e2-help.sh run
+    exit
+  else
+    $LIBX/e2-hook.sh run -1 "${@}"
+    $LIBX/e2-run.sh "${@}"
+    $LIBX/e2-hook.sh run  1 "${@}"
+  fi
+
+}
+
+cmd_edit() {
+
+  local what="$1"
+
+  [[ -z "$EDITOR" ]] && echo "EDITOR unset" && exit
+
+  if [[ -z "$what" ]] ; then
+    $LIBX/e2-help.sh edit
+    exit
+  else
+    $LIBX/e2-hook.sh edit -1 "${@}"
+    $LIBX/e2-edit.sh "${@}"
+    $LIBX/e2-hook.sh edit  1 "${@}"
+  fi
+
+}
+
+cmd_gen() {
+
+  local what="$1"
+
+  if [[ -z "$what" ]] ; then
+    $LIBX/e2-help.sh gen
+    exit
+  else
+    $LIBX/e2-hook.sh gen -1 "${@}"
+    $LIBX/e2-gen.sh "${@}"
+    $LIBX/e2-hook.sh gen  1 "${@}"
+  fi
+
+}
+
+cmd="$1"
+
+if [[ -z "$cmd" ]] ; then
+  $LIBX/e2-help.sh help
+  exit
+
+elif [[ "$cmd" == "run" || "$cmd" == "r" ]] ; then
+  shift
+  cmd_run "${@}"
+
+elif [[ "$cmd" == "edit" || "$cmd" == "e" ]] ; then
+  shift
+  cmd_edit "${@}"
+
+elif [[ "$cmd" == "gen" || "$cmd" == "g" ]] ; then
+  shift
+  cmd_gen "${@}"
+
+else
+  echo "Unknown command: $cmd"
+fi
