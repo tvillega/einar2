@@ -1,0 +1,14 @@
+[Unit]
+Description=Einar2 Daemon
+After=network.target
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStart=/opt/einar2/einard
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
