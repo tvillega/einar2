@@ -3,6 +3,8 @@
 $labDataExists  = false;
 $queryStringSet = false;
 
+$machines = [];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   $labName           = $_POST['lab_name'] ?? '';
@@ -74,6 +76,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+    <?php
+      foreach (glob('archetypes/service-*.yml') as $archetype) {
+        if ($archetype == '.' || $archetype == '..') continue;
+        $machine = str_replace("archetypes/service-", "", $archetype);
+        $machine = str_replace(".yml", "", $machine);
+        $machines[] = $machine;
+        print $machine . '<br>';
+    }
+    ?>
+
     <!-- Send POST with form data to myself (executes the code at the top)  -->
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
 
@@ -86,14 +98,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Step 1 of 4</h2>
         <p>Note that you need a switch to connect two devices. Think of it as if you have no crossover cables and surplus of switches.</p>
         
-        <div class="form-table">
+        <div id="form-items" class="form-table">
 
             <div class="form-row">
                 <div class="form-cell">
                     <label for="lab_name">Lab name:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="text" id="lab_name" name="lab_name" 
+                    <input type="text" id="lab_name" name="lab_name"
                            value="<?php echo $labDataExists ? htmlspecialchars($labData['lab_name']) : ''; ?>"
                            required>
                 </div>
@@ -112,6 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </div>
 
+        <button type="button" onclick="addNewMachineSelector()">Add machine </button>
         <button type="submit">Submit</button>
     </form>
 
@@ -159,4 +172,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
 </body>
+<script>
+  const machines = <?php echo json_encode($machines); ?>;
+
+  function addNewMachineSelector() {
+    const container = document.getElementById('form-items');
+    let optionsHTML = '';
+
+    for (const machine of machines) {
+      optionsHTML += `<option value="${machine}">${machine}</option>`;
+    }
+
+    const newMachineSelectorRow = document.createElement('div');
+    newMachineSelectorRow.className = 'form-row';
+    newMachineSelectorRow.innerHTML = `
+        <div class="form-cell">
+            <label>Machine:</label>
+        </div>
+        <div class="form-cell">
+            <select name="machines[]" required>${optionsHTML}</select>
+            <button type="button" onclick="this.closest('.form-row').remove()">Remove</button>
+        </div>
+    `;
+
+    container.appendChild(newMachineSelectorRow);
+  }
+</script>
 </html>
