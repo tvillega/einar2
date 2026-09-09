@@ -82,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $machine = str_replace("archetypes/service-", "", $archetype);
         $machine = str_replace(".yml", "", $machine);
         $machines[] = $machine;
-        print $machine . '<br>';
     }
     ?>
 
@@ -124,7 +123,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </div>
 
-        <button type="button" onclick="addNewMachineSelector()">Add machine </button>
+        <div class="controls-row" style="margin-top: 10px;">
+            <button type="button" id="add-machine-btn" onclick="addMachineFormRow()">Add machine type</button>
+            <select id="machine-type-select">
+                <?php foreach ($machines as $machine): ?>
+                    <option value="<?php echo htmlspecialchars($machine); ?>"><?php echo htmlspecialchars($machine); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
         <button type="submit">Submit</button>
     </form>
 
@@ -175,27 +182,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script>
   const machines = <?php echo json_encode($machines); ?>;
 
-  function addNewMachineSelector() {
-    const container = document.getElementById('form-items');
-    let optionsHTML = '';
+  function updateAddMachineButtonState() {
+    const selectEl = document.getElementById('machine-type-select');
+    const addBtn = document.getElementById('add-machine-btn');
+    addBtn.disabled = selectEl.options.length === 0;
+  }
 
-    for (const machine of machines) {
-      optionsHTML += `<option value="${machine}">${machine}</option>`;
-    }
+  function addMachineFormRow() {
+    const container = document.getElementById('form-items');
+    const selectEl = document.getElementById('machine-type-select');
+    const selectedIndex = selectEl.selectedIndex;
+
+    if (selectedIndex === -1) return;
+
+    const selectedOption = selectEl.options[selectedIndex];
+    const machineName = selectedOption.value;
+
+    selectEl.remove(selectedIndex);
 
     const newMachineSelectorRow = document.createElement('div');
     newMachineSelectorRow.className = 'form-row';
     newMachineSelectorRow.innerHTML = `
         <div class="form-cell">
-            <label>Machine:</label>
+            <label>Number of ${machineName}'s:</label>
         </div>
         <div class="form-cell">
-            <select name="machines[]" required>${optionsHTML}</select>
-            <button type="button" onclick="this.closest('.form-row').remove()">Remove</button>
+            <input type="number" name="machines[${machineName}]" min="0" required>
+            <button type="button" onclick="removeMachineFormRow(this, '${machineName}')">Remove</button>
         </div>
     `;
 
     container.appendChild(newMachineSelectorRow);
+    updateAddMachineButtonState();
+  }
+
+  function removeMachineFormRow(button, machineName) {
+    button.closest('.form-row').remove();
+
+    const selectEl = document.getElementById('machine-type-select');
+    const option = document.createElement('option');
+    option.value = machineName;
+    option.textContent = machineName;
+    selectEl.appendChild(option);
+    updateAddMachineButtonState();
   }
 </script>
 </html>
