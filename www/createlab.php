@@ -98,39 +98,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                            required>
                 </div>
             </div>
-            
-            <div class="form-row">
-                <div class="form-cell">
-                    <label for="routers">Number of routers:</label>
-                </div>
-                <div class="form-cell">
-                    <input type="number" id="routers" name="routers" min="0"
-                           value="<?php echo $labDataExists ? htmlspecialchars($labData['routers']) : ''; ?>"
-                           required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-cell">
-                    <label for="servers">Number of servers:</label>
-                </div>
-                <div class="form-cell">
-                    <input type="number" id="servers" name="servers" min="0"
-                           value="<?php echo $labDataExists ? htmlspecialchars($labData['servers']) : ''; ?>"
-                           required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-cell">
-                    <label for="computers">Number of computers:</label>
-                </div>
-                <div class="form-cell">
-                    <input type="number" id="computers" name="computers" min="0"
-                           value="<?php echo $labDataExists ? htmlspecialchars($labData['computers']) : ''; ?>"
-                           required>
-                </div>
-            </div>
 
             <div class="form-row">
                 <div class="form-cell">
@@ -168,27 +135,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div style="display: table-cell; padding: 5px; font-weight: bold;">Directory:</div>
                 <div style="display: table-cell; padding: 5px;">
                     <?php echo htmlspecialchars($labData['lab_dir']); ?>
-                </div>
-            </div>
-
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding: 5px; font-weight: bold;">Routers:</div>
-                <div style="display: table-cell; padding: 5px;">
-                    <?php echo htmlspecialchars($labData['routers']); ?>
-                </div>
-            </div>
-
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding: 5px; font-weight: bold;">Servers:</div>
-                <div style="display: table-cell; padding: 5px;">
-                    <?php echo htmlspecialchars($labData['servers']); ?>
-                </div>
-            </div>
-
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding: 5px; font-weight: bold;">Computers:</div>
-                <div style="display: table-cell; padding: 5px;">
-                    <?php echo htmlspecialchars($labData['computers']); ?>
                 </div>
             </div>
 
