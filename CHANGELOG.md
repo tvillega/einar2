@@ -1,5 +1,10 @@
 # Changelog
 
+## [alpha.7](https://github.com/tvillega/einar2/releases/tag/alpha.7) (2027-09-09)
+## What's Changed
+* Broken release
+* Enter beta stage
+
 ## [alpha.6](https://github.com/tvillega/einar2/releases/tag/alpha.6) (2026-08-08)
 ## What's Changed
 * Fixed prompt to load configurations when missing the interfaces list
