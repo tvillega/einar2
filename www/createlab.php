@@ -111,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="switches">Number of switches:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="number" id="switches" name="switches" min="0"
+                    <input type="number" min="0" id="switches" name="switches"
                            value="<?php echo $labDataExists ? htmlspecialchars($labData['switches']) : ''; ?>"
                            required>
                 </div>
@@ -203,7 +203,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Number of ${machineName}'s:</label>
         </div>
         <div class="form-cell">
-            <input type="number" name="machines[${machineName}]" min="0" required>
+            <input type="number" min="0" name="machines[${machineName}]" required>
             <button type="button" onclick="removeMachineFormRow(this, '${machineName}')">Remove</button>
         </div>
     `;
