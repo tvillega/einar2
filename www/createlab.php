@@ -117,6 +117,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
+            <?php if (!empty($labData['machines'])): ?>
+                <?php foreach ($labData['machines'] as $name => $num): ?>
+                    <div class="form-row">
+                        <div class="form-cell">
+                            <label for="<?php echo htmlspecialchars($name); ?>">Number of <?php echo htmlspecialchars($name); ?>'s:</label>
+                        </div>
+                        <div class="form-cell">
+                            <input type="number" min="0"
+                                   id="<?php echo htmlspecialchars($name); ?>"
+                                   name="machines[<?php echo htmlspecialchars($name); ?>]"
+                                   value="<?php echo htmlspecialchars($num); ?>"
+                                   required>
+                            <button type="button" onclick="removeMachineFormRow(this, '<?php echo htmlspecialchars($name); ?>')">Remove</button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
         </div>
 
         <div class="controls-row" style="margin-top: 10px;">
@@ -161,7 +179,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            </div>
+            <?php foreach ($labData['machines'] as $name => $num): ?>
+                <div style="display: table-row;">
+                    <div style="display: table-cell; padding: 5px; font-weight: bold;"><?php echo htmlspecialchars($name); ?>'s:</div>
+                    <div style="display: table-cell; padding: 5px;">
+                        <?php echo htmlspecialchars($num); ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
         </div>
     <?php endif; ?>
 
@@ -182,6 +208,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     const selectEl = document.getElementById('machine-type-select');
     const addBtn = document.getElementById('add-machine-btn');
     addBtn.disabled = selectEl.options.length === 0;
+  }
+
+  function removeExistingMachineOptions() {
+    const container = document.getElementById('form-items');
+    const selectEl = document.getElementById('machine-type-select');
+
+    if (!container || !selectEl) return;
+
+    const machineInputs = container.querySelectorAll('input[name^="machines["]');
+
+    machineInputs.forEach(input => {
+      const match = input.name.match(/machines\[(.*?)\]/);
+      if (match && match[1]) {
+        const machineName = match[1];
+
+        for (let i = 0; i < selectEl.options.length; i++) {
+          if (selectEl.options[i].value === machineName) {
+            selectEl.remove(i);
+            break;
+          }
+        }
+      }
+    });
+    updateAddMachineButtonState();
   }
 
   function addMachineFormRow() {
@@ -222,5 +272,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     selectEl.appendChild(option);
     updateAddMachineButtonState();
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    removeExistingMachineOptions();
+  });
 </script>
 </html>
