@@ -14,23 +14,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (!is_dir($labDir)) {
     mkdir($labDir, 0755, true);
   }
-    
-  $routers   = isset($_POST['routers'])   ? (int)$_POST['routers']   : 0;
-  $servers   = isset($_POST['servers'])   ? (int)$_POST['servers']   : 0;
-  $switches  = isset($_POST['switches'])  ? (int)$_POST['switches']  : 0;
-  $computers = isset($_POST['computers']) ? (int)$_POST['computers'] : 0;
+
+  $switches  = isset($_POST['switches']) ? (int)$_POST['switches'] : 0;
+  $machines  = isset($_POST['machines']) ? $_POST['machines']      : [];
 
   if ($switches == 0) {
     $switches = 1;
   }
 
   $data = [
-    'lab_name'            => $labName,
-    'lab_dir'             => $labDir,
-    'routers'             => $routers,
-    'servers'             => $servers,
-    'computers'           => $computers,
-    'switches'            => $switches
+    'lab_name'  => $labName,
+    'lab_dir'   => $labDir,
+    'switches'  => $switches,
+    'machines'  => $machines
   ];
 
   file_put_contents($labDir . '/lab.json', json_encode($data, JSON_PRETTY_PRINT));
