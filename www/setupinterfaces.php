@@ -14,12 +14,7 @@ $labFile           = $labPath . "/lab.json";
 $jsonRaw           = file_get_contents($labFile);
 $labData           = json_decode($jsonRaw, true);
 
-$deviceCount             = [];
-$deviceCount['router']   = $labData['routers'];
-$deviceCount['server']   = $labData['servers'];
-$deviceCount['computer'] = $labData['computers'];
-
-$switchesNumber          = $labData['switches'];
+$switchesNumber    = $labData['switches'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -84,112 +79,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Step 3 of 4</h2>
 
     <?php
-        foreach (['router', 'server', 'computer'] as $device):
+        foreach ($labData['machines'] as $machineName => $machineNumber):
 
-          $deviceNumber = isset($deviceCount[$device]) ? $deviceCount[$device] : 0;
+          $machineType  = $machineName . "Type";
+          $machineTitle = strtoupper($machineName) . "'s";
 
-          if ($deviceNumber != 0):
-
-            $deviceType  = $device . "s";
-            $deviceTitle = ucfirst($deviceType);
-
-            if ($formSubmitted) {
-              $allSubmittedNames = [];
-              foreach ($servicesData[$deviceType] as $deviceData) {
-                $allSubmittedNames[] = $deviceData['name'];
-              }
-              $duplicatedNames = array_diff_assoc($allSubmittedNames, array_unique($allSubmittedNames));
-            } else {
-              $duplicatedNames = ["1.2.3.4"]; // Garbage to not crash the code below
+          if ($formSubmitted) {
+            $allSubmittedNames = [];
+            foreach ($servicesData[$machineType] as $machineData) {
+              $allSubmittedNames[] = $machineData['name'];
             }
+            $duplicatedNames = array_diff_assoc($allSubmittedNames, array_unique($allSubmittedNames));
+          } else {
+            $duplicatedNames = ["1.2.3.4"]; // Garbage to not crash the code below
+          }
     ?>
 
-        <h3><?php echo $deviceTitle; ?></h3>
+    <h3><?php echo $machineTitle; ?></h3>
 
-            <?php for ($i = 0; $i <= $deviceNumber-1; $i++): ?>
-                <fieldset style="background-color: #F8F8FF;">
+        <?php for ($i = 0; $i <= $machineNumber-1; $i++): ?>
+            <fieldset style="background-color: #F8F8FF;">
 
-                    <?php
-                        $deviceID                     = $device . $i;
+                <?php
+                    $machineID                     = $machineName . $i;
 
-                        $nameTagLabelAttrFor          = $device . "_name";
-                        $nameTagInputAttrValue        = ($formSubmitted && isset($servicesData[$deviceType][$deviceID]['name']))
-                                                            ? htmlspecialchars($servicesData[$deviceType][$deviceID]['name'])
-                                                            : '';
-                        $nameTagInputAttrName         = $deviceType . "[" . $deviceID . "][name]";
+                    $nameTagLabelAttrFor          = $machineName . "_name";
+                    $nameTagInputAttrValue        = ($formSubmitted && isset($servicesData[$machineType][$machineID]['name']))
+                                                        ? htmlspecialchars($servicesData[$machineType][$machineID]['name'])
+                                                        : '';
+                    $nameTagInputAttrName         = $machineType . "[" . $machineID . "][name]";
 
-                        $ifnumberTagLabelAttrFor      = $deviceID . "_ifnumber";
-                        $ifnumberSavedValue           = ($formSubmitted && isset($servicesData[$deviceType][$deviceID]['if_number']))
-                                                            ? $servicesData[$deviceType][$deviceID]['if_number']
-                                                            : null;
-                        $ifnumberTagInputAttrName     = $deviceType . "[" . $deviceID . "][if_number]";
+                    $ifnumberTagLabelAttrFor      = $machineID . "_ifnumber";
+                    $ifnumberSavedValue           = ($formSubmitted && isset($servicesData[$machineType][$machineID]['if_number']))
+                                                        ? $servicesData[$machineType][$machineID]['if_number']
+                                                        : null;
+                    $ifnumberTagInputAttrName     = $machineType . "[" . $machineID . "][if_number]";
 
-                    ?>
-
-
+                ?>
 
 
-                    <legend><?php echo $device . $i; ?></legend>
 
-                    <div style="display: table; width: 30%;">
 
-                        <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
-                                <label for="<?php echo $nameTagLabelAttrFor; ?>">Name:</label>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
-                                <input type="text"
-                                      value="<?php echo $nameTagInputAttrValue; ?>"
-                                      id="<?php echo $nameTagLabelAttrFor; ?>"
-                                      name="<?php echo $nameTagInputAttrName; ?>"
-                                      required>
-                            </div>
+                <legend><?php echo $machineID; ?></legend>
 
-                            <?php if ($formSubmitted): ?>
+                <div style="display: table; width: 30%;">
 
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
-                                <?php
-                                    if (in_array($nameTagInputAttrValue,$duplicatedNames)) {
-                                      echo '<strong style="color:chocolate;">DUP</strong>';
-                                      $validForm = false;
-                                    } else {
-                                      echo '<strong style="color:green;">OK</strong>';
-                                    }
-                                ?>
-                            </div>
-
-                            <?php endif; ?>
-
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <label for="<?php echo $nameTagLabelAttrFor; ?>">Name:</label>
+                        </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <input type="text"
+                                  value="<?php echo $nameTagInputAttrValue; ?>"
+                                  id="<?php echo $nameTagLabelAttrFor; ?>"
+                                  name="<?php echo $nameTagInputAttrName; ?>"
+                                  required>
                         </div>
 
-                        <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
-                                <label for="<?php echo $ifnumberTagLabelAttrFor; ?>">Interfaces:</label>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
-                                <select id="<?php echo $ifnumberTagLabelAttrFor; ?>"
-                                        name="<?php echo $ifnumberTagInputAttrName; ?>"
-                                        required>
+                        <?php if ($formSubmitted): ?>
 
-                                    <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
-
-                                        <?php $isSelected = ($formSubmitted && $ifnumberSavedValue !== null && $ifnumberSavedValue == $j) ? 'selected' : ''; ?>
-
-                                        <option value="<?php echo $j; ?>" <?php echo $isSelected; ?>>
-                                            <?php echo $j; ?>
-                                        </option>
-
-                                    <?php endfor; ?>
-
-                                </select>
-                            </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <?php
+                                if (in_array($nameTagInputAttrValue,$duplicatedNames)) {
+                                  echo '<strong style="color:chocolate;">DUP</strong>';
+                                  $validForm = false;
+                                } else {
+                                  echo '<strong style="color:green;">OK</strong>';
+                                }
+                            ?>
                         </div>
+
+                        <?php endif; ?>
 
                     </div>
-                </fieldset>
-            <?php endfor; ?>
 
-        <?php endif; ?>
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <label for="<?php echo $ifnumberTagLabelAttrFor; ?>">Interfaces:</label>
+                        </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 20%;">
+                            <select id="<?php echo $ifnumberTagLabelAttrFor; ?>"
+                                    name="<?php echo $ifnumberTagInputAttrName; ?>"
+                                    required>
+
+                                <?php for ($j = 1; $j <= $switchesNumber; $j++): ?>
+
+                                    <?php $isSelected = ($formSubmitted && $ifnumberSavedValue !== null && $ifnumberSavedValue == $j) ? 'selected' : ''; ?>
+
+                                    <option value="<?php echo $j; ?>" <?php echo $isSelected; ?>>
+                                        <?php echo $j; ?>
+                                    </option>
+
+                                <?php endfor; ?>
+
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </fieldset>
+        <?php endfor; ?>
+
     <?php endforeach; ?>
 
         <div style="padding-top: 15px;">

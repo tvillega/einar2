@@ -3,7 +3,7 @@
 require __DIR__ . '/ip_in_range.php';
 
 /* Global variables */
-$devicesHaveIflistSet   = false;
+$machinesHaveIflistSet   = false;
 $validForm         = true;
 $formSubmitted     = false;
 $queryStringSet    = false;
@@ -17,12 +17,7 @@ $labFile           = $labPath . "/lab.json";
 $jsonRaw           = file_get_contents($labFile);
 $labData           = json_decode($jsonRaw, true);
 
-$deviceCount             = [];
-$deviceCount['router']   = $labData['routers'];
-$deviceCount['server']   = $labData['servers'];
-$deviceCount['computer'] = $labData['computers'];
-
-$switchesNumber          = $labData['switches'];
+$switchesNumber    = $labData['switches'];
 
 $networksPath    = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName . '/networks.json';
 $servicesPath    = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName . '/services.json';
@@ -33,10 +28,10 @@ $services = json_decode(file_get_contents($servicesPath), true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  foreach (['router', 'server', 'computer'] as $device) {
-    $deviceType = $device . "s";
-    if ($deviceCount[$device] != 0 && isset($_POST[$deviceType])) {
-      $services[$deviceType] = array_replace_recursive($services[$deviceType], $_POST[$deviceType]);
+  foreach ($labData['machines'] as $machineName => $machineNumber) {
+    $machineType = $machineName . "Type";
+    if (isset($_POST[$machineType])) {
+      $services[$machineType] = array_replace_recursive($services[$machineType], $_POST[$machineType]);
     }
   }
 
@@ -94,12 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
         if ($formSubmitted) {
           $allSubmittedIpAddresses = [];
-          foreach ($services as $deviceType) {
-            foreach ($deviceType as $deviceID) {
-              if (!isset($deviceID['if_list'])) {
+          foreach ($services as $machineType) {
+            foreach ($machineType as $machineID) {
+              if (!isset($machineID['if_list'])) {
                 $allSubmittedIfs[] = "127.0.0.1"; // Garbage to avoid a crash
               } else {
-                foreach ($deviceID['if_list'] as $interface) {
+                foreach ($machineID['if_list'] as $interface) {
                   $allSubmittedIpAddresses[] = $interface['ip'];
                 }
               }
@@ -111,178 +106,172 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
 
     <?php
-        foreach (['router', 'server', 'computer'] as $device):
+        foreach ($labData['machines'] as $machineName => $machineNumber):
 
-          $deviceNumber = isset($deviceCount[$device]) ? $deviceCount[$device] : 0;
-
-          if ($deviceNumber != 0):
-
-            $deviceType  = $device . "s";
-            $deviceTitle = ucfirst($deviceType);
+          $machineType  = $machineName . "Type";
+          $machineTitle = strtoupper($machineName) . "'s";
     ?>
 
-        <h3><?php echo $deviceTitle; ?></h3>
+        <h3><?php echo $machineTitle; ?></h3>
 
-            <?php for ($i = 0; $i <= $deviceNumber-1; $i++): ?>
-                <fieldset style="background-color: #F8F8FF;">
+        <?php for ($i = 0; $i <= $machineNumber-1; $i++): ?>
+            <fieldset style="background-color: #F8F8FF;">
 
-                    <?php
-                        $deviceID                     = $device . $i;
-                        $deviceName                   = $services[$deviceType][$deviceID]['name'];
-                        $deviceIfnumber               = $services[$deviceType][$deviceID]['if_number']-1;
+                <?php
+                    $machineID                    = $machineName . $i;
+                    $machineIfnumber              = $services[$machineType][$machineID]['if_number']-1;
 
-                        if (isset($services[$deviceType][$deviceID]['if_list'])) {
-                          $deviceIflist         = $services[$deviceType][$deviceID]['if_list'];
-                          $devicesHaveIflistSet = true;
-                        }
+                    if (isset($services[$machineType][$machineID]['if_list'])) {
+                      $machineIflist        = $services[$machineType][$machineID]['if_list'];
+                      $machinesHaveIflistSet = true;
+                    }
 
-                    ?>
+                ?>
 
-                    <legend><?php echo $deviceName; ?></legend>
+                <legend><?php echo $machineName; ?></legend>
 
-                    <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
+                <?php for ($j = 0; $j <= $machineIfnumber; $j++): ?>
 
-                    <?php
-                        if ($formSubmitted && $devicesHaveIflistSet) {
-                          $allSubmittedIfs = [];
-                          foreach ($deviceIflist as $deviceIf) {
-                            $allSubmittedIfs[] = $deviceIf['if'];
-                          }
-                          $duplicatedIfs = array_diff_assoc($allSubmittedIfs, array_unique($allSubmittedIfs));
-                        } else {
-                          $duplicatedIfs = ["99"]; // Garbage to not crash the code below
-                        }
-                    ?>
+                <?php
+                    if ($formSubmitted && $machinesHaveIflistSet) {
+                      $allSubmittedIfs = [];
+                      foreach ($machineIflist as $machineIf) {
+                        $allSubmittedIfs[] = $machineIf['if'];
+                      }
+                      $duplicatedIfs = array_diff_assoc($allSubmittedIfs, array_unique($allSubmittedIfs));
+                    } else {
+                      $duplicatedIfs = ["99"]; // Garbage to not crash the code below
+                    }
+                ?>
 
-                        <?php $eth = "eth" . $j; ?>
+                    <?php $eth = "eth" . $j; ?>
 
-                        <?php if ($j != 0): ?>
-                            <hr style="border: 1.3px dashed; margin: 0.1em;">
-                        <?php endif; ?>
+                    <?php if ($j != 0): ?>
+                        <hr style="border: 1.3px dashed; margin: 0.1em;">
+                    <?php endif; ?>
 
-                        <div class="form-group">
-                            <?php echo "<strong>" . $eth . "</strong>"; ?>
-                        </div>
+                    <div class="form-group">
+                        <?php echo "<strong>" . $eth . "</strong>"; ?>
+                    </div>
 
 
-                        <div style="display: table; width: 30%;">
+                    <div style="display: table; width: 30%;">
 
-                            <div style="display: table-row;">
-                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                    <?php
-                                        $ifconnTagLabelAttrFor    = $deviceID . "_if" . $j;
-                                        $ifconnTagSelectAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][if]";
-                                        $ifconnTagSelectValue     = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]['if']))
-                                                                    ? $services[$deviceType][$deviceID]['if_list'][$j]['if']
-                                                                    : null;
-                                    ?>
-                                    <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
-                                </div>
-                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                    <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
-                                            name="<?php echo $ifconnTagSelectAttrName; ?>"
-                                            required>
-
-                                        <?php for ($k = 0; $k <= $switchesNumber-1; $k++): ?>
-
-                                            <?php
-                                                $isSelected = ($formSubmitted && $ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
-                                                $switch     = 'switch' . $k;
-                                                $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
-                                            ?>
-
-                                            <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
-                                                <?php echo $cidr ?>
-                                            </option>
-
-                                        <?php endfor; ?>
-
-                                    </select>
-                                </div>
-
-                                <?php if ($formSubmitted): ?>
-
-                                    <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                        <?php
-                                            if (!$devicesHaveIflistSet) {
-                                              echo '<strong style="color:#8A2BE2;">UNSET</strong>';
-                                              $validForm = false;
-                                            } else if (in_array($ifconnTagSelectValue,$duplicatedIfs)) {
-                                              echo '<strong style="color:chocolate;">DUP</strong>';
-                                              $validForm = false;
-                                            } else {
-                                              echo '<strong style="color:green;">OK</strong>';
-                                            }
-                                        ?>
-                                    </div>
-
-                                <?php endif; ?>
-
+                        <div style="display: table-row;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <?php
+                                    $ifconnTagLabelAttrFor    = $machineID . "_if" . $j;
+                                    $ifconnTagSelectAttrName  = $machineType . "[" . $machineID . "][if_list][" . $j . "][if]";
+                                    $ifconnTagSelectValue     = ($formSubmitted && isset($services[$machineType][$machineID]['if_list'][$j]['if']))
+                                                                ? $services[$machineType][$machineID]['if_list'][$j]['if']
+                                                                : null;
+                                ?>
+                                <label for="<?php echo $ifconnTagLabelAttrFor; ?>">Connected to:</label>
                             </div>
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <select id="<?php echo $ifconnTagLabelAttrFor; ?>"
+                                        name="<?php echo $ifconnTagSelectAttrName; ?>"
+                                        required>
 
-                            <div style="display: table-row;">
-                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                    <?php
-                                        $ipTagLabelAttrFor   = $deviceID . "_ip" . $j;
-                                        $ipTagInputAttrName  = $deviceType . "[" . $deviceID . "][if_list][" . $j . "][ip]";
-                                        $ipTagInputAttrValue = ($formSubmitted && isset($services[$deviceType][$deviceID]['if_list'][$j]["ip"]))
-                                                                    ? htmlspecialchars($services[$deviceType][$deviceID]['if_list'][$j]["ip"])
-                                                                    : '';
-                                    ?>
-                                    <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
-                                </div>
-                                <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                    <input type="text"
-                                          value="<?php echo $ipTagInputAttrValue ?>"
-                                          id="<?php echo $ipTagLabelAttrFor; ?>"
-                                          name="<?php echo $ipTagInputAttrName; ?>"
-                                          required>
-                                </div>
+                                    <?php for ($k = 0; $k <= $switchesNumber-1; $k++): ?>
+
+                                        <?php
+                                            $isSelected = ($formSubmitted && $ifconnTagSelectValue !== null && $ifconnTagSelectValue == $k) ? 'selected' : '';
+                                            $switch     = 'switch' . $k;
+                                            $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                        ?>
+
+                                        <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
+                                            <?php echo $cidr ?>
+                                        </option>
+
+                                    <?php endfor; ?>
+
+                                </select>
+                            </div>
 
                             <?php if ($formSubmitted): ?>
 
                                 <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                     <?php
-                                        if ($devicesHaveIflistSet) {
-                                          $switch = 'switch' . $ifconnTagSelectValue;
-                                          $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
-                                        }
-                                        if (!$devicesHaveIflistSet) {
+                                        if (!$machinesHaveIflistSet) {
                                           echo '<strong style="color:#8A2BE2;">UNSET</strong>';
                                           $validForm = false;
-                                        } else if (!filter_var($ipTagInputAttrValue, FILTER_VALIDATE_IP)) {
-                                          echo '<strong style="color:red";>INVALID</strong>';
-                                          $validForm = false;
-                                        } else if (!ipv4_in_range($ipTagInputAttrValue,$cidr)) {
-                                          echo '<strong style="color:red;">FAILED</strong>';
-                                          $validForm = false;
-                                        } else if (in_array($ipTagInputAttrValue,$duplicatedIpAddresses)) {
+                                        } else if (in_array($ifconnTagSelectValue,$duplicatedIfs)) {
                                           echo '<strong style="color:chocolate;">DUP</strong>';
                                           $validForm = false;
                                         } else {
-                                          echo '<strong style="color:green">OK</strong>';
+                                          echo '<strong style="color:green;">OK</strong>';
                                         }
                                     ?>
                                 </div>
 
-
                             <?php endif; ?>
-
-                            </div>
 
                         </div>
 
-                    <?php endfor; ?>
-                </fieldset>
-            <?php endfor; ?>
-        <?php endif; ?>
+                        <div style="display: table-row;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <?php
+                                    $ipTagLabelAttrFor   = $machineID . "_ip" . $j;
+                                    $ipTagInputAttrName  = $machineType . "[" . $machineID . "][if_list][" . $j . "][ip]";
+                                    $ipTagInputAttrValue = ($formSubmitted && isset($services[$machineType][$machineID]['if_list'][$j]["ip"]))
+                                                                ? htmlspecialchars($services[$machineType][$machineID]['if_list'][$j]["ip"])
+                                                                : '';
+                                ?>
+                                <label for="<?php echo $ipTagLabelAttrFor; ?>">ip:</label>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <input type="text"
+                                      value="<?php echo $ipTagInputAttrValue ?>"
+                                      id="<?php echo $ipTagLabelAttrFor; ?>"
+                                      name="<?php echo $ipTagInputAttrName; ?>"
+                                      required>
+                            </div>
+
+                        <?php if ($formSubmitted): ?>
+
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <?php
+                                    if ($machinesHaveIflistSet) {
+                                      $switch = 'switch' . $ifconnTagSelectValue;
+                                      $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                    }
+                                    if (!$machinesHaveIflistSet) {
+                                      echo '<strong style="color:#8A2BE2;">UNSET</strong>';
+                                      $validForm = false;
+                                    } else if (!filter_var($ipTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                      echo '<strong style="color:red";>INVALID</strong>';
+                                      $validForm = false;
+                                    } else if (!ipv4_in_range($ipTagInputAttrValue,$cidr)) {
+                                      echo '<strong style="color:red;">FAILED</strong>';
+                                      $validForm = false;
+                                    } else if (in_array($ipTagInputAttrValue,$duplicatedIpAddresses)) {
+                                      echo '<strong style="color:chocolate;">DUP</strong>';
+                                      $validForm = false;
+                                    } else {
+                                      echo '<strong style="color:green">OK</strong>';
+                                    }
+                                ?>
+                            </div>
+
+
+                        <?php endif; ?>
+
+                        </div>
+
+                    </div>
+
+                <?php endfor; ?>
+            </fieldset>
+        <?php endfor; ?>
     <?php endforeach; ?>
 
         <div style="padding-top: 15px;">
             <button type="submit">Submit</button>
             <?php
                 $servicesFile = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labNameNormalized . '/services.json';
-                if (file_exists($servicesFile) && $devicesHaveIflistSet) {
+                if (file_exists($servicesFile) && $machinesHaveIflistSet) {
                     echo "<a href=" . $_SERVER['PHP_SELF'] . "?laboratory=" . $_GET['laboratory'] . "&submitted" . ">(load saved configurations)" . "</a>";
                 }
             ?>
@@ -291,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if ($formSubmitted): ?>
 
-        <?php if ($devicesHaveIflistSet): ?>
+        <?php if ($machinesHaveIflistSet): ?>
 
             <h2>Services loaded</h2>
             <p>To update its values, fill the form and submit it again.</p>
@@ -306,129 +295,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (false): ?>
 
         <?php
-            foreach (['router', 'server', 'computer'] as $device):
+            foreach ($labData['machines'] as $machineName => $machineNumber):
 
-              $deviceNumber = isset($deviceCount[$device]) ? $deviceCount[$device] : 0;
-
-              if ($deviceNumber != 0):
-
-                $deviceType  = $device . "s";
-                $deviceTitle = ucfirst($deviceType);
+                $machineType  = $machineName . "s";
+                $machineTitle = strtoupper($machineType) . "'s";
 
                 // If user re-configured interfaces, we shortcircuit to avoid null
-                if (!isset($services[$deviceType][$device . "0"]['if_list'])) {
+                if (!isset($services[$machineType][$machineName . "0"]['if_list'])) {
                   break;
                 }
         ?>
 
-            <h3><?php echo $deviceTitle; ?></h3>
+            <h3><?php echo $machineTitle; ?></h3>
 
-                <?php for ($i = 0; $i <= $deviceNumber-1; $i++): ?>
+            <?php for ($i = 0; $i <= $machineNumber-1; $i++): ?>
 
-                <fieldset style="background-color: #F8F8FF;">
-                <legend><?php echo $deviceTitle; ?></legend>
+            <fieldset style="background-color: #F8F8FF;">
+            <legend><?php echo $machineTitle; ?></legend>
 
-                    <?php
-                        $deviceID                     = $device . $i;
-                        $deviceName                   = $services[$deviceType][$deviceID]['name'];
-                        $deviceIfnumber               = $services[$deviceType][$deviceID]['if_number']-1;
-                        $deviceIflist                 = $services[$deviceType][$deviceID]['if_list'];
-                    ?>
+                <?php
+                    $machineID                     = $machineName . $i;
+                    $machineIfnumber               = $services[$machineType][$machineID]['if_number']-1;
+                    $machineIflist                 = $services[$machineType][$machineID]['if_list'];
+                ?>
 
-                    <p>
-                        <style>
-                            .device-wrap:hover .device-id,
-                            .device-wrap:hover .port-id {
-                                opacity: 1 !important;
-                                visibility: visible !important;
-                            }
-                        </style>
+                <p>
+                    <style>
+                        .device-wrap:hover .device-id,
+                        .device-wrap:hover .port-id {
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                        }
+                    </style>
 
-                        <span class="device-wrap">
-                            <?php echo "Name: <i>" . $deviceName . "</i>"; ?>
-                            <span class="device-id" style="color: #4169E1; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;">
-                                (<?php echo $deviceID; ?>)
-                            </span>
-
-                            <?php if ($device == 'server'): ?>
-                                <?php
-                                    $portNumber = 8080 + $i;
-                                    $serverAddress    = "http://127.0.0.1:" . $portNumber;
-                                ?>
-                                <span class="port-id" style="color: #4169E1; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; margin-left: 2px;">
-                                    -> <a target="_blank"
-                                       href="<?php echo $serverAddress; ?>"
-                                       style="color: #4169E1;">
-                                          <i><?php echo $serverAddress; ?></i>
-                                    </a>
-                                </span>
-                            <?php endif; ?>
+                    <span class="device-wrap">
+                        <?php echo "Name: <i>" . $machineName . "</i>"; ?>
+                        <span class="device-id" style="color: #4169E1; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;">
+                            (<?php echo $machineID; ?>)
                         </span>
-                    </p>
 
-                    <div style="display: table; width: 70%;">
+                        <?php if ($machineType == 'serverType'): ?>
+                            <?php
+                                $portNumber = 8080 + $i;
+                                $serverAddress    = "http://127.0.0.1:" . $portNumber;
+                            ?>
+                            <span class="port-id" style="color: #4169E1; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; margin-left: 2px;">
+                                -> <a target="_blank"
+                                    href="<?php echo $serverAddress; ?>"
+                                    style="color: #4169E1;">
+                                      <i><?php echo $serverAddress; ?></i>
+                                </a>
+                            </span>
+                        <?php endif; ?>
+                    </span>
+                </p>
 
-                        <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
-                                Interface
-                            </div>
-                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
-                                CIDR
-                            </div>
-                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
-                                IP
-                            </div>
-                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
-                                GW
-                            </div>
-                            <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
-                                Check
-                            </div>
+                <div style="display: table; width: 70%;">
 
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                            Interface
+                        </div>
+                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                            CIDR
+                        </div>
+                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                            IP
+                        </div>
+                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                            GW
+                        </div>
+                        <div style="display: table-cell; padding: 5px; font-weight: bold; width: 10%">
+                            Check
                         </div>
 
-                        <?php for ($j = 0; $j <= $deviceIfnumber; $j++): ?>
-
-                            <?php
-                                $ip     = $deviceIflist[$j]['ip'];
-                                $if     = $deviceIflist[$j]['if'];
-                                $switch = 'switch' . $if;
-                                $net    = $networks[$switch]['network'];
-                                $mask   = $networks[$switch]['mask'];
-                                $gw     = $networks[$switch]['gateway'];
-                                $cidr   = $net . "/" . $mask;
-                                $check  = ipv4_in_range($ip, $cidr);
-                            ?>
-
-                            <div style="display: table-row;">
-                                <div style="display: table-cell; padding: 5px; font-style:italic; width: 10%">
-                                    <?php echo htmlspecialchars("eth" . $j); ?>
-                                </div>
-                                <div style="display: table-cell; padding: 5px; width: 10%">
-                                    <?php echo htmlspecialchars($cidr); ?>
-                                </div>
-                                <div style="display: table-cell; padding: 5px; width: 10%">
-                                    <?php echo htmlspecialchars($ip); ?>
-                                </div>
-                                <div style="display: table-cell; padding: 5px; width: 10%">
-                                    <?php echo htmlspecialchars($gw) ?>
-                                </div>
-                                <div style="display: table-cell; padding: 5px; width: 10%">
-                                    <?php
-                                        if (!$check) {
-                                            echo '<strong style="color:red;">FAILED</strong>';
-                                            $validForm = false;
-                                        } else {
-                                            echo '<strong style="color:green">OK</strong>';
-                                        }
-                                    ?>
-                                </div>
-                            </div>
-                        <?php endfor; ?>
                     </div>
-                    </fieldset>
-                <?php endfor; ?>
-            <?php endif; ?>
+
+                    <?php for ($j = 0; $j <= $machineIfnumber; $j++): ?>
+
+                        <?php
+                            $ip     = $machineIflist[$j]['ip'];
+                            $if     = $machineIflist[$j]['if'];
+                            $switch = 'switch' . $if;
+                            $net    = $networks[$switch]['network'];
+                            $mask   = $networks[$switch]['mask'];
+                            $gw     = $networks[$switch]['gateway'];
+                            $cidr   = $net . "/" . $mask;
+                            $check  = ipv4_in_range($ip, $cidr);
+                        ?>
+
+                        <div style="display: table-row;">
+                            <div style="display: table-cell; padding: 5px; font-style:italic; width: 10%">
+                                <?php echo htmlspecialchars("eth" . $j); ?>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; width: 10%">
+                                <?php echo htmlspecialchars($cidr); ?>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; width: 10%">
+                                <?php echo htmlspecialchars($ip); ?>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; width: 10%">
+                                <?php echo htmlspecialchars($gw) ?>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; width: 10%">
+                                <?php
+                                    if (!$check) {
+                                        echo '<strong style="color:red;">FAILED</strong>';
+                                        $validForm = false;
+                                    } else {
+                                        echo '<strong style="color:green">OK</strong>';
+                                    }
+                                ?>
+                            </div>
+                        </div>
+                    <?php endfor; ?>
+                </div>
+                </fieldset>
+            <?php endfor; ?>
         <?php endforeach; ?>
     <?php endif; ?>
 

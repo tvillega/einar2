@@ -3,6 +3,8 @@
 $labDataExists  = false;
 $queryStringSet = false;
 
+$machines = [];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   $labName           = $_POST['lab_name'] ?? '';
@@ -12,23 +14,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (!is_dir($labDir)) {
     mkdir($labDir, 0755, true);
   }
-    
-  $routers   = isset($_POST['routers'])   ? (int)$_POST['routers']   : 0;
-  $servers   = isset($_POST['servers'])   ? (int)$_POST['servers']   : 0;
-  $switches  = isset($_POST['switches'])  ? (int)$_POST['switches']  : 0;
-  $computers = isset($_POST['computers']) ? (int)$_POST['computers'] : 0;
+
+  $switches  = isset($_POST['switches']) ? (int)$_POST['switches'] : 0;
+  $machines  = isset($_POST['machines']) ? $_POST['machines']      : [];
 
   if ($switches == 0) {
     $switches = 1;
   }
 
   $data = [
-    'lab_name'            => $labName,
-    'lab_dir'             => $labDir,
-    'routers'             => $routers,
-    'servers'             => $servers,
-    'computers'           => $computers,
-    'switches'            => $switches
+    'lab_name'  => $labName,
+    'lab_dir'   => $labDir,
+    'switches'  => $switches,
+    'machines'  => $machines
   ];
 
   file_put_contents($labDir . '/lab.json', json_encode($data, JSON_PRETTY_PRINT));
@@ -74,6 +72,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+    <?php
+      foreach (glob('archetypes/service-*.yml') as $archetype) {
+        if ($archetype == '.' || $archetype == '..') continue;
+        $machine = str_replace("archetypes/service-", "", $archetype);
+        $machine = str_replace(".yml", "", $machine);
+        $machines[] = $machine;
+    }
+    ?>
+
     <!-- Send POST with form data to myself (executes the code at the top)  -->
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
 
@@ -86,48 +93,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Step 1 of 4</h2>
         <p>Note that you need a switch to connect two devices. Think of it as if you have no crossover cables and surplus of switches.</p>
         
-        <div class="form-table">
+        <div id="form-items" class="form-table">
 
             <div class="form-row">
                 <div class="form-cell">
                     <label for="lab_name">Lab name:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="text" id="lab_name" name="lab_name" 
+                    <input type="text" id="lab_name" name="lab_name"
                            value="<?php echo $labDataExists ? htmlspecialchars($labData['lab_name']) : ''; ?>"
-                           required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-cell">
-                    <label for="routers">Number of routers:</label>
-                </div>
-                <div class="form-cell">
-                    <input type="number" id="routers" name="routers" min="0"
-                           value="<?php echo $labDataExists ? htmlspecialchars($labData['routers']) : ''; ?>"
-                           required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-cell">
-                    <label for="servers">Number of servers:</label>
-                </div>
-                <div class="form-cell">
-                    <input type="number" id="servers" name="servers" min="0"
-                           value="<?php echo $labDataExists ? htmlspecialchars($labData['servers']) : ''; ?>"
-                           required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-cell">
-                    <label for="computers">Number of computers:</label>
-                </div>
-                <div class="form-cell">
-                    <input type="number" id="computers" name="computers" min="0"
-                           value="<?php echo $labDataExists ? htmlspecialchars($labData['computers']) : ''; ?>"
                            required>
                 </div>
             </div>
@@ -137,12 +111,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="switches">Number of switches:</label>
                 </div>
                 <div class="form-cell">
-                    <input type="number" id="switches" name="switches" min="0"
+                    <input type="number" min="0" id="switches" name="switches"
                            value="<?php echo $labDataExists ? htmlspecialchars($labData['switches']) : ''; ?>"
                            required>
                 </div>
             </div>
 
+            <?php if (!empty($labData['machines'])): ?>
+                <?php foreach ($labData['machines'] as $name => $num): ?>
+                    <div class="form-row">
+                        <div class="form-cell">
+                            <label for="<?php echo htmlspecialchars($name); ?>">Number of <?php echo htmlspecialchars($name); ?>'s:</label>
+                        </div>
+                        <div class="form-cell">
+                            <input type="number" min="0"
+                                   id="<?php echo htmlspecialchars($name); ?>"
+                                   name="machines[<?php echo htmlspecialchars($name); ?>]"
+                                   value="<?php echo htmlspecialchars($num); ?>"
+                                   required>
+                            <button type="button" onclick="removeMachineFormRow(this, '<?php echo htmlspecialchars($name); ?>')">Remove</button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+        </div>
+
+        <div class="controls-row" style="margin-top: 10px;">
+            <button type="button" id="add-machine-btn" onclick="addMachineFormRow()">Add machine type</button>
+            <select id="machine-type-select">
+                <?php foreach ($machines as $machine): ?>
+                    <option value="<?php echo htmlspecialchars($machine); ?>"><?php echo htmlspecialchars($machine); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <button type="submit">Submit</button>
@@ -172,34 +173,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div style="display: table-row;">
-                <div style="display: table-cell; padding: 5px; font-weight: bold;">Routers:</div>
-                <div style="display: table-cell; padding: 5px;">
-                    <?php echo htmlspecialchars($labData['routers']); ?>
-                </div>
-            </div>
-
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding: 5px; font-weight: bold;">Servers:</div>
-                <div style="display: table-cell; padding: 5px;">
-                    <?php echo htmlspecialchars($labData['servers']); ?>
-                </div>
-            </div>
-
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding: 5px; font-weight: bold;">Computers:</div>
-                <div style="display: table-cell; padding: 5px;">
-                    <?php echo htmlspecialchars($labData['computers']); ?>
-                </div>
-            </div>
-
-            <div style="display: table-row;">
                 <div style="display: table-cell; padding: 5px; font-weight: bold;">Switches:</div>
                 <div style="display: table-cell; padding: 5px;">
                     <?php echo htmlspecialchars($labData['switches']); ?>
                 </div>
             </div>
 
-            </div>
+            <?php foreach ($labData['machines'] as $name => $num): ?>
+                <div style="display: table-row;">
+                    <div style="display: table-cell; padding: 5px; font-weight: bold;"><?php echo htmlspecialchars($name); ?>'s:</div>
+                    <div style="display: table-cell; padding: 5px;">
+                        <?php echo htmlspecialchars($num); ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
         </div>
     <?php endif; ?>
 
@@ -213,4 +201,80 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
 </body>
+<script>
+  const machines = <?php echo json_encode($machines); ?>;
+
+  function updateAddMachineButtonState() {
+    const selectEl = document.getElementById('machine-type-select');
+    const addBtn = document.getElementById('add-machine-btn');
+    addBtn.disabled = selectEl.options.length === 0;
+  }
+
+  function removeExistingMachineOptions() {
+    const container = document.getElementById('form-items');
+    const selectEl = document.getElementById('machine-type-select');
+
+    if (!container || !selectEl) return;
+
+    const machineInputs = container.querySelectorAll('input[name^="machines["]');
+
+    machineInputs.forEach(input => {
+      const match = input.name.match(/machines\[(.*?)\]/);
+      if (match && match[1]) {
+        const machineName = match[1];
+
+        for (let i = 0; i < selectEl.options.length; i++) {
+          if (selectEl.options[i].value === machineName) {
+            selectEl.remove(i);
+            break;
+          }
+        }
+      }
+    });
+    updateAddMachineButtonState();
+  }
+
+  function addMachineFormRow() {
+    const container = document.getElementById('form-items');
+    const selectEl = document.getElementById('machine-type-select');
+    const selectedIndex = selectEl.selectedIndex;
+
+    if (selectedIndex === -1) return;
+
+    const selectedOption = selectEl.options[selectedIndex];
+    const machineName = selectedOption.value;
+
+    selectEl.remove(selectedIndex);
+
+    const newMachineSelectorRow = document.createElement('div');
+    newMachineSelectorRow.className = 'form-row';
+    newMachineSelectorRow.innerHTML = `
+        <div class="form-cell">
+            <label>Number of ${machineName}'s:</label>
+        </div>
+        <div class="form-cell">
+            <input type="number" min="0" name="machines[${machineName}]" required>
+            <button type="button" onclick="removeMachineFormRow(this, '${machineName}')">Remove</button>
+        </div>
+    `;
+
+    container.appendChild(newMachineSelectorRow);
+    updateAddMachineButtonState();
+  }
+
+  function removeMachineFormRow(button, machineName) {
+    button.closest('.form-row').remove();
+
+    const selectEl = document.getElementById('machine-type-select');
+    const option = document.createElement('option');
+    option.value = machineName;
+    option.textContent = machineName;
+    selectEl.appendChild(option);
+    updateAddMachineButtonState();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    removeExistingMachineOptions();
+  });
+</script>
 </html>
