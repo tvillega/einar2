@@ -1,0 +1,13 @@
+services:
+
+  einar2-{{ Name }}:
+    image: {{ Image }}
+    container_name: einar2-{{ Name }}
+    restart: always
+    hostname: einar2-{{ Name }}
+    ports:
+      - "{{ Port }}:80"
+    volumes:
+      - ./config:/config
+      - ./labs:/einar2/labs
+    entrypoint: /config/entrypoint.sh

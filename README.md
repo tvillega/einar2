@@ -15,15 +15,15 @@ Create the following `docker-compose.yaml`:
 ```
 services:
 
-  einar2-website:
+  einar2:
     image: tvillega/einar2:latest
-    container_name: einar2-website
+    container_name: einar2
     restart: always
     ports:
       - "80:80"
     volumes:
+      - ./config:/config
       - ./labs:/einar2/labs
-    entrypoint: /einar2/entrypoint.sh
 ```
 
 Now you can go to `localhost` or `127.0.0.1:80` on your web browser to start using Einar2.
