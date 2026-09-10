@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/setupcomposefileAux.php';
+
 $settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/settings.json';
 if (!file_exists($settingsFile)) {
   die("File settings.json missing at document root");
@@ -22,9 +24,9 @@ if (file_exists($labDataFile)) {
   die("Error: Laboratory has not been created or initialized.");
 }
 
-$routersNumber   = $labData['routers'];
-$serversNumber   = $labData['servers'];
-$computersNumber = $labData['computers'];
+$machineArchetypeDirs = [];
+$machineArchetypeVars = [];
+
 $switchesNumber  = $labData['switches'];
 
 $networksPath    = $_SERVER['DOCUMENT_ROOT'] . '/labs/' . $labName . '/networks.json';
@@ -54,136 +56,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $archetypesDir = __DIR__  . '/archetypes';
 
-  /* All archetype directories */
+  /* All archetype dirs */
   $archetypeDirComposeNetworks  = $archetypesDir . '/compose-networks.yml';
   $archetypeDirComposeServices  = $archetypesDir . '/compose-services.yml';
   $archetypeDirJoinNetwork      = $archetypesDir . '/join-network.yml';
   $archetypeDirNetworkBridge    = $archetypesDir . '/network-bridge.yml';
-  $archetypeDirServiceComputer  = $archetypesDir . '/service-computer.yml';
-  $archetypeDirServiceRouter    = $archetypesDir . '/service-router.yml';
-  $archetypeDirServiceServer    = $archetypesDir . '/service-server.yml';
-
-  function stripComments(string $template) {
-    $pattern = '/(?<indent>^[ \t]*)?\{#[^}]*#\}(?<trailing>[ \t]*\r?\n)?/m';
-
-    return preg_replace_callback($pattern, function ($matches) {
-      $hasIndent = !empty($matches['indent']);
-      $hasTrailingNewline = !empty($matches['trailing']);
-      if ($hasIndent && $hasTrailingNewline) {
-        return '';
-      }
-      return ($matches['indent'] ?? '') . ($matches['trailing'] ?? '');
-    }, $template);
-  }
+  $archetypeDirMachines         = getServiceArchetypeDirs();
 
   /* All archetypes contents without comments */
   $archetypeVarComposeNetworks  = stripComments(file_get_contents($archetypeDirComposeNetworks));
   $archetypeVarComposeServices  = stripComments(file_get_contents($archetypeDirComposeServices));
   $archetypeVarJoinNetwork      = stripComments(file_get_contents($archetypeDirJoinNetwork));
   $archetypeVarNetworkBridge    = stripComments(file_get_contents($archetypeDirNetworkBridge));
-  $archetypeVarServiceComputer  = stripComments(file_get_contents($archetypeDirServiceComputer));
-  $archetypeVarServiceRouter    = stripComments(file_get_contents($archetypeDirServiceRouter));
-  $archetypeVarServiceServer    = stripComments(file_get_contents($archetypeDirServiceServer));
+  $archetypeVarMachines         = getServiceArchetypeVars($archetypeDirMachines);
 
   file_put_contents($outputComposeServicesFile, $archetypeVarComposeServices);
   file_put_contents($outputComposeNetworksFile, $archetypeVarComposeNetworks);
 
-  function serviceBlockTypeAppender(
-    string $deviceType,
-    array  $devices,
-    string $serviceBlock,
-    string $serviceJoinNetwork,
-    string $outputFile
-  ) {
-
-    $port = 8080;
-
-    foreach ($devices as $device) {
-
-      global $networks;
-      global $settingsData;
-
-      $myServiceBlock = $serviceBlock;
-
-      $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
-
-      if ($deviceType == "server") {
-        $myServiceBlock = str_replace('{{ Port }}', $port, $myServiceBlock);
-        $port++;
-      }
-
-      $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
-
-      file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
-
-      $ifCount     = $device['if_number'];
-      if ($ifCount != 0) {
-          for ($i = 0; $i < $ifCount; $i++) {
-
-            $myServiceJoinNetwork = $serviceJoinNetwork;
-
-            $switch             = "switch" . $device['if_list'][$i]['if'];
-            $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
-            $address            = $device['if_list'][$i]['ip'];
-
-            $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
-            $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
-
-            file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
-          }
-      }
-    }
-  }
-
-  if (!empty($services['routers'])) {
+  foreach ($archetypeDirMachines as $machineName => $machineDir) {
+    $machineType = $machineName . "Type";
     serviceBlockTypeAppender(
-      'router',
-      $services['routers'],
-      $archetypeVarServiceRouter,
+      $networks,
+      $settingsData,
+      $machineName,
+      $services[$machineType],
+      $archetypeVarMachines[$machineName],
       $archetypeVarJoinNetwork,
       $outputComposeServicesFile
     );
-  }
-
-  if (!empty($services['servers'])) {
-    serviceBlockTypeAppender(
-      'server',
-      $services['servers'],
-      $archetypeVarServiceServer,
-      $archetypeVarJoinNetwork,
-      $outputComposeServicesFile
-    );
-  }
-
-  if (!empty($services['computers'])) {
-    serviceBlockTypeAppender(
-      'computer',
-      $services['computers'],
-      $archetypeVarServiceComputer,
-      $archetypeVarJoinNetwork,
-      $outputComposeServicesFile
-    );
-  }
-
-  function networkBlockAppender(
-    array  $switches,
-    string $networkBlock,
-    string $outputFile
-  ) {
-
-    foreach ($switches as $switch) {
-
-      $myNetworkBlock = $networkBlock;
-
-      $dashedNetwork = str_replace('.', '-', $switch['network']);
-
-      $myNetworkBlock = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myNetworkBlock);
-      $myNetworkBlock = str_replace('{{ Network }}', $switch['network'], $myNetworkBlock);
-      $myNetworkBlock = str_replace('{{ Mask }}', $switch['mask'], $myNetworkBlock);
-      $myNetworkBlock = str_replace('{{ Gateway }}', $switch['gateway'], $myNetworkBlock);
-
-      file_put_contents($outputFile, $myNetworkBlock, FILE_APPEND);
-    }
   }
 
   networkBlockAppender(
