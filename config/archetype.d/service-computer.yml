@@ -1,8 +1,8 @@
 
-  e2-server-{{ Name }}:
+  e2-computer-{{ Name }}:
     image: {{ Image }}
-    container_name: e2-server-{{ Name }}
-    entrypoint: /server/entrypoint.sh
+    container_name: e2-computer-{{ Name }}
+    entrypoint: /config/entrypoint.d/computer.sh
     stdin_open: true
     tty: true
     cap_add:
@@ -10,7 +10,5 @@
     sysctls:
       - net.ipv4.conf.all.rp_filter=0 {# if per interface: net.ipv4.conf.ethX.rp_filter=0 #}
       - net.ipv4.conf.default.rp_filter=0
-    hostname: server-{{ Name }}
-    ports:
-      - "{{ Port }}:80"
+    hostname: computer-{{ Name }}
     networks:

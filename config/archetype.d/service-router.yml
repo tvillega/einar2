@@ -2,7 +2,7 @@
   e2-router-{{ Name }}:
     image: {{ Image }}
     container_name: e2-router-{{ Name }}
-    entrypoint: /router/entrypoint.sh
+    entrypoint: /config/entrypoint.d/router.sh
     stdin_open: true
     tty: true
     cap_add:
