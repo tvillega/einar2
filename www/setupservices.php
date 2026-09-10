@@ -29,7 +29,7 @@ $services = json_decode(file_get_contents($servicesPath), true);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   foreach ($labData['machines'] as $machineName => $machineNumber) {
-    $machineType = $machine . "Type";
+    $machineType = $machineName . "Type";
     if (isset($_POST[$machineType])) {
       $services[$machineType] = array_replace_recursive($services[$machineType], $_POST[$machineType]);
     }
