@@ -1,5 +1,13 @@
 # Changelog
 
+## [beta.1](https://github.com/tvillega/einar2/releases/tag/beta.1) (2027-09-11)
+## What's Changed
+* feat: allow custom machine types by @tvillega in https://github.com/tvillega/einar2/pull/3
+* feat: centralize config dir by @tvillega in https://github.com/tvillega/einar2/pull/5
+* feat: relative cli path resolution by @tvillega in https://github.com/tvillega/einar2/pull/8
+* feat!: deprecate old build system by @tvillega in https://github.com/tvillega/einar2/pull/9
+* chore: save docs md files alongside php files by @tvillega in https://github.com/tvillega/einar2/pull/11
+
 ## [alpha.7](https://github.com/tvillega/einar2/releases/tag/alpha.7) (2027-09-09)
 ## What's Changed
 * Broken release
