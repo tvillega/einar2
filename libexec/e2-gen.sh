@@ -3,9 +3,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-PKG_LIBX_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-PKG_ROOT_DIR=$( cd "$PKG_LIBX_DIR/.." ; pwd -P )
-PKG_ARCH_DIR=$( cd "$PKG_ROOT_DIR/config/archetype.d" ; pwd -P )
+if [ -z "${PKG_ROOT_DIR:-}" ]; then
+    echo "err: ${BASH_SOURCE[0]} cannot be invoked directly" >&2
+    exit 1
+fi
 
 IMG="${DOCKER_IMAGE}"
 

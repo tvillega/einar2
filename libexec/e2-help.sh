@@ -3,6 +3,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+if [ -z "${PKG_ROOT_DIR:-}" ]; then
+    echo "err: ${BASH_SOURCE[0]} cannot be invoked directly" >&2
+    exit 1
+fi
+
 print_help() {
 
 cat << EOF
