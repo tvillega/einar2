@@ -3,7 +3,7 @@
 require_once __DIR__ . '../../../vendor/Michelf/MarkdownExtra.inc.php';
 
 $downloadIndex          = true;
-$markdownTextChangelog  = file_get_contents(__DIR__ . '/../assets/releasenotes.md');
+$markdownTextChangelog  = file_get_contents(__DIR__ . '/../releasenotes.md');
 $markdownTextChangelog2 = str_replace("# Changelog", '', $markdownTextChangelog);
 $markdownTextChangelog3 = str_replace("##", "###", $markdownTextChangelog2);
 

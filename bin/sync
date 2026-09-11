@@ -1,5 +1,11 @@
 #!/bin/bash
 
+PKG_BBIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_BBIN_DIR/.." ; pwd -P )
+PKG_CONF_DIR="$PKG_ROOT_DIR/config"
+PKG_DOCS_DIR="$PKG_ROOT_DIR/docs"
+PKG_WWW_DIR="$PKG_ROOT_DIR/www"
+
 # Git doesn't like hardlinks
 # during development archetypes and markdown files
 # need to be synced with their counterparts inside www
@@ -8,39 +14,39 @@
 
 ## SYNC ARCHETYPES
 
-archdir="www/archetypes"
+ARCHETYPE_DIR="${PKG_WWW_DIR}/archetypes"
 
-if [[ ! -d "$archdir" ]] ; then
-  mkdir -v "$archdir"
+if [[ ! -d "$ARCHETYPE_DIR" ]] ; then
+  mkdir -v "$ARCHETYPE_DIR"
 fi
 
-cp -rv --remove-destination config/archetype.d/*  "${archdir}/"
+cp -rv --remove-destination "$PKG_CONF_DIR"/archetype.d/*  "${ARCHETYPE_DIR}/"
 
 ## SYNC DOCS INDEX + CHANGELOG
 
-cp -rv --remove-destination docs/index.md  www/docs/assets/index.md
-cp -v  --remove-destination CHANGELOG.md   www/docs/assets/releasenotes.md
+cp -rv --remove-destination "$PKG_DOCS_DIR"/index.md     "$PKG_WWW_DIR"/docs/index.md
+cp -v  --remove-destination "$PKG_ROOT_DIR"/CHANGELOG.md "$PKG_WWW_DIR"/docs/releasenotes.md
 
 ## SYNC USER GUIDE
 
-guidedir="www/docs/assets/userguide"
+GUIDE_DIR="${PKG_WWW_DIR}/docs/userguide"
 
-if [[ ! -d "$guidedir" ]] ; then
-  mkdir -v "$guidedir"
+if [[ ! -d "$GUIDE_DIR" ]] ; then
+  mkdir -v "$GUIDE_DIR"
 fi
 
-cp -rv --remove-destination docs/userguide/* "${guidedir}/"
+cp -rv --remove-destination "$PKG_DOCS_DIR"/userguide/* "${GUIDE_DIR}/"
 
 ## SYNC ADVANCED USER GUIDE
 
-advguidedir="www/docs/assets/advguide"
+ADVGUIDE_DIR="${PKG_WWW_DIR}/docs/advguide"
 
-if [[ ! -d "$advguidedir" ]] ; then
-  mkdir -v "$advguidedir"
+if [[ ! -d "$ADVGUIDE_DIR" ]] ; then
+  mkdir -v "$ADVGUIDE_DIR"
 fi
 
-cp -rv --remove-destination docs/advguide/* "${advguidedir}/"
+cp -rv --remove-destination "$PKG_DOCS_DIR"/advguide/* "${ADVGUIDE_DIR}/"
 
 ## SYNC SETTINGS
 
-cp -v  --remove-destination config/settings.json www/settings.json
+cp -v  --remove-destination "$PKG_CONF_DIR"/settings.json "$PKG_WWW_DIR"/settings.json
