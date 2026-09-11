@@ -3,8 +3,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LIBX="${E2_LIBEXEC-./libexec}"
-IMG="${E2_IMAGE-tvillega/einar2:latest}"
+PKG_LIBX_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_LIBX_DIR/.." ; pwd -P )
+PKG_ARCH_DIR=$( cd "$PKG_ROOT_DIR/config/archetype.d" ; pwd -P )
+
+IMG="${DOCKER_IMAGE}"
 
 gen_computer() {
 
@@ -15,7 +18,7 @@ gen_computer() {
     exit
   fi
 
-  cat "archetypes/service-computer.yml" \
+  cat "$PKG_ARCH_DIR/service-computer.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ Image }}|$IMG|g" \
     | sed "s|{{ Name }}|$name|g" 
@@ -32,7 +35,7 @@ gen_server() {
     exit
   fi
 
-  cat "archetypes/service-server.yml" \
+  cat "$PKG_ARCH_DIR/service-server.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ Image }}|$IMG|g" \
     | sed "s|{{ Name }}|$name|g" \
@@ -49,7 +52,7 @@ gen_router() {
     exit
   fi
 
-  cat "archetypes/service-router.yml" \
+  cat "$PKG_ARCH_DIR/service-router.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ Image }}|$IMG|g" \
     | sed "s|{{ Name }}|$name|g"
@@ -69,7 +72,7 @@ join_network() {
   address_dashed=$(echo $address | sed 's|\.|-|g')
   network_dashed=$(echo $network | sed 's|\.|-|g')
 
-  cat "archetypes/join-network.yml" \
+  cat "$PKG_ARCH_DIR/join-network.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ Address }}|$address|g" \
     | sed "s|{{ AddressDashed }}|$address_dashed|g" \
@@ -92,7 +95,7 @@ gen_network_bridge() {
   network_dashed=$(echo $network | sed 's|\.|-|g')
   mask_no_leading_slash="${mask##/}"
 
-  cat "archetypes/network-bridge.yml" \
+  cat "$PKG_ARCH_DIR/network-bridge.yml" \
     | sed 's/{#[^}]*#}//g' \
     | sed "s|{{ Network }}|$network|g" \
     | sed "s|{{ NetworkDashed }}|$network_dashed|g" \
@@ -103,15 +106,14 @@ gen_network_bridge() {
 
 gen_compose_services() {
 
-  cat "archetypes/compose-services.yml" \
+  cat "$PKG_ARCH_DIR/compose-services.yml" \
     | sed 's/{#[^}]*#}//g'
-
 
 }
 
 gen_compose_networks() {
 
-  cat "archetypes/compose-networks.yml" \
+  cat "$PKG_ARCH_DIR/compose-networks.yml" \
     | sed 's/{#[^}]*#}//g'
 
 }
@@ -190,7 +192,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    $LIBX/e2-help.sh gen
+    $PKG_LIBX_DIR/e2-help.sh gen
     exit
     ;;
 esac; shift; done

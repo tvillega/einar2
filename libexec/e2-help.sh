@@ -84,11 +84,9 @@ usage: einar2 run <command>
 Run a docker command. Requires a privileged user or sudo|doas.
 
   <command> := list   <section>
-             | shell  <lab>
              | start  <lab>
              | stop   <lab>
              | shell  <lab>
-             | util   <utility>
 
   <section> := services
              | networks
@@ -98,12 +96,6 @@ Run a docker command. Requires a privileged user or sudo|doas.
        XX-labname
        ├── docker-compose.yml
        └── docker-compose-networks.yml
-
-  <utility> is a script under the utils directory, you must
-            reference it by name without the .sh extension.
-
-            You can create your own utilities and save them
-            under the utils dir to call them from einar2.
 EOF
 }
 

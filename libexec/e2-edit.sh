@@ -3,7 +3,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LIBX="${E2_LIBEXEC-./libexec}"
+PKG_LIBX_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_LIBX_DIR/.." ; pwd -P )
 
 check_dir() {
 
@@ -47,7 +48,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    $LIBX/e2-help.sh edit
+    $PKG_LIBX_DIR/e2-help.sh edit
     exit
     ;;
 esac; shift; done

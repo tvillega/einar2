@@ -3,8 +3,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LIBX="${E2_LIBEXEC-./libexec}"
-UTIL="${E2_UTIL-./utils}"
+PKG_LIBX_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_LIBX/.." ; pwd -P )
+PKG_UTIL_DIR=$( cd "$PKG_ROOT/" ; pwd -P )
 
 run_start()     {
 
@@ -73,26 +74,10 @@ run_list()      {
 
 }
 
-run_utility() {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "You must specify an utility by its name"
-    exit
-  elif [[ ! -f "./utils/${what}.sh" ]] ; then
-    echo "Utility not found."
-    exit
-  else
-    $UTIL/"${what}.sh"
-  fi
-
-}
-
 run_ipc_listener() {
 
   local socket="/var/run/einar.socket"
-  local daemon="/opt/einar2/bin/einard"
+  local daemon="${PKG_ROOT_DIR}/bin/einard"
 
   if [[ -S "$socket" ]] ; then
     echo "Closing previous session"
@@ -122,10 +107,7 @@ run_ipc() {
 
   local what="${1-}"
 
-  if [[ ! -d "/opt/einar2" ]] ; then
-    echo "Einar2 is not installed as a system program"
-    exit
-  elif [[ -z "$what" ]] ; then
+  if [[ -z "$what" ]] ; then
     echo "usage: run ipc listener|<command>"
     exit
   elif [[ "$what" == "listener" ]] ; then
@@ -180,7 +162,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     exit
     ;;
   *)
-    $LIBX/e2-help.sh run
+    $PKG_LIBX_DIR/e2-help.sh run
     exit
     ;;
 esac; shift; done
