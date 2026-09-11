@@ -2,9 +2,6 @@ registry/
 e2
 labs
 www/archetypes
-www/docs/assets/advguide
-www/docs/assets/userguide
-www/docs/assets/index.md
-www/docs/assets/releasenotes.md
+www/docs/**/*.md
 www/labs
 www/settings.json
