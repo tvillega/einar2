@@ -2,7 +2,14 @@
 
 PKG_BBIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 PKG_ROOT_DIR=$( cd "$PKG_BBIN_DIR/.." ; pwd -P )
+
 PKG_LIBX_DIR="$PKG_ROOT_DIR/libexec"
+PKG_ETC_DIR="$PKG_ROOT_DIR/etc"
+
+export PKG_ROOT_DIR
+export PKG_LIBX_DIR
+export PKG_SHARE_DIR
+export PKG_ETC_DIR
 
 # default settings
 source "${PKG_ROOT_DIR}/defaults.conf"
@@ -10,6 +17,7 @@ source "${PKG_ROOT_DIR}/defaults.conf"
 # default settings overrides
 [[ -f ~/.einar.conf ]] && source ~/.einar.conf
 [[ -f /etc/einar.conf ]] && source /etc/einar.conf
+[[ -f /usr/local/etc/einar.conf ]] && source /usr/local/etc/einar.conf
 
 export DOCKER_IMAGE
 

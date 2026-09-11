@@ -1,8 +1,14 @@
 #!/bin/bash
 
-PKG_LIBX_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-PKG_ROOT_DIR=$( cd "$PKG_LIBX_DIR/.." ; pwd -P )
-PKG_HOOK_DIR=$( cd "$PKG_ROOT_DIR/share/hooks" ; pwd -P )
+set -euo pipefail
+IFS=$'\n\t'
+
+if [ -z "${PKG_ROOT_DIR:-}" ]; then
+    echo "err: ${BASH_SOURCE[0]} cannot be invoked directly" >&2
+    exit 1
+fi
+
+PKG_HOOK_DIR=$( cd "$PKG_SHARE_DIR/hooks" ; pwd -P )
 
 hook_run() {
 
