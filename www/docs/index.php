@@ -3,7 +3,7 @@
 require_once __DIR__ . '../../vendor/Michelf/MarkdownExtra.inc.php';
 
 $rootIndex      = true;
-$markdownText   = file_get_contents(__DIR__ . '/assets/index.md');
+$markdownText = file_get_contents(__DIR__ . '/' . basename(__FILE__, '.php') . '.md');
 
 include(__DIR__ . '/assets/header.php');
 echo Michelf\MarkdownExtra::defaultTransform($markdownText);
