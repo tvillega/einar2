@@ -8,7 +8,6 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
-PKG_ARCH_DIR=$( cd "${PKG_ETC_DIR}/archetype.d" ; pwd -P )
 IMG="${DOCKER_IMAGE}"
 
 gen_computer() {

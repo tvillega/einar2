@@ -8,8 +8,6 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
-PKG_HOOK_DIR=$( cd "$PKG_SHARE_DIR/hooks" ; pwd -P )
-
 hook_run() {
 
   local s="$1" ; shift
