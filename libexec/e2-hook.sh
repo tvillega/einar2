@@ -1,20 +1,21 @@
 #!/bin/bash
 
-LIBX="${E2_LIBEXEC-./libexec}"
-HOOKS_DIR="${E2_HOOKS-./share/hooks}"
+PKG_LIBX_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_LIBX_DIR/.." ; pwd -P )
+PKG_HOOK_DIR=$( cd "$PKG_ROOT_DIR/share/hooks" ; pwd -P )
 
 hook_run() {
 
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in "$HOOKS_DIR"/*pre.run ; do
+    for a in "$PKG_HOOK_DIR"/*pre.run ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
     done
   else
-    for a in "$HOOKS_DIR"/*post.run ; do
+    for a in "$PKG_HOOK_DIR"/*post.run ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
@@ -28,13 +29,13 @@ hook_edit() {
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in "$HOOKS_DIR"/*pre.edit ; do
+    for a in "$PKG_HOOK_DIR"/*pre.edit ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
     done
   else
-    for a in "$HOOKS_DIR"/*post.edit ; do
+    for a in "$PKG_HOOK_DIR"/*post.edit ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
@@ -48,13 +49,13 @@ hook_gen() {
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    for a in "$HOOKS_DIR"/*pre.gen ; do
+    for a in "$PKG_HOOK_DIR"/*pre.gen ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
     done
   else
-    for a in "$HOOKS_DIR"/*post.gen ; do
+    for a in "$PKG_HOOK_DIR"/*post.gen ; do
       chmod +x $a
       $a "${@}"
       chmod -x $a
@@ -68,13 +69,13 @@ hook_or_disable() {
   # Default hooks are mandatory for simplicity
   # removing any of them will disable all hooks
 
-  [[ ! -d "${HOOKS_DIR}" ]] && exit
-  [[ ! -f "${HOOKS_DIR}/00-default-post.edit" ]] && exit
-  [[ ! -f "${HOOKS_DIR}/00-default-post.gen"  ]] && exit
-  [[ ! -f "${HOOKS_DIR}/00-default-post.run"  ]] && exit
-  [[ ! -f "${HOOKS_DIR}/00-default-pre.edit"  ]] && exit
-  [[ ! -f "${HOOKS_DIR}/00-default-pre.gen"   ]] && exit
-  [[ ! -f "${HOOKS_DIR}/00-default-pre.run"   ]] && exit
+  [[ ! -d "${PKG_HOOK_DIR}" ]] && exit
+  [[ ! -f "${PKG_HOOK_DIR}/00-default-post.edit" ]] && exit
+  [[ ! -f "${PKG_HOOK_DIR}/00-default-post.gen"  ]] && exit
+  [[ ! -f "${PKG_HOOK_DIR}/00-default-post.run"  ]] && exit
+  [[ ! -f "${PKG_HOOK_DIR}/00-default-pre.edit"  ]] && exit
+  [[ ! -f "${PKG_HOOK_DIR}/00-default-pre.gen"   ]] && exit
+  [[ ! -f "${PKG_HOOK_DIR}/00-default-pre.run"   ]] && exit
 
 }
 

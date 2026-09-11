@@ -1,18 +1,29 @@
 #!/bin/bash
 
-LIBX="${E2_LIBEXEC_PATH-./libexec}"
+PKG_BBIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_BBIN_DIR/.." ; pwd -P )
+PKG_LIBX_DIR="$PKG_ROOT_DIR/libexec"
+
+# default settings
+source "${PKG_ROOT_DIR}/defaults.conf"
+
+# default settings overrides
+[[ -f ~/.einar.conf ]] && source ~/.einar.conf
+[[ -f /etc/einar.conf ]] && source /etc/einar.conf
+
+export DOCKER_IMAGE
 
 cmd_run() {
 
   local what="$1"
 
   if [[ -z "$what" ]] ; then
-    $LIBX/e2-help.sh run
+    $PKG_LIBX_DIR/e2-help.sh run
     exit
   else
-    $LIBX/e2-hook.sh run -1 "${@}"
-    $LIBX/e2-run.sh "${@}"
-    $LIBX/e2-hook.sh run  1 "${@}"
+    $PKG_LIBX_DIR/e2-hook.sh run -1 "${@}"
+    $PKG_LIBX_DIR/e2-run.sh "${@}"
+    $PKG_LIBX_DIR/e2-hook.sh run  1 "${@}"
   fi
 
 }
@@ -24,12 +35,12 @@ cmd_edit() {
   [[ -z "$EDITOR" ]] && echo "EDITOR unset" && exit
 
   if [[ -z "$what" ]] ; then
-    $LIBX/e2-help.sh edit
+    $PKG_LIBX_DIR/e2-help.sh edit
     exit
   else
-    $LIBX/e2-hook.sh edit -1 "${@}"
-    $LIBX/e2-edit.sh "${@}"
-    $LIBX/e2-hook.sh edit  1 "${@}"
+    $PKG_LIBX_DIR/e2-hook.sh edit -1 "${@}"
+    $PKG_LIBX_DIR/e2-edit.sh "${@}"
+    $PKG_LIBX_DIR/e2-hook.sh edit  1 "${@}"
   fi
 
 }
@@ -39,12 +50,12 @@ cmd_gen() {
   local what="$1"
 
   if [[ -z "$what" ]] ; then
-    $LIBX/e2-help.sh gen
+    $PKG_LIBX_DIR/e2-help.sh gen
     exit
   else
-    $LIBX/e2-hook.sh gen -1 "${@}"
-    $LIBX/e2-gen.sh "${@}"
-    $LIBX/e2-hook.sh gen  1 "${@}"
+    $PKG_LIBX_DIR/e2-hook.sh gen -1 "${@}"
+    $PKG_LIBX_DIR/e2-gen.sh "${@}"
+    $PKG_LIBX_DIR/e2-hook.sh gen  1 "${@}"
   fi
 
 }
@@ -52,7 +63,7 @@ cmd_gen() {
 cmd="$1"
 
 if [[ -z "$cmd" ]] ; then
-  $LIBX/e2-help.sh help
+  $PKG_LIBX_DIR/e2-help.sh help
   exit
 
 elif [[ "$cmd" == "run" || "$cmd" == "r" ]] ; then
