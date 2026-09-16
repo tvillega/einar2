@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/ip_in_range.php';
+require_once __DIR__ . '/vendor/Cloudflare/ip_in_range.php';
 
 /* Global variables */
 $machinesHaveIflistSet   = false;
