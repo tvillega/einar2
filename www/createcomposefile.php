@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   foreach ($archetypeDirMachines as $machineName => $machineDir) {
     $machineType = $machineName . "Type";
+    if (!isset($services[$machineType])) continue;
     serviceBlockTypeAppender(
       $networks,
       $settingsData,
