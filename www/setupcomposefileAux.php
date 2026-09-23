@@ -55,6 +55,8 @@ function serviceBlockTypeAppender(
       $port++;
     }
 
+    $myServiceBlock = str_replace('{{ DefaultGateway }}', $device['gw'], $myServiceBlock);
+
     $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
 
     file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
@@ -93,7 +95,7 @@ function networkBlockAppender(
     $myNetworkBlock = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myNetworkBlock);
     $myNetworkBlock = str_replace('{{ Network }}', $switch['network'], $myNetworkBlock);
     $myNetworkBlock = str_replace('{{ Mask }}', $switch['mask'], $myNetworkBlock);
-    $myNetworkBlock = str_replace('{{ Gateway }}', $switch['gateway'], $myNetworkBlock);
+    $myNetworkBlock = str_replace('{{ HostBindGateway }}', $switch['gateway'], $myNetworkBlock);
 
     file_put_contents($outputFile, $myNetworkBlock, FILE_APPEND);
   }
