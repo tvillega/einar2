@@ -7,4 +7,4 @@
       driver: default
       config:
         - subnet: {{ Network }}/{{ Mask }}
-          gateway: {{ Gateway }} {# To use a container as gateway the container's IP can't be x.x.x.1 #}
+          gateway: {{ HostBindGateway }} {# To use a container as gateway the container's IP can't be x.x.x.1 #}

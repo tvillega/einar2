@@ -255,6 +255,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 ?>
                             </div>
 
+                        <?php endif; ?>
+
+                        </div>
+
+                        <div style="display: table-row;">
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <?php
+                                    $gwTagLabelAttrFor   = $machineID . "_gw" . $j;
+                                    $gwTagInputAttrName  = $machineType . "[" . $machineID . "][gw]";
+                                    $gwTagInputAttrValue = ($formSubmitted && isset($services[$machineType][$machineID]["gw"]))
+                                                                ? htmlspecialchars($services[$machineType][$machineID]["gw"])
+                                                                : '';
+                                ?>
+                                <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
+                            </div>
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <input type="text"
+                                      value="<?php echo $gwTagInputAttrValue ?>"
+                                      id="<?php echo $gwTagLabelAttrFor; ?>"
+                                      name="<?php echo $gwTagInputAttrName; ?>"
+                                      required>
+                            </div>
+
+                        <?php if ($formSubmitted): ?>
+
+                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                                <?php
+                                    if ($machinesHaveIflistSet) {
+                                      $switch = 'switch' . $ifconnTagSelectValue;
+                                      $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
+                                    }
+                                    if (!$machinesHaveIflistSet) {
+                                      echo '<strong style="color:#8A2BE2;">UNSET</strong>';
+                                      $validForm = false;
+                                    } else if (!filter_var($gwTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                      echo '<strong style="color:red";>INVALID</strong>';
+                                      $validForm = false;
+                                    } else if (!ipv4_in_range($gwTagInputAttrValue,$cidr)) {
+                                      echo '<strong style="color:red;">FAILED</strong>';
+                                      $validForm = false;
+                                    } else {
+                                      echo '<strong style="color:green">VALID</strong>';
+                                    }
+                                ?>
+                            </div>
 
                         <?php endif; ?>
 
