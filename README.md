@@ -15,9 +15,9 @@ Create the following `docker-compose.yaml`:
 ```
 services:
 
-  einar2:
+  einar2-webui:
     image: tvillega/einar2:latest
-    container_name: einar2
+    container_name: einar2-webui
     restart: always
     ports:
       - "80:80"

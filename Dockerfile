@@ -18,16 +18,19 @@ RUN apk add --no-cache \
 
 RUN mkdir -pv /var/lib/php/sessions /etc/quagga
 
-COPY config  /config.default
-COPY docs/   /einar2/assets/
-COPY www/    /einar2/
-RUN rm -rf   /einar2/archetypes # from devel env
+COPY config            /config.default
+COPY www/              /einar2/
+COPY docs              /einar2/
+COPY share/archetypes  /einar2/
+COPY share/server      /einar2/
+COPY share/webui/      /einar2/
+COPY CHANGELOG.md      /einar2/docs/releasenotes.md
 
 RUN touch /etc/quagga/zebra.conf && echo "zebra=yes" > /etc/quagga/daemons
 
 RUN chown -R lighttpd:lighttpd /einar2 /var/lib/php/sessions
-RUN chmod +x /config.default/entrypoint.sh
+RUN chmod +x /einar2/entrypoint.sh /einar2/jailbreak.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/config.default/entrypoint.sh"]
+ENTRYPOINT ["/einar2/entrypoint.sh"]
