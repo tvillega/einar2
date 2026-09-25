@@ -30,7 +30,7 @@ COPY CHANGELOG.md       /einar2/docs/releasenotes.md
 RUN touch /etc/quagga/zebra.conf && echo "zebra=yes" > /etc/quagga/daemons
 
 RUN chown -R lighttpd:lighttpd /einar2 /var/lib/php/sessions
-RUN chmod +x /einar2/entrypoint.sh /einar2/jailbreak.sh
+RUN chmod +x /einar2/entrypoint.sh /einar2/jailbreak.sh /einar2/entrypoints/*.sh
 
 EXPOSE 80
 
