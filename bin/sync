@@ -33,7 +33,7 @@ fun_sync_docs_advguide() {
   local advguidedir="${PKG_WWW_DIR}/docs/advguide"
 
   if [[ $s -lt 0 ]] ; then
-    rm -rfv $advguidedir
+    rm -rfv "${advguidedir}/"*.md
   else
     if [[ ! -d "$advguidedir" ]] ; then
       mkdir -v "$advguidedir"
@@ -49,7 +49,7 @@ fun_sync_docs_userguide() {
   local guidedir="${PKG_WWW_DIR}/docs/userguide"
 
   if [[ $s -lt 0 ]] ; then
-    rm -rfv $guidedir
+    rm -rfv "${guidedir}/"*.md
   else
     if [[ ! -d "$guidedir" ]] ; then
       mkdir -v "$guidedir"
@@ -69,8 +69,6 @@ fun_sync_docs_changelog() {
   else
     cp -rv --remove-destination "$PKG_DOCS_DIR"/index.md     "$PKG_WWW_DIR"/docs/index.md
     cp -v  --remove-destination "$PKG_ROOT_DIR"/CHANGELOG.md "$PKG_WWW_DIR"/docs/releasenotes.md
-    fun_sync_docs_userguide $s
-    fun_sync_docs_advguide  $s
   fi
 
 }
@@ -79,15 +77,9 @@ fun_sync_docs() {
 
   local s="$1" ; shift
 
-  if [[ $s -lt 0 ]] ; then
-    rm -v "$PKG_WWW_DIR"/docs/index.md
-    rm -v "$PKG_WWW_DIR"/docs/releasenotes.md
-  else
-    cp -rv --remove-destination "$PKG_DOCS_DIR"/index.md     "$PKG_WWW_DIR"/docs/index.md
-    cp -v  --remove-destination "$PKG_ROOT_DIR"/CHANGELOG.md "$PKG_WWW_DIR"/docs/releasenotes.md
-    fun_sync_docs_userguide $s
-    fun_sync_docs_advguide  $s
-  fi
+  fun_sync_docs_userguide $s
+  fun_sync_docs_advguide  $s
+  fun_sync_docs_changelog $s
 
 }
 
