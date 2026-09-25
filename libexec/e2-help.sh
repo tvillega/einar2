@@ -81,6 +81,19 @@ to container's names for clearer reverse DNS lookup outputs.
 EOF
 }
 
+print_help_sync() {
+
+cat <<EOF
+usage: einar2 sync
+
+Devel util. Sync configuration files to DOCUMENT_ROOT.
+
+  <command> ::= yay
+              | nay
+EOF
+
+}
+
 print_help_run() {
 
 cat <<EOF
@@ -117,6 +130,10 @@ while [[ "$1" != "--" ]]; do case $1 in
     ;;
   gen)
     print_help_gen
+    exit
+    ;;
+  sync)
+    print_help_sync
     exit
     ;;
   run)
