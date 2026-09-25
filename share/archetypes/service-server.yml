@@ -2,7 +2,7 @@
   e2-server-{{ Name }}:
     image: {{ Image }}
     container_name: e2-server-{{ Name }}
-    entrypoint: /config/entrypoint.d/server.sh
+    entrypoint: /einar2/entrypoints/server.sh
     stdin_open: true
     tty: true
     cap_add:
