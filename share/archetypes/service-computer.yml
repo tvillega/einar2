@@ -1,8 +1,8 @@
 
-  e2-router-{{ Name }}:
+  e2-computer-{{ Name }}:
     image: {{ Image }}
-    container_name: e2-router-{{ Name }}
-    entrypoint: /config/entrypoint.d/router.sh
+    container_name: e2-computer-{{ Name }}
+    entrypoint: /einar2/entrypoints/computer.sh
     stdin_open: true
     tty: true
     cap_add:
@@ -10,11 +10,7 @@
     environment:
       - DEFAULT_GATEWAY={{ DefaultGateway }}
     sysctls:
-      - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.rp_filter=0 {# if per interface: net.ipv4.conf.ethX.rp_filter=0 #}
       - net.ipv4.conf.default.rp_filter=0
-      {# - net.ipv4.conf.eth0.rp_filter=0 #}
-    hostname: router-{{ Name }}
-    volumes:
-      - ./e2-router-{{ Name }}-quagga:/etc/quagga
+    hostname: computer-{{ Name }}
     networks:

@@ -2,9 +2,9 @@
 
 require __DIR__ . '/setupcomposefileAux.php';
 
-$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/settings.json';
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/defaults.json';
 if (!file_exists($settingsFile)) {
-  die("File settings.json missing at document root");
+  die("File defaults.json missing at document root");
 }
 $settingsRaw   = file_get_contents($settingsFile);
 $settingsData  = json_decode($settingsRaw, true);

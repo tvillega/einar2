@@ -1,52 +1,124 @@
 #!/bin/bash
 
 PKG_BBIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-PKG_ROOT_DIR=$( cd "$PKG_BBIN_DIR/.." ; pwd -P )
-PKG_CONF_DIR="$PKG_ROOT_DIR/config"
-PKG_DOCS_DIR="$PKG_ROOT_DIR/docs"
-PKG_WWW_DIR="$PKG_ROOT_DIR/www"
+PKG_ROOT_DIR=$( cd "${PKG_BBIN_DIR}/.." ; pwd -P )
 
-# Git doesn't like hardlinks
-# during development archetypes and markdown files
-# need to be synced with their counterparts inside www
-# which simulate where they would be available
-# inside the published Einar2 docker image
+PKG_SHARE_DIR="${PKG_ROOT_DIR}/share"
+PKG_LIBX_DIR="${PKG_ROOT_DIR}/libexec"
 
-## SYNC ARCHETYPES
+export PKG_ROOT_DIR
 
-ARCHETYPE_DIR="${PKG_WWW_DIR}/archetypes"
+PKG_DOCS_DIR="${PKG_ROOT_DIR}/docs"
+PKG_WWW_DIR="${PKG_ROOT_DIR}/www"
 
-if [[ ! -d "$ARCHETYPE_DIR" ]] ; then
-  mkdir -v "$ARCHETYPE_DIR"
+fun_sync_archetypes() {
+
+  local s="$1" ; shift
+  local archdir="${PKG_WWW_DIR}/archetypes"
+
+  if [[ $s -lt 0 ]] ; then
+    rm -rfv "$archdir"
+  else
+    if [[ ! -d "$archdir" ]] ; then
+      mkdir -v "$archdir"
+    fi
+    cp -rv --remove-destination "$PKG_SHARE_DIR"/archetypes/*  "${archdir}/"
+  fi
+
+}
+
+fun_sync_docs_advguide() {
+
+  local s="$1" ; shift
+  local advguidedir="${PKG_WWW_DIR}/docs/advguide"
+
+  if [[ $s -lt 0 ]] ; then
+    rm -rfv "${advguidedir}/"*.md
+  else
+    if [[ ! -d "$advguidedir" ]] ; then
+      mkdir -v "$advguidedir"
+    fi
+    cp -rv --remove-destination "$PKG_DOCS_DIR"/advguide/* "${advguidedir}/"
+  fi
+
+}
+
+fun_sync_docs_userguide() {
+
+  local s="$1" ; shift
+  local guidedir="${PKG_WWW_DIR}/docs/userguide"
+
+  if [[ $s -lt 0 ]] ; then
+    rm -rfv "${guidedir}/"*.md
+  else
+    if [[ ! -d "$guidedir" ]] ; then
+      mkdir -v "$guidedir"
+    fi
+    cp -rv --remove-destination "$PKG_DOCS_DIR"/userguide/* "${guidedir}/"
+  fi
+
+}
+
+fun_sync_docs_changelog() {
+
+  local s="$1" ; shift
+
+  if [[ $s -lt 0 ]] ; then
+    rm -v "$PKG_WWW_DIR"/docs/index.md
+    rm -v "$PKG_WWW_DIR"/docs/releasenotes.md
+  else
+    cp -rv --remove-destination "$PKG_DOCS_DIR"/index.md     "$PKG_WWW_DIR"/docs/index.md
+    cp -v  --remove-destination "$PKG_ROOT_DIR"/CHANGELOG.md "$PKG_WWW_DIR"/docs/releasenotes.md
+  fi
+
+}
+
+fun_sync_docs() {
+
+  local s="$1" ; shift
+
+  fun_sync_docs_userguide $s
+  fun_sync_docs_advguide  $s
+  fun_sync_docs_changelog $s
+
+}
+
+fun_sync_settings() {
+
+  local s="$1" ; shift
+
+  if [[ $s -lt 0 ]] ; then
+    rm -v "$PKG_WWW_DIR"/settings.json
+  else
+    cp -v  --remove-destination "$PKG_SHARE_DIR"/webui/defaults.json "$PKG_WWW_DIR"/settings.json
+  fi
+
+}
+
+fun_sync_all() {
+
+  local s="$1" ; shift
+
+  fun_sync_archetypes $s
+  fun_sync_docs       $s
+  fun_sync_settings   $s
+
+}
+
+cmd="$1"
+
+if [[ -z "$cmd" ]] ; then
+  $PKG_LIBX_DIR/e2-help.sh sync
+  exit
+
+elif [[ "$cmd" == "yay" || "$cmd" == "y" ]] ; then
+  shift
+  fun_sync_all  1
+
+elif [[ "$cmd" == "nay" || "$cmd" == "n" ]] ; then
+  shift
+  fun_sync_all  -1
+
+else
+  echo "Unknown command: $cmd"
 fi
-
-cp -rv --remove-destination "$PKG_CONF_DIR"/archetype.d/*  "${ARCHETYPE_DIR}/"
-
-## SYNC DOCS INDEX + CHANGELOG
-
-cp -rv --remove-destination "$PKG_DOCS_DIR"/index.md     "$PKG_WWW_DIR"/docs/index.md
-cp -v  --remove-destination "$PKG_ROOT_DIR"/CHANGELOG.md "$PKG_WWW_DIR"/docs/releasenotes.md
-
-## SYNC USER GUIDE
-
-GUIDE_DIR="${PKG_WWW_DIR}/docs/userguide"
-
-if [[ ! -d "$GUIDE_DIR" ]] ; then
-  mkdir -v "$GUIDE_DIR"
-fi
-
-cp -rv --remove-destination "$PKG_DOCS_DIR"/userguide/* "${GUIDE_DIR}/"
-
-## SYNC ADVANCED USER GUIDE
-
-ADVGUIDE_DIR="${PKG_WWW_DIR}/docs/advguide"
-
-if [[ ! -d "$ADVGUIDE_DIR" ]] ; then
-  mkdir -v "$ADVGUIDE_DIR"
-fi
-
-cp -rv --remove-destination "$PKG_DOCS_DIR"/advguide/* "${ADVGUIDE_DIR}/"
-
-## SYNC SETTINGS
-
-cp -v  --remove-destination "$PKG_CONF_DIR"/settings.json "$PKG_WWW_DIR"/settings.json

@@ -34,7 +34,7 @@ install:
 
 	# Copy files to target directories
 	install -m 755 bin/*                  $(DESTDIR)$(bindir)/
-	install -m 644 config/archetype.d/*   $(DESTDIR)$(sysconfdir)/archetypes/
+	install -m 644 share/archetypes/*     $(DESTDIR)$(sysconfdir)/archetypes/
 	install -m 644 share/defaults.conf    $(DESTDIR)$(datadir)/
 	install -m 644 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
 	install -m 755 libexec/*              $(DESTDIR)$(libdir)/
@@ -44,5 +44,4 @@ install:
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/config|/etc/$(pkgname)|g'  $(DESTDIR)$(bindir)/$(pkgname)
-	sed -i 's|/archetype.d|/archetypes|g' $(DESTDIR)$(bindir)/$(pkgname)
 
