@@ -1,7 +1,6 @@
 
-  e2-router-{{ Name }}:
+  router-{{ Name }}:
     image: {{ Image }}
-    container_name: e2-router-{{ Name }}
     entrypoint: /einar2/entrypoints/router.sh
     stdin_open: true
     tty: true
