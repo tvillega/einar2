@@ -1,0 +1,14 @@
+
+  {{ Type }}-{{ Name }}:
+    image: {{ Image }}
+    entrypoint: /einar2/entrypoints/custom.sh
+    cmd: {{ Command }}
+    stdin_open: true
+    tty: true
+    cap_add: {{ CapArray }}
+    environment: {{ EnvArray }}
+    sysctls: {{ SysArray }}
+    hostname: {{ HostName }}
+    ports: {{ PortArray }}
+    volumes: {{ VolArray }}
+    networks:

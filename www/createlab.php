@@ -73,12 +73,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
     <?php
+      // Default archetypes available on the image
       foreach (glob('archetypes/service-*.yml') as $archetype) {
         if ($archetype == '.' || $archetype == '..') continue;
         $machine = str_replace("archetypes/service-", "", $archetype);
         $machine = str_replace(".yml", "", $machine);
         $machines[] = $machine;
-    }
+      }
+      // Machines defined by the user on the bind mount
+      foreach (glob('config/machines/*.ini') as $customMachine) {
+        if ($customMachine == '.' || $customMachine == '..') continue;
+        $machine = str_replace("config/machines/", "", $customMachine);
+        $machine = str_replace(".ini", "", $machine);
+        $machines[] = $machine;
+      }
+
     ?>
 
     <!-- Send POST with form data to myself (executes the code at the top)  -->

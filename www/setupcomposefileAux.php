@@ -80,6 +80,90 @@ function serviceBlockTypeAppender(
   }
 }
 
+function serviceCustomTypeAppender(
+  array  $networks,
+  array  $settingsData,
+  string $deviceType,
+  array  $devices,
+  string $serviceBlock,
+  string $serviceJoinNetwork,
+  string $outputFile
+) {
+
+  $customConfigIniPath = "config/machines/" . $deviceType . ".ini";
+  $config              = parse_ini_file($customConfigIniPath, true);
+
+  $archetypeArrayPlaceholders = [
+    '{{ CapArray }}'  => ['Capabilities', 'CapArray'],
+    '{{ EnvArray }}'  => ['Environments', 'EnvArray'],
+    '{{ SysArray }}'  => ['Sysctls', 'SysArray'],
+    '{{ VolArray }}'  => ['Volumes', 'VolumeArray']
+    '{{ PortArray }}' => ['Ports', 'PortArray']
+  ];
+
+  $archetypeValues = [];
+  foreach (archetypeArrayPlaceholders as $arrayPlaceholder => [$sectionName, $arrayKey]) {
+
+    $items = $config[$sectionName][$arrayKey] ?? [];
+
+    if (!empty($items)) {
+      $archetypeValues[$arrayPlaceholder] = json_encode($items);
+    } else {
+      $archetypeValues[$arrayPlaceholder] = '[]';
+    }
+  }
+
+  foreach ($devices as $device) {
+
+    $myServiceBlock = $serviceBlock;
+
+    /* Override */
+    $myServiceBlock = str_replace('{{ Command }}', $config['Docker']['command'], $myServiceBlock);
+    $myServiceBlock = str_replace('{{ HostName }}', $config['Docker']['hostname'], $myServiceBlock);
+    if ($config['Docker']['image'] != "default") { // e.g. roarenas/einar2:latest
+      $myServiceBlock = str_replace('{{ Image }}', $config['Docker']['image'], $myServiceBlock);
+    }
+
+    /* General */
+    $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
+    $myServiceBlock = str_replace('{{ DefaultGateway }}', $device['gw'], $myServiceBlock);
+    if ($config['Docker']['image'] == "default") {
+      $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
+    }
+
+    /* Custom */
+    foreach ($archetypeValues as $valuePlaceholder => $value) {
+      if ($value === '[]') {
+        // remove entire line if empty
+        $pattern = '/^.*' . preg_quote(trim($valuePlaceholder), '/') . '.*\r?\n?/m';
+        $myServiceBlock = preg_replace($pattern, '', $myServiceBlock);
+      } else {
+        // replace placeholder with array string
+        $myServiceBlock = str_replace($valuePlaceholder, $value, $myServiceBlock);
+      }
+    }
+
+    file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
+
+    $ifCount     = $device['if_number'];
+    if ($ifCount != 0) {
+      for ($i = 0; $i < $ifCount; $i++) {
+
+        $myServiceJoinNetwork = $serviceJoinNetwork;
+
+        $switch             = "switch" . $device['if_list'][$i]['if'];
+        $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
+        $address            = $device['if_list'][$i]['ip'];
+
+        $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
+        $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
+
+        file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
+      }
+    }
+  }
+}
+
 function networkBlockAppender(
   array  $switches,
   string $networkBlock,
