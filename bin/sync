@@ -90,7 +90,7 @@ fun_sync_settings() {
   if [[ $s -lt 0 ]] ; then
     rm -v "$PKG_WWW_DIR"/settings.json
   else
-    cp -v  --remove-destination "$PKG_SHARE_DIR"/webui/defaults.json "$PKG_WWW_DIR"/settings.json
+    cp -v  --remove-destination "$PKG_SHARE_DIR"/webui/defaults.json "$PKG_WWW_DIR"/defaults.json
   fi
 
 }
