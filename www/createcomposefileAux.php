@@ -61,6 +61,7 @@ function serviceBlockAppender(
 
     $knownType = KnownServiceTypes::tryFrom($serviceType);
     //error_log($knownType->value);
+    $serviceTypeName = str_replace("Type", "", $serviceType);
 
     if (isset($knownType)) {
 
@@ -75,8 +76,7 @@ function serviceBlockAppender(
        *
        */
 
-      $serviceTypeName = str_replace("Type", "", $serviceType);
-      $archetypeString = stripComments(file_get_contents("archetypes/service-" . $serviceTypeName . ".yml"));
+      $archetypeString = stripComments(file_get_contents(__DIR__ . "/archetypes/service-" . $serviceTypeName . ".yml"));
 
       foreach ($serviceData as $serviceTypeItem) {
         serviceBlockKnownTypeAppender(
@@ -89,6 +89,31 @@ function serviceBlockAppender(
           $serviceJoinNetworkString,
           $outputFile
         );
+      }
+    } else {
+
+      $metaArchetypeString = stripComments(file_get_contents(__DIR__ . "/archetypes/service-custom.yml"));
+      $serviceTypeIniPath  = __DIR__ . '/config/machines/' . $serviceTypeName . '.ini';
+
+      if (!file_exists($serviceTypeIniPath)) continue; /* Generate custom archetype on-the-fly or quit */
+      $archetypeString = generateArchetypeFromIni($metaArchetypeString,
+                                                  $settingsData,
+                                                  $serviceTypeIniPath,
+                                                  $serviceTypeName);
+
+      foreach ($serviceData as $serviceTypeItem) {
+        serviceBlockKnownTypeAppender(
+          $networks,
+          $settingsData,
+          $serviceType,
+          $serviceTypeItem,
+          -1, // {{ Port }} won't exist here
+          $archetypeString,
+          $serviceJoinNetworkString,
+          $outputFile
+        );
+
+
       }
     }
   }
@@ -134,96 +159,62 @@ function serviceBlockKnownTypeAppender(
   }
 }
 
-function serviceBlockCustomTypeAppender(
-  array  $services,
-  array  $networks,
-  array  $iniDirMachines,
+function generateArchetypeFromIni(
+  string $metaArchetype,
   array  $settingsData,
-  string $serviceJoinNetwork,
-  string $outputFile
+  string $iniPath,
+  string $typeVar
 ) {
 
-  $serviceBlock = stripComments(file_get_contents("archetypes/service-custom.yml"));
+  $config = parse_ini_file($iniPath, true);
+  $archetype = $metaArchetype;
 
-  $customServices = [];
-  foreach ($services as $serviceItem) {
-    if ($serviceItem != "computerType" && $serviceItem != "serverType" && $serviceItem != "routerType") {
-      $customServices[] = $serviceItem;
-    }
+  $docker         = $config['Docker'] ?? [];
+  $dockerImage    = $docker['image'] ?? "default";
+  $dockerCommand  = $docker['command'] ?? "sleep inf";
+  $dockerHostname = $docker['hostname'] ?? "{{ Type }}-{{ Name }}";
+
+
+  if ($docker['image'] == "default") {
+    $docker['image'] = $settingsData["einar2"]["image"];
   }
+  $archetype = str_replace('{{ Image }}', $docker['image'], $archetype);
+  $archetype = str_replace('{{ Command }}', $docker['command'], $archetype);
+  $archetype = str_replace('{{ HostName }}', $docker['hostname'], $archetype);
 
-  $configPath = "config/machines/" . $deviceName . ".ini";
-  $config     = parse_ini_file($configPath, true);
-
-  $archetypeArrayPlaceholders = [
-    '{{ CapArray }}'  => ['Capabilities', 'CapArray'],
-    '{{ EnvArray }}'  => ['Environments', 'EnvArray'],
-    '{{ SysArray }}'  => ['Sysctls', 'SysArray'],
-    '{{ VolArray }}'  => ['Volumes', 'VolumeArray'],
-    '{{ PortArray }}' => ['Ports', 'PortArray']
-  ];
-
-  $archetypeValues = [];
-  foreach ($archetypeArrayPlaceholders as $arrayPlaceholder => [$sectionName, $arrayKey]) {
-
-    $items = $config[$sectionName][$arrayKey] ?? [];
-
-    if (!empty($items)) {
-      $archetypeValues[$arrayPlaceholder] = json_encode($items);
+  $nonEmptyArrayOrStripLine = function(string $placeholder, array $items, string &$text) {
+    if (empty($items)) {
+      $pattern = '/^[^\r\n]*' . preg_quote($placeholder, '/') . '[^\r\n]*(\r\n|\n)?/m';
+      $text = preg_replace($pattern, '', $text);
     } else {
-      $archetypeValues[$arrayPlaceholder] = '[]';
+      $text = str_replace($placeholder, json_encode($items, JSON_UNESCAPED_SLASHES), $text);
     }
-  }
+  };
 
-  foreach ($customService as $deviceType => $device) {
+  $capabilities = $config['Capabilities'] ?? [];
+  $capArray = $capabilities['CapArray'] ?? [];
+  $nonEmptyArrayOrStripLine('{{ CapArray }}', $capArray, $archetype);
 
-    $myServiceBlock = $serviceBlock;
+  $environments = $config['Environments'] ?? [];
+  $envArray = $environments['EnvArray'] ?? [];
+  $nonEmptyArrayOrStripLine('{{ EnvArray }}', $envArray, $archetype);
 
-    /* Override */
-    $myServiceBlock = str_replace('{{ Command }}', $config['Docker']['command'], $myServiceBlock);
-    $myServiceBlock = str_replace('{{ HostName }}', $config['Docker']['hostname'], $myServiceBlock);
-    if ($config['Docker']['image'] != "default") { // e.g. roarenas/einar2:latest
-      $myServiceBlock = str_replace('{{ Image }}', $config['Docker']['image'], $myServiceBlock);
-    }
+  $sysctls = $config['Sysctls'] ?? [];
+  $sysArray = $sysctls['SysArray'] ?? [];
+  $nonEmptyArrayOrStripLine('{{ SysArray }}', $sysArray, $archetype);
 
-    /* General */
-    $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
-    $myServiceBlock = str_replace('{{ DefaultGateway }}', $device['gw'], $myServiceBlock);
-    if ($config['Docker']['image'] == "default") {
-      $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
-    }
+  $volumes = $config['Volumes'] ?? [];
+  $volArray = $volumes['VolArray'] ?? [];
+  $nonEmptyArrayOrStripLine('{{ VolArray }}', $volArray, $archetype);
 
-    /* Custom */
-    foreach ($archetypeValues as $valuePlaceholder => $value) {
-      if ($value === '[]') {
-        // remove entire line if empty
-        $pattern = '/^.*' . preg_quote(trim($valuePlaceholder), '/') . '.*\r?\n?/m';
-        $myServiceBlock = preg_replace($pattern, '', $myServiceBlock);
-      } else {
-        // replace placeholder with array string
-        $myServiceBlock = str_replace($valuePlaceholder, $value, $myServiceBlock);
-      }
-    }
+  $ports = $config['Ports'] ?? [];
+  $portArray = $ports['PortArray'] ?? [];
+  $nonEmptyArrayOrStripLine('{{ PortArray }}', $portArray, $archetype);
 
-    file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
+  /* Some arrays have this variable inside */
+  $archetype = str_replace('{{ Type }}', $typeVar, $archetype);
 
-    $ifCount     = $device['if_number'];
-    if ($ifCount != 0) {
-      for ($i = 0; $i < $ifCount; $i++) {
-
-        $myServiceJoinNetwork = $serviceJoinNetwork;
-
-        $switch             = "switch" . $device['if_list'][$i]['if'];
-        $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
-        $address            = $device['if_list'][$i]['ip'];
-
-        $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
-        $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
-
-        file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
-      }
-    }
-  }
+  return $archetype;
 }
 
 function networkBlockAppender(
