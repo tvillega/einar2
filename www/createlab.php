@@ -78,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($archetype == '.' || $archetype == '..') continue;
         $machine = str_replace("archetypes/service-", "", $archetype);
         $machine = str_replace(".yml", "", $machine);
+        if ($machine == "custom") continue;
         $machines[] = $machine;
       }
       // Machines defined by the user on the bind mount
