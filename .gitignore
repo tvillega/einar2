@@ -4,4 +4,4 @@ labs
 www/archetypes
 www/docs/**/*.md
 www/labs
-www/settings.json
+www/defaults.json

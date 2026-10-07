@@ -83,14 +83,14 @@ fun_sync_docs() {
 
 }
 
-fun_sync_settings() {
+fun_sync_defaults() {
 
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    rm -v "$PKG_WWW_DIR"/settings.json
+    rm -v "$PKG_WWW_DIR"/defaults.json
   else
-    cp -v  --remove-destination "$PKG_SHARE_DIR"/webui/defaults.json "$PKG_WWW_DIR"/settings.json
+    cp -v  --remove-destination "$PKG_SHARE_DIR"/webui/defaults.json "$PKG_WWW_DIR"/defaults.json
   fi
 
 }
@@ -101,7 +101,7 @@ fun_sync_all() {
 
   fun_sync_archetypes $s
   fun_sync_docs       $s
-  fun_sync_settings   $s
+  fun_sync_defaults   $s
 
 }
 
