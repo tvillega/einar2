@@ -263,9 +263,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                 <?php
                                     $gwTagLabelAttrFor   = $machineID . "_gw" . $j;
-                                    $gwTagInputAttrName  = $machineType . "[" . $machineID . "][gw]";
-                                    $gwTagInputAttrValue = ($formSubmitted && isset($services[$machineType][$machineID]["gw"]))
-                                                                ? htmlspecialchars($services[$machineType][$machineID]["gw"])
+                                    $gwTagInputAttrName  = $machineType . "[" . $machineID . "][if_list][" . $j . "][gw]";
+                                    $gwTagInputAttrValue = ($formSubmitted && isset($services[$machineType][$machineID]['if_list'][$j]["gw"]))
+                                                                ? htmlspecialchars($services[$machineType][$machineID]['if_list'][$j]["gw"])
                                                                 : '';
                                 ?>
                                 <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
