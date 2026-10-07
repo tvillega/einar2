@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/setupcomposefileAux.php';
+require __DIR__ . '/createcomposefileAux.php';
 
 $settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/defaults.json';
 if (!file_exists($settingsFile)) {
@@ -54,42 +54,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $outputComposeNetworksFile = $labPath . '/docker-compose-networks.yml';
   $outputJsonFile            = $labPath . '/docker-compose.json';
 
-  $archetypesDir = __DIR__  . '/archetypes';
-
   /* All archetype dirs */
-  $archetypeDirComposeNetworks  = $archetypesDir . '/compose-networks.yml';
-  $archetypeDirComposeServices  = $archetypesDir . '/compose-services.yml';
-  $archetypeDirJoinNetwork      = $archetypesDir . '/join-network.yml';
-  $archetypeDirNetworkBridge    = $archetypesDir . '/network-bridge.yml';
-  $archetypeDirMachines         = getServiceArchetypeDirs();
+  $archetypeComposeNetworksPath  = __DIR__  . '/archetypes' . '/compose-networks.yml';
+  $archetypeComposeServicesPath  = __DIR__  . '/archetypes' . '/compose-services.yml';
+  $archetypeJoinNetworkPath      = __DIR__  . '/archetypes' . '/join-network.yml';
+  $archetypeNetworkBridgePath    = __DIR__  . '/archetypes' . '/network-bridge.yml';
 
   /* All archetypes contents without comments */
-  $archetypeVarComposeNetworks  = stripComments(file_get_contents($archetypeDirComposeNetworks));
-  $archetypeVarComposeServices  = stripComments(file_get_contents($archetypeDirComposeServices));
-  $archetypeVarJoinNetwork      = stripComments(file_get_contents($archetypeDirJoinNetwork));
-  $archetypeVarNetworkBridge    = stripComments(file_get_contents($archetypeDirNetworkBridge));
-  $archetypeVarMachines         = getServiceArchetypeVars($archetypeDirMachines);
+  $archetypeComposeNetworksString  = stripComments(file_get_contents($archetypeComposeNetworksPath));
+  $archetypeComposeServicesString  = stripComments(file_get_contents($archetypeComposeServicesPath));
+  $archetypeJoinNetworkString      = stripComments(file_get_contents($archetypeJoinNetworkPath));
+  $archetypeNetworkBridgeString    = stripComments(file_get_contents($archetypeNetworkBridgePath));
 
-  file_put_contents($outputComposeServicesFile, $archetypeVarComposeServices);
-  file_put_contents($outputComposeNetworksFile, $archetypeVarComposeNetworks);
+  file_put_contents($outputComposeServicesFile, $archetypeComposeServicesString);
+  file_put_contents($outputComposeNetworksFile, $archetypeComposeNetworksString);
 
-  foreach ($archetypeDirMachines as $machineName => $machineDir) {
-    $machineType = $machineName . "Type";
-    if (!isset($services[$machineType])) continue;
-    serviceBlockTypeAppender(
-      $networks,
-      $settingsData,
-      $machineName,
-      $services[$machineType],
-      $archetypeVarMachines[$machineName],
-      $archetypeVarJoinNetwork,
-      $outputComposeServicesFile
-    );
-  }
+  serviceBlockAppender(
+    $networks,
+    $services,
+    $settingsData,
+    $archetypeJoinNetworkString,
+    $outputComposeServicesFile
+  );
 
   networkBlockAppender(
     $networks,
-    $archetypeVarNetworkBridge,
+    $archetypeNetworkBridgeString,
     $outputComposeNetworksFile
   );
 

@@ -1,6 +1,6 @@
 <?php
 
-function getServiceArchetypeDirs() {
+function getServiceArchetypePaths() {
   $dirs = [];
   foreach (glob('archetypes/service-*.yml') as $archetype) {
     if ($archetype == '.' || $archetype == '..') continue;
@@ -11,12 +11,23 @@ function getServiceArchetypeDirs() {
   return $dirs;
 }
 
-function getServiceArchetypeVars(array $dirs) {
+function getServiceArchetypeStrings(array $dirs) {
   $vars = [];
   foreach ($dirs as $machine => $dir) {
     $vars[$machine] = stripComments(file_get_contents($dirs[$machine]));
   }
   return $vars;
+}
+
+function getServiceIniPaths() {
+  $dirs = [];
+  foreach (glob('config/machines/*.ini') as $ini) {
+    if ($ini == '.' || $ini == '..') continue;
+    $machine = str_replace("archetypes/service-", "", $ini);
+    $machine = str_replace(".yml", "", $machine);
+    $dirs[$machine] = $ini;
+  }
+  return $dirs;
 }
 
 function stripComments(string $template) {
@@ -32,77 +43,128 @@ function stripComments(string $template) {
   }, $template);
 }
 
-function serviceBlockTypeAppender(
+enum KnownServiceTypes: String {
+  case ComputerType = "computerType";
+  case RouterType   = "routerType";
+  case ServerType   = "serverType";
+}
+
+function serviceBlockAppender(
   array  $networks,
+  array  $services,
   array  $settingsData,
-  string $deviceType,
-  array  $devices,
-  string $serviceBlock,
-  string $serviceJoinNetwork,
+  string $serviceJoinNetworkString,
   string $outputFile
 ) {
 
-  $port = 8080;
+  foreach ($services as $serviceType => $serviceData) {
 
-  foreach ($devices as $device) {
+    $knownType = KnownServiceTypes::tryFrom($serviceType);
+    //error_log($knownType->value);
 
-    $myServiceBlock = $serviceBlock;
+    if (isset($knownType)) {
 
-    $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
+      $port = 8080;
 
-    if ($deviceType == "server") {
-      $myServiceBlock = str_replace('{{ Port }}', $port, $myServiceBlock);
-      $port++;
-    }
+      /*
+       * Einar2 provides by default 3 archetypes,
+       * each of them defining a service type
+       *
+       * This triggers the classic logic of listing all saved
+       * archetypes on the docker image and choosing one
+       *
+       */
 
-    $myServiceBlock = str_replace('{{ DefaultGateway }}', $device['gw'], $myServiceBlock);
+      $serviceTypeName = str_replace("Type", "", $serviceType);
+      $archetypeString = stripComments(file_get_contents("archetypes/service-" . $serviceTypeName . ".yml"));
 
-    $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
-
-    file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
-
-    $ifCount     = $device['if_number'];
-    if ($ifCount != 0) {
-      for ($i = 0; $i < $ifCount; $i++) {
-
-        $myServiceJoinNetwork = $serviceJoinNetwork;
-
-        $switch             = "switch" . $device['if_list'][$i]['if'];
-        $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
-        $address            = $device['if_list'][$i]['ip'];
-
-        $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
-        $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
-
-        file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
+      foreach ($serviceData as $serviceTypeItem) {
+        serviceBlockKnownTypeAppender(
+          $networks,
+          $settingsData,
+          $serviceType,
+          $serviceTypeItem,
+          $port++,
+          $archetypeString,
+          $serviceJoinNetworkString,
+          $outputFile
+        );
       }
     }
   }
 }
 
-function serviceCustomTypeAppender(
+function serviceBlockKnownTypeAppender(
   array  $networks,
   array  $settingsData,
   string $deviceType,
-  array  $devices,
+  array  $device,
+  int    $port,
   string $serviceBlock,
   string $serviceJoinNetwork,
   string $outputFile
 ) {
 
-  $customConfigIniPath = "config/machines/" . $deviceType . ".ini";
-  $config              = parse_ini_file($customConfigIniPath, true);
+  $myServiceBlock = $serviceBlock;
+
+  if ($deviceType == "serverType") {
+    $myServiceBlock = str_replace('{{ Port }}', $port, $myServiceBlock);
+  }
+
+  $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
+  $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
+
+  file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
+
+  $ifCount     = $device['if_number'];
+  if ($ifCount != 0) {
+    for ($i = 0; $i < $ifCount; $i++) {
+
+      $myServiceJoinNetwork = $serviceJoinNetwork;
+
+      $switch             = "switch" . $device['if_list'][$i]['if'];
+      $dashedNetwork      = str_replace('.', '-', $networks[$switch]['network']);
+      $address            = $device['if_list'][$i]['ip'];
+
+      $myServiceJoinNetwork = str_replace('{{ NetworkDashed }}', $dashedNetwork, $myServiceJoinNetwork);
+      $myServiceJoinNetwork = str_replace('{{ Address }}', $address, $myServiceJoinNetwork);
+
+      file_put_contents($outputFile, $myServiceJoinNetwork, FILE_APPEND);
+    }
+  }
+}
+
+function serviceBlockCustomTypeAppender(
+  array  $services,
+  array  $networks,
+  array  $iniDirMachines,
+  array  $settingsData,
+  string $serviceJoinNetwork,
+  string $outputFile
+) {
+
+  $serviceBlock = stripComments(file_get_contents("archetypes/service-custom.yml"));
+
+  $customServices = [];
+  foreach ($services as $serviceItem) {
+    if ($serviceItem != "computerType" && $serviceItem != "serverType" && $serviceItem != "routerType") {
+      $customServices[] = $serviceItem;
+    }
+  }
+
+  $configPath = "config/machines/" . $deviceName . ".ini";
+  $config     = parse_ini_file($configPath, true);
 
   $archetypeArrayPlaceholders = [
     '{{ CapArray }}'  => ['Capabilities', 'CapArray'],
     '{{ EnvArray }}'  => ['Environments', 'EnvArray'],
     '{{ SysArray }}'  => ['Sysctls', 'SysArray'],
-    '{{ VolArray }}'  => ['Volumes', 'VolumeArray']
+    '{{ VolArray }}'  => ['Volumes', 'VolumeArray'],
     '{{ PortArray }}' => ['Ports', 'PortArray']
   ];
 
   $archetypeValues = [];
-  foreach (archetypeArrayPlaceholders as $arrayPlaceholder => [$sectionName, $arrayKey]) {
+  foreach ($archetypeArrayPlaceholders as $arrayPlaceholder => [$sectionName, $arrayKey]) {
 
     $items = $config[$sectionName][$arrayKey] ?? [];
 
@@ -113,7 +175,7 @@ function serviceCustomTypeAppender(
     }
   }
 
-  foreach ($devices as $device) {
+  foreach ($customService as $deviceType => $device) {
 
     $myServiceBlock = $serviceBlock;
 
