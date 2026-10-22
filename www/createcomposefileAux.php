@@ -138,6 +138,7 @@ function serviceBlockKnownTypeAppender(
 
   $myServiceBlock = str_replace('{{ Name }}', $device['name'], $myServiceBlock);
   $myServiceBlock = str_replace('{{ Image }}', $settingsData["einar2"]["image"], $myServiceBlock);
+  $myServiceBlock = str_replace('{{ DefaultGateway }}', $device['gw'], $myServiceBlock);
 
   file_put_contents($outputFile, $myServiceBlock, FILE_APPEND);
 

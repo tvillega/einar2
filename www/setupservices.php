@@ -180,18 +180,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             $switch     = 'switch' . $k;
                                             $cidr       = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
                                         ?>
-
                                         <option value="<?php echo $k; ?>" <?php echo $isSelected; ?>>
-                                            <?php echo $cidr ?>
+                                            <?php echo $cidr; ?>
                                         </option>
-
                                     <?php endfor; ?>
 
                                 </select>
                             </div>
 
                             <?php if ($formSubmitted): ?>
-
                                 <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                     <?php
                                         if (!$machinesHaveIflistSet) {
@@ -205,9 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         }
                                     ?>
                                 </div>
-
                             <?php endif; ?>
-
                         </div>
 
                         <div style="display: table-row;">
@@ -223,17 +218,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                 <input type="text"
-                                      value="<?php echo $ipTagInputAttrValue ?>"
+                                      value="<?php echo $ipTagInputAttrValue; ?>"
                                       id="<?php echo $ipTagLabelAttrFor; ?>"
                                       name="<?php echo $ipTagInputAttrName; ?>"
                                       required>
                             </div>
 
                         <?php if ($formSubmitted): ?>
-
                             <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                 <?php
-                                    if ($machinesHaveIflistSet) {
+                                    if ($machinesHaveIflistSet && isset($ifconnTagSelectValue)) {
                                       $switch = 'switch' . $ifconnTagSelectValue;
                                       $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
                                     }
@@ -241,9 +235,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       echo '<strong style="color:#8A2BE2;">UNSET</strong>';
                                       $validForm = false;
                                     } else if (!filter_var($ipTagInputAttrValue, FILTER_VALIDATE_IP)) {
-                                      echo '<strong style="color:red";>INVALID</strong>';
+                                      echo '<strong style="color:red;">INVALID</strong>';
                                       $validForm = false;
-                                    } else if (!ipv4_in_range($ipTagInputAttrValue,$cidr)) {
+                                    } else if (isset($cidr) && !ipv4_in_range($ipTagInputAttrValue, $cidr)) {
                                       echo '<strong style="color:red;">FAILED</strong>';
                                       $validForm = false;
                                     } else if (in_array($ipTagInputAttrValue,$duplicatedIpAddresses)) {
@@ -254,60 +248,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     }
                                 ?>
                             </div>
-
                         <?php endif; ?>
+                    </div>
 
+                </div>
+
+                <?php endfor; ?>
+
+                <hr style="border: 1.3px dashed; margin: 1em 0 0.5em 0;">
+
+                <div style="display: table; width: 30%;">
+                    <div style="display: table-row;">
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                            <?php
+                                $gwTagLabelAttrFor   = $machineID . "_gw";
+                                $gwTagInputAttrName  = $machineType . "[" . $machineID . "][gw]";
+                                $gwTagInputAttrValue = ($formSubmitted && isset($services[$machineType][$machineID]["gw"]))
+                                                            ? htmlspecialchars($services[$machineType][$machineID]["gw"])
+                                                            : '';
+                            ?>
+                            <label for="<?php echo $gwTagLabelAttrFor; ?>">Default gateway:</label>
+                        </div>
+                        <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
+                            <input type="text"
+                                  value="<?php echo $gwTagInputAttrValue; ?>"
+                                  id="<?php echo $gwTagLabelAttrFor; ?>"
+                                  name="<?php echo $gwTagInputAttrName; ?>"
+                                  required>
                         </div>
 
-                        <div style="display: table-row;">
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                <?php
-                                    $gwTagLabelAttrFor   = $machineID . "_gw" . $j;
-                                    $gwTagInputAttrName  = $machineType . "[" . $machineID . "][gw]";
-                                    $gwTagInputAttrValue = ($formSubmitted && isset($services[$machineType][$machineID]["gw"]))
-                                                                ? htmlspecialchars($services[$machineType][$machineID]["gw"])
-                                                                : '';
-                                ?>
-                                <label for="<?php echo $gwTagLabelAttrFor; ?>">Gateway:</label>
-                            </div>
-                            <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
-                                <input type="text"
-                                      value="<?php echo $gwTagInputAttrValue ?>"
-                                      id="<?php echo $gwTagLabelAttrFor; ?>"
-                                      name="<?php echo $gwTagInputAttrName; ?>"
-                                      required>
-                            </div>
-
                         <?php if ($formSubmitted): ?>
-
                             <div style="display: table-cell; padding: 5px; vertical-align: middle; width: 30%;">
                                 <?php
-                                    if ($machinesHaveIflistSet) {
-                                      $switch = 'switch' . $ifconnTagSelectValue;
-                                      $cidr   = $networks[$switch]['network'] . "/" . $networks[$switch]['mask'];
-                                    }
-                                    if (!$machinesHaveIflistSet) {
-                                      echo '<strong style="color:#8A2BE2;">UNSET</strong>';
-                                      $validForm = false;
-                                    } else if (!filter_var($gwTagInputAttrValue, FILTER_VALIDATE_IP)) {
-                                      echo '<strong style="color:red";>INVALID</strong>';
-                                      $validForm = false;
-                                    } else if (!ipv4_in_range($gwTagInputAttrValue,$cidr)) {
-                                      echo '<strong style="color:red;">FAILED</strong>';
+                                    if (!filter_var($gwTagInputAttrValue, FILTER_VALIDATE_IP)) {
+                                      echo '<strong style="color:red;">INVALID</strong>';
                                       $validForm = false;
                                     } else {
                                       echo '<strong style="color:green">VALID</strong>';
                                     }
                                 ?>
                             </div>
-
                         <?php endif; ?>
-
-                        </div>
-
                     </div>
+                </div>
 
-                <?php endfor; ?>
             </fieldset>
         <?php endfor; ?>
     <?php endforeach; ?>
