@@ -18,7 +18,6 @@ RUN apk add --no-cache \
 
 RUN mkdir -pv /var/lib/php/sessions /etc/quagga
 
-COPY config             /config.default
 COPY www/               /einar2/
 COPY docs/              /einar2/docs/
 COPY share/archetypes/  /einar2/archetypes/

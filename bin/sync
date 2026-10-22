@@ -10,6 +10,7 @@ export PKG_ROOT_DIR
 
 PKG_DOCS_DIR="${PKG_ROOT_DIR}/docs"
 PKG_WWW_DIR="${PKG_ROOT_DIR}/www"
+PKG_CFG_DIR="${PKG_ROOT_DIR}/config"
 
 fun_sync_archetypes() {
 
@@ -95,6 +96,20 @@ fun_sync_defaults() {
 
 }
 
+fun_sync_config() {
+
+  local s="$1" ; shift
+
+  [[ -d "$PKG_WWW_DIR"/config ]] && rm -v "$PKG_WWW_DIR"/config
+
+  if [[ $s -lt 0 ]] ; then
+    :
+  else
+    ln -sfv "$PKG_CFG_DIR" "$PKG_WWW_DIR"/config
+  fi
+
+}
+
 fun_sync_all() {
 
   local s="$1" ; shift
@@ -102,6 +117,7 @@ fun_sync_all() {
   fun_sync_archetypes $s
   fun_sync_docs       $s
   fun_sync_defaults   $s
+  fun_sync_config     $s
 
 }
 

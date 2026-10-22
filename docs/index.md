@@ -19,15 +19,15 @@ Start an instance of Einar2 image on its default configuration:
 ```
 services:
 
-  einar2-website:
+  einar2-webui:
     image: tvillega/einar2:latest
-    container_name: einar2-website
+    container_name: einar2-webui
     restart: always
     ports:
       - "80:80"
     volumes:
+      - ./config:/einar2/config
       - ./labs:/einar2/labs
-    entrypoint: /einar2/entrypoint.sh
 ```
 
 You will get a startpage at `localhost:80` where you can get started. The license is AGPL.
