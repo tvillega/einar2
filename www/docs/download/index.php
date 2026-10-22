@@ -3,9 +3,6 @@
 require_once __DIR__ . '../../../vendor/Michelf/MarkdownExtra.inc.php';
 
 $downloadIndex          = true;
-$markdownTextChangelog  = file_get_contents(__DIR__ . '/../releasenotes.md');
-$markdownTextChangelog2 = str_replace("# Changelog", '', $markdownTextChangelog);
-$markdownTextChangelog3 = str_replace("##", "###", $markdownTextChangelog2);
 
 include(__DIR__ . '/../assets/header.php');
 
@@ -15,7 +12,6 @@ include(__DIR__ . '/../assets/header.php');
 <ul>
     <li><a href="#latest">Latest build</a></li>
     <li><a href="#demo">Demo movie</a></li>
-    <li><a href="#changelog">Changelog</a></li>
 </ul>
 
 <h2 id="latest">Latest build</h2>
@@ -32,8 +28,6 @@ For security reasons please only perform activities related to your simulations 
 
 <?php
 
-echo '<h2 id="changelog">Changelog</h2>';
-echo Michelf\MarkdownExtra::defaultTransform($markdownTextChangelog3);
 include(__DIR__ . '/../assets/footer.php');
 
 ?>
