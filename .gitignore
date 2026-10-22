@@ -5,3 +5,4 @@ www/archetypes
 www/docs/**/*.md
 www/labs
 www/defaults.json
+www/config
