@@ -22,7 +22,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./config:/config
+      - ./config:/einar2/config
       - ./labs:/einar2/labs
 ```
 
