@@ -120,6 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php
                     $machineID                    = $machineName . $i;
                     $machineIfnumber              = $services[$machineType][$machineID]['if_number']-1;
+                    $machineDisplayName           = $services[$machineType][$machineID]['name'];
+                    $machineDisplayPrettyName     = $machineDisplayName . " <span style='color: grey'>(" . $machineID . ")</span>";
 
                     if (isset($services[$machineType][$machineID]['if_list'])) {
                       $machineIflist        = $services[$machineType][$machineID]['if_list'];
@@ -128,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 ?>
 
-                <legend><?php echo $machineName; ?></legend>
+                <legend><?php echo $machineDisplayPrettyName; ?></legend>
 
                 <?php for ($j = 0; $j <= $machineIfnumber; $j++): ?>
 
