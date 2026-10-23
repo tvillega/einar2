@@ -28,6 +28,16 @@ fun_sync_archetypes() {
 
 }
 
+# fun_sync_docs_index() {
+#
+#   local s="$1" ; shift
+#   local index="${PKG_WWW_DIR}/docs/assets/index.md"
+#
+#   if [[ $s -lt 0 ]] ; then
+#     rm -rfv
+#
+# }
+
 fun_sync_docs_advguide() {
 
   local s="$1" ; shift

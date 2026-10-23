@@ -24,7 +24,6 @@ COPY share/archetypes/  /einar2/archetypes/
 COPY share/entrypoints/ /einar2/entrypoints/
 COPY share/server/      /einar2/server/
 COPY share/webui/       /einar2/
-COPY CHANGELOG.md       /einar2/docs/releasenotes.md
 
 RUN touch /etc/quagga/zebra.conf && echo "zebra=yes" > /etc/quagga/daemons
 
