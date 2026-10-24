@@ -2,19 +2,25 @@
 
 ## What is Einar2?
 
-Einar2 is a router simulator that is meant to aid students in learning routing protocols and docker networking.
+Einar2 is a docker router simulator that is meant to aid students in learning routing protocols. It can also be used to teach docker networking and kernel network namespacing.
 
 ## Who is it made by?
 
-It is made by a single student of FCFM at Universidad de Chile. See *Links* for attributions.
+It is made by a single student at the Faculty of Physic Sciences and Mathematics of Universidad de Chile.
 
 ## How does it work?
 
-The docker-image is based on Alpine Linux and is multi-purpose, acting as Einar2, router, server or computer depending on the entrypoint selected. It uses docker's native networking system to connect machines with one another. A web interface allows to configure the containers from pre-defined archetypes of docker services and networks, keeping the focus on the laboratory.
+The docker image is based on Alpine which is a lightweight Linux distribution tailored for containerization that can be run on any operating system. The container is used as Docker-out-of-Docker to orchestrate multiple instances of itself, each of the containers uses its own entrypoint to simulate a different machine.
 
 ## How do I get started?
 
-Start an instance of Einar2 image on its default configuration:
+Create a directory on your system and enter it:
+
+```
+mkdir path/to/work && cd path/to/work
+```
+
+Create the following `docker-compose.yml`:
 
 ```
 services:
@@ -30,8 +36,14 @@ services:
       - ./labs:/einar2/labs
 ```
 
-You will get a startpage at `localhost:80` where you can get started. The license is AGPL.
+Spin up the container:
+
+```
+docker compose up -d
+```
+
+You will get a startpage at `localhost` on your web browser where you can get started.
 
 ## Why the name Einar2?
 
-The original project this is based on is called Einar, which stands for Einar is not a router.
+It stands for Einar is not a router v2.

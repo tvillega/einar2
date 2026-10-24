@@ -37,7 +37,6 @@
                     <a <?php echo (isset($userguideIndex)) ? $clsNav : ''; ?> href="/docs/userguide/index.php">User guide</a>
                     <a <?php echo (isset($advguideIndex))  ? $clsNav : ''; ?> href="/docs/advguide/index.php">Advanced user guide</a>
                     <a <?php echo (isset($linksIndex))     ? $clsNav : ''; ?> href="/docs/links/index.php">Links</a>
-                    <a <?php echo (isset($downloadIndex))  ? $clsNav : ''; ?> href="/docs/download/index.php">Download</a>
                     <a <?php echo (isset($contactIndex))   ? $clsNav : ''; ?> href="/docs/contact/index.php">Contact</a>
                 </div>
             </center>
@@ -54,8 +53,6 @@
               $fileTitle = "Advanced user guide";
             elseif (isset($linksIndex)):
               $fileTitle = "Links";
-            elseif (isset($downloadIndex)):
-              $fileTitle = "Download";
             elseif (isset($contactIndex)):
               $fileTitle = "Contact";
             endif;
