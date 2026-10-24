@@ -28,15 +28,18 @@ fun_sync_archetypes() {
 
 }
 
-# fun_sync_docs_index() {
-#
-#   local s="$1" ; shift
-#   local index="${PKG_WWW_DIR}/docs/assets/index.md"
-#
-#   if [[ $s -lt 0 ]] ; then
-#     rm -rfv
-#
-# }
+fun_sync_docs_index() {
+
+  local s="$1" ; shift
+  local docindex="${PKG_WWW_DIR}/docs/index.md"
+
+  if [[ $s -lt 0 ]] ; then
+    rm -rfv "${docindex}"
+  else
+    cp -rv --remove-destination "$PKG_DOCS_DIR"/index.md "${docindex}"
+  fi
+
+}
 
 fun_sync_docs_advguide() {
 
@@ -74,6 +77,7 @@ fun_sync_docs() {
 
   local s="$1" ; shift
 
+  fun_sync_docs_index     $s
   fun_sync_docs_userguide $s
   fun_sync_docs_advguide  $s
 
