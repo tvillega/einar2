@@ -3,7 +3,7 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
 
                 <div style="margin: 0; text-align: center;">
-                    <b>Einar2</b><br>
+                    <a href="/docs/index.php" style="color: inherit; text-decoration: none;"><b>Einar2</b></a><br>
                     <table style="margin: 0 auto; text-align: left; border-collapse: collapse; font-size: inherit;">
                         <tr>
                             <td style="padding: 1px 8px 1px 0; text-align: right;"><a href="mailto:tvillega@dcc.uchile.cl">Tomás Villegas</a></td>
@@ -17,7 +17,7 @@
                 </div>
 
                 <div style="margin: 0; text-align: center;">
-                    <b>Einar1</b><br>
+                    <a href="/docs/einar/index.html" style="color: inherit; text-decoration: none;"><b>Einar</b></a><br>
                     <table style="margin: 0 auto; text-align: left; border-collapse: collapse; font-size: inherit;">
                         <tr>
                             <td style="padding: 1px 8px 1px 0; text-align: right;"><a href="mailto:ricbor@kth.se">Rickard Borgmörster</a></td>
