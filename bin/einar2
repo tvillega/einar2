@@ -46,6 +46,21 @@ cmd_run() {
 
 }
 
+cmd_ipc() {
+
+  local what="$1"
+
+  if [[ -z "$what" ]] ; then
+    $PKG_LIB_DIR/einar2-help.sh ipc
+    exit
+  else
+    $PKG_LIB_DIR/einar2-hook.sh ipc -1 "${@}"
+    $PKG_LIB_DIR/einar2-ipc.sh "${@}"
+    $PKG_LIB_DIR/einar2-hook.sh ipc  1 "${@}"
+  fi
+
+}
+
 cmd="$1"
 
 [[ -z "$E2_CLI_INIT" ]] && echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked here" && exit
@@ -57,6 +72,10 @@ if [[ -z "$cmd" ]] ; then
 elif [[ "$cmd" == "run" ]] ; then
   shift
   cmd_run "${@}"
+
+elif [[ "$cmd" == "ipc" ]] ; then
+  shift
+  cmd_ipc "${@}"
 
 else
   echo "${BASH_SOURCE[0]##*/}: unknown command: $cmd" >&2

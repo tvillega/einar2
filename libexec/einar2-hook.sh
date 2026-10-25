@@ -28,6 +28,26 @@ hook_run() {
 
 }
 
+hook_ipc() {
+
+  local s="$1" ; shift
+
+  if [[ $s -lt 0 ]] ; then
+    for a in "$PKG_HOOK_DIR"/*pre.ipc ; do
+      chmod +x $a
+      $a "${@}"
+      chmod -x $a
+    done
+  else
+    for a in "$PKG_HOOK_DIR"/*post.ipc ; do
+      chmod +x $a
+      $a "${@}"
+      chmod -x $a
+    done
+  fi
+
+}
+
 hook_or_disable() {
 
   # Default hooks are mandatory for simplicity
@@ -36,6 +56,8 @@ hook_or_disable() {
   [[ -d "${PKG_HOOK_DIR}" ]] || exit
   [[ -f "${PKG_HOOK_DIR}/00-default-post.run"  ]] || exit
   [[ -f "${PKG_HOOK_DIR}/00-default-pre.run"   ]] || exit
+  [[ -f "${PKG_HOOK_DIR}/00-default-post.ipc"  ]] || exit
+  [[ -f "${PKG_HOOK_DIR}/00-default-pre.ipc"   ]] || exit
 
 }
 
@@ -47,6 +69,11 @@ while [[ "$1" != "--" ]]; do case $1 in
   run)
     shift
     hook_run "${@}"
+    exit
+    ;;
+  ipc)
+    shift
+    hook_ipc "${@}"
     exit
     ;;
 esac; shift; done
