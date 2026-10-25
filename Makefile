@@ -30,6 +30,7 @@ install:
 	install -d $(DESTDIR)/etc/profile.d
 	install -d $(DESTDIR)$(datadir)/archetypes
 	install -d $(DESTDIR)$(datadir)/hooks
+	install -d $(DESTDIR)$(docdir)/advguide
 
 	install -m 755 bin/einar2             $(DESTDIR)$(bindir)/einar2
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
