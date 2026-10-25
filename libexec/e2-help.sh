@@ -26,26 +26,6 @@ Authored by Tom Villegas (tvillega)
 EOF
 }
 
-print_help_edit() {
-
-cat << EOF
-usage: einar2 edit <section>
-
-Edits the section of a laboratory.
-
-  <section> := services <lab>
-             | networks <lab>
-
-  <lab> is a relative directory with the following structure:
-
-       XX-labname
-       ├── docker-compose.yml
-       └── docker-compose-networks.yml
-
-Examples are provided in the labs directory.
-EOF
-}
-
 print_help_sync() {
 
 cat <<EOF
@@ -87,10 +67,6 @@ EOF
 while [[ "$1" != "--" ]]; do case $1 in
   help)
     print_help
-    exit
-    ;;
-  edit)
-    print_help_edit
     exit
     ;;
   sync)

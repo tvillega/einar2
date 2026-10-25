@@ -76,10 +76,6 @@ elif [[ "$cmd" == "run" ]] ; then
   shift
   cmd_run "${@}"
 
-elif [[ "$cmd" == "edit" ]] ; then
-  shift
-  cmd_edit "${@}"
-
 else
   echo "${BASH_SOURCE[0]}: unknown command: $cmd" >&2
 fi
