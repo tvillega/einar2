@@ -22,14 +22,12 @@ export PKG_HOOK_DIR
 source "${PKG_SHARE_DIR}/defaults.conf"
 
 # settings overrides
-[[ -f /etc/einar.conf ]] && source /etc/einar.conf
-[[ -f /usr/local/etc/einar.conf ]] && source /usr/local/etc/einar.conf
-[[ -f ~/.einar.conf ]] && source ~/.einar.conf
+[[ -f /etc/einar2/einar2.conf ]] && source /etc/einar2/einar2.conf
+[[ -f /usr/local/etc/einar2/einar2.conf ]] && source /usr/local/etc/einar2/einar2.conf
+[[ -f ~/.einar2.conf ]] && source ~/.einar2.conf
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-[[ -f "$XDG_CONFIG_HOME/einar/einar.conf" ]] && source "$XDG_CONFIG_HOME/einar/einar.conf"
-
-export DOCKER_IMAGE
+[[ -f "$XDG_CONFIG_HOME/einar2/einar2.conf" ]] && source "$XDG_CONFIG_HOME/einar2/einar2.conf"
 
 cmd_run() {
 
