@@ -21,38 +21,48 @@ all:
 install:
 	@echo "Installing to $(DESTDIR)$(prefix)..."
 
-	# Create target directories first
 	install -d $(DESTDIR)$(bindir)
 	install -d $(DESTDIR)$(libdir)
 	install -d $(DESTDIR)$(datadir)
 	install -d $(DESTDIR)$(docdir)
 	install -d $(DESTDIR)$(sysconfdir)
 
-	# Create system sub directories
 	install -d $(DESTDIR)/etc/profile.d
-	install -d $(DESTDIR)/root
-
-	# Create einar2 sub directories
 	install -d $(DESTDIR)$(datadir)/archetypes
 	install -d $(DESTDIR)$(datadir)/hooks
 
-	# Copy files to target directories
-	install -m 755 bin/*                  $(DESTDIR)$(bindir)/
+	install -m 755 bin/einar2             $(DESTDIR)$(bindir)/einar2
+	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
+	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
+
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
 	install -m 644 share/defaults.conf    $(DESTDIR)$(datadir)/
 	install -m 644 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
 	install -m 644 share/profile.d/*      $(DESTDIR)/etc/profile.d/
+
 	install -m 755 libexec/*              $(DESTDIR)$(libdir)/
+
 	install -m 644 docs/*.md              $(DESTDIR)$(docdir)/
-
-
-	# Source custom scripts on each exec -it bash
-	echo 'for f in /etc/profile.d/*.sh; do [ -r "$$f" ] && . "$$f"; done' >> $(DESTDIR)/root/.bashrc
+	install -m 644 docs/advguide/*.md     $(DESTDIR)$(docdir)/advguide/
 
 	# Patch paths on executables
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/config|/etc/$(pkgname)|g'  $(DESTDIR)$(bindir)/$(pkgname)
+
+uninstall:
+	@echo "Uninstalling from $(DESTDIR)$(prefix)..."
+
+	rm -f $(DESTDIR)$(bindir)/einar2
+	rm -f $(DESTDIR)$(bindir)/einard
+	rm -f $(DESTDIR)$(bindir)/netns
+
+	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
+
+	rm -rf $(DESTDIR)$(libdir)
+	rm -rf $(DESTDIR)$(datadir)
+	rm -rf $(DESTDIR)$(docdir)
+	rm -rf $(DESTDIR)$(sysconfdir)
 
 package:
 	@echo "Building package..."
