@@ -4,7 +4,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 if [ -z "${PKG_ROOT_DIR:-}" ]; then
-    echo "err: ${BASH_SOURCE[0]} cannot be invoked directly" >&2
+    echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked directly" >&2
     exit 1
 fi
 
@@ -14,7 +14,7 @@ run_start()     {
 
   if [[ -z "$what" ]] ; then
     echo "usage: run start <lab>"
-    exit
+    exit 1
 
   else
     docker compose -f "${1%%/}/docker-compose.yml" up
@@ -27,7 +27,7 @@ run_stop()      {
 
   if [[ -z "$what" ]] ; then
     echo "usage: run stop <lab>"
-    exit
+    exit 1
 
   else
     docker compose -f "${1%%/}/docker-compose.yml" down
@@ -40,7 +40,7 @@ run_shell()      {
 
   if [[ -z "$what" ]] ; then
     echo "usage: run shell <container>"
-    exit
+    exit 1
 
   else
     docker exec -it "$what" bash
@@ -61,61 +61,17 @@ run_list()      {
 
   if [[ -z "$what" ]] ; then
     echo "usage: run list services|networks"
-    exit
-  elif [[ "$what" == "services" || "$what" == "service" || "$what" == "ls" ]] ; then
+    exit 1
+  elif [[ "$what" == "services" ]] ; then
     run_list_services
     exit
-  elif [[ "$what" == "networks" || "$what" == "network" ]] ; then
+  elif [[ "$what" == "networks" ]] ; then
     run_list_networks
     exit
   else
     run_list_services
     exit
   fi 
-
-}
-
-run_ipc_listener() {
-
-  local socket="/var/run/einar.socket"
-  local daemon="${PKG_ROOT_DIR}/bin/einard"
-
-  if [[ -S "$socket" ]] ; then
-    echo "Closing previous session"
-    rm -f "$socket"
-  fi
-
-  echo "Listening on socket $socket"
-  socat UNIX-LISTEN:"$socket",fork,reuseaddr SYSTEM:"$daemon"
-
-}
-
-run_ipc_command() {
-
-  local cmd="${1-}"
-  local socket="/var/run/einar.socket"
-
-  if [[ ! -S "$socket" ]] ; then
-    echo "failed to connect to the einar API at unix://${socket}"
-    exit
-  fi
-
-  printf -- "$cmd" | socat - UNIX-CONNECT:"$socket"
-
-}
-
-run_ipc() {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "usage: run ipc listener|<command>"
-    exit
-  elif [[ "$what" == "listener" ]] ; then
-    run_ipc_listener
-  else
-    run_ipc_command "$what"
-  fi
 
 }
 
@@ -127,43 +83,23 @@ while [[ "$1" != "--" ]]; do case $1 in
     run_list "${@}"
     exit
     ;;
-  list-networks|ln)
-    shift
-    run_list_networks
-    exit
-    ;;
-  list-networks|ls)
-    shift
-    run_list_services
-    exit
-    ;;
-  shell|sh)
+  shell)
     shift
     run_shell "${@}"
     exit
     ;;
-  start|up)
+  start)
     shift
     run_start "${@}"
     exit
     ;;
-  stop|down)
+  stop)
     shift
     run_stop "${@}"
     exit
     ;;
-  util)
-    shift
-    run_utility "${@}"
-    exit
-    ;;
-  ipc)
-    shift
-    run_ipc "${@}"
-    exit
-    ;;
   *)
-    $PKG_LIBX_DIR/e2-help.sh run
+    $PKG_LIB_DIR/e2-help.sh run
     exit
     ;;
 esac; shift; done
