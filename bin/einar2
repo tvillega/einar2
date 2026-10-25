@@ -64,21 +64,6 @@ cmd_edit() {
 
 }
 
-cmd_gen() {
-
-  local what="$1"
-
-  if [[ -z "$what" ]] ; then
-    $PKG_LIB_DIR/einar2-help.sh gen
-    exit
-  else
-    $PKG_LIB_DIR/einar2-hook.sh gen -1 "${@}"
-    $PKG_LIB_DIR/einar2-gen.sh "${@}"
-    $PKG_LIB_DIR/einar2-hook.sh gen  1 "${@}"
-  fi
-
-}
-
 cmd="$1"
 
 [[ -z "$E2_CLI_INIT" ]] && echo "err: ${BASH_SOURCE[0]} cannot be invoked here" && exit

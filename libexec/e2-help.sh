@@ -46,41 +46,6 @@ Examples are provided in the labs directory.
 EOF
 }
 
-print_help_gen() {
-
-cat << EOF
-usage: einar2 gen <archetype>
-
-Prints a service or network block from an archetype.
-
-  <archetype> := network  <network> <mask> <gateway>
-               | compose  <section>
-               | computer <name>
-               | join-network <address> <network>
-               | laboratory <name>
-               | router   <name>
-               | server   <name>
-
-  <section> := services
-             | networks
-
-  <address> is an assignable IPv4 for a service,
-            excludes reserved numbers x.x.x.{0,1,255}.
-  <network> is an IPv4 address that identifies a whole network,
-            commonly assigned to x.x.x.0 for /24 masks.
-  <mask>    is the network mask, ranging from 0 to 32,
-            leading slash is ignored if present.
-  <gateway> is an IPv4 address that acts as gateway,
-                 the x.x.x.1 corresponds to docker's guest:host bind.
-
-  <section> fills compose with Einar2 custom images and networks
-            to use as base for new laboratories
-
-Archetypes follow Einar naming conventions, and prepend e2
-to container's names for clearer reverse DNS lookup outputs.
-EOF
-}
-
 print_help_sync() {
 
 cat <<EOF
@@ -126,10 +91,6 @@ while [[ "$1" != "--" ]]; do case $1 in
     ;;
   edit)
     print_help_edit
-    exit
-    ;;
-  gen)
-    print_help_gen
     exit
     ;;
   sync)
