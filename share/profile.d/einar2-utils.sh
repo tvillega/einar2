@@ -18,7 +18,7 @@ e2() {
             einar2 run shell "$@"
             ;;
         *)
-            einar2 "$c" "$@"
+            einar2 "$s" "$@"
             ;;
     esac
 }
