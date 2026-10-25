@@ -4,7 +4,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 if [ -z "${PKG_ROOT_DIR:-}" ]; then
-    echo "err: ${BASH_SOURCE[0]} cannot be invoked directly" >&2
+    echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked directly" >&2
     exit 1
 fi
 
@@ -17,11 +17,9 @@ Networking laboratory built on top of docker.
 
 Commands:
 
-  edit: modifies services and networks.
-  gen : builds service and network blocks from archetypes.
-  run : deploys labs. Requires superuser privileges.
+  run : deploys laboratories.
 
-Run ./einar2 <subcommand> to read about a specific subcommand.
+Run einar2 <subcommand> to read about a specific subcommand.
 Authored by Tom Villegas (tvillega)
 EOF
 }
