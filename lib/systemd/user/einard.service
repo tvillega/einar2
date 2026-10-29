@@ -1,12 +1,12 @@
 [Unit]
-Description=Einar2 Daemon
+Description=Einar2 IPC Listener
 After=network.target
 After=docker.service
 Requires=docker.service
 
 [Service]
 Type=simple
-ExecStart=/opt/einar2/einard
+ExecStart=/usr/bin/einar2 ipc listener
 Restart=on-failure
 RestartSec=5s
 
