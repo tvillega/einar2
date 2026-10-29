@@ -4,11 +4,11 @@ LOG_FILE="/tmp/einar.log"
 
 log() {
     local ts="$(date --utc +%Y-%m-%d-%H:%M:%S)"
-    printf -- "%s %s\n" "$ts" "$1" | tee -a "$LOG_FILE" > /dev/tty
+    printf -- "%s %s\n" "$ts" "$1" | tee -a "$LOG_FILE"
 }
 
 launch() {
-    nohup "$@" >/dev/null 2>&1 &
+    nohup "$@" >> "/tmp/einar.log" 2>&1 &
     disown "$!" 2>/dev/null
 }
 

@@ -10,7 +10,7 @@ sysconfdir       = /etc/$(pkgname)
 localstatedir    = /var
 runstatedir      = $(localstatedir)/run
 docdir           = $(datarootdir)/doc/$(pkgname)
-systemduserdir   = $(prefix)/lib/systemd/user
+systemdsysdir    = $(prefix)/lib/systemd/system
 
 SHELL := /bin/bash
 
@@ -38,17 +38,18 @@ install:
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
 	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
 
+	install -m 644 etc/profile.d/*        $(DESTDIR)/etc/profile.d/
+
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
 	install -m 644 share/defaults.conf    $(DESTDIR)$(datadir)/
-	install -m 644 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
-	install -m 644 share/profile.d/*      $(DESTDIR)/etc/profile.d/
+	install -m 755 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
 
 	install -m 755 libexec/*              $(DESTDIR)$(libdir)/
 
 	install -m 644 docs/*.md              $(DESTDIR)$(docdir)/
 	install -m 644 docs/advguide/*.md     $(DESTDIR)$(docdir)/advguide/
 
-	install -m 644 lib/systemd/user/einard.service $(DESTDIR)$(systemduserdir)/einard.service
+	install -m 644 lib/systemd/system/einard.service $(DESTDIR)$(systemdsysdir)/einard.service
 
 	# Patch paths on executables
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)

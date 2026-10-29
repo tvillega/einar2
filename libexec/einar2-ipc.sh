@@ -8,8 +8,7 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
-XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
-SOCKET="${XDG_RUNTIME_DIR}/einar2.sock"
+SOCKET="/tmp/einar2.sock"
 
 ipc_listener() {
 

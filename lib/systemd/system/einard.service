@@ -1,0 +1,16 @@
+[Unit]
+Description=Einar2 IPC Listener
+After=graphical.target
+Wants=graphical.target
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/root/.Xauthority
+Environment=XDG_RUNTIME_DIR=/run/user/0
+ExecStart=/usr/bin/einar2 ipc listener
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=graphical.target
