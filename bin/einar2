@@ -8,6 +8,7 @@ PKG_SHARE_DIR="${PKG_ROOT_DIR}/share"
 PKG_ETC_DIR="${PKG_ROOT_DIR}/config"
 
 export PKG_ROOT_DIR
+export PKG_BIN_DIR
 export PKG_LIB_DIR
 export PKG_SHARE_DIR
 export PKG_ETC_DIR
