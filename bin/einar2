@@ -62,8 +62,6 @@ cmd_ipc() {
 
 cmd="$1"
 
-[[ -z "$E2_CLI_INIT" ]] && echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked here" && exit
-
 if [[ -z "$cmd" ]] ; then
   $PKG_LIB_DIR/einar2-help.sh help
   exit
