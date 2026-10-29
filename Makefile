@@ -27,7 +27,7 @@ install:
 	install -d $(DESTDIR)$(datadir)
 	install -d $(DESTDIR)$(docdir)
 	install -d $(DESTDIR)$(sysconfdir)
-	install -d $(DESTDIR)$(systemduserdir)
+	install -d $(DESTDIR)$(systemdsysdir)
 
 	install -d $(DESTDIR)/etc/profile.d
 	install -d $(DESTDIR)$(datadir)/archetypes
