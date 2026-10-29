@@ -1,26 +1,49 @@
 ## Create VM
 
-Create a `qcow2` image:
+Start by cloning the repository:
 
 ```
-qemu-img create -f qcow2 einar2.img 4.7G
+git clone https://github.com/tvillega/einar2.git
 ```
 
-Enable Network Block Device (nbd) on the kernel:
+Now enter the `dist/` directory before proceeding:
+
+```
+mkdir -p dist/ && cd dist
+```
+
+Steps are grouped into *stages*, each stage creates an overlay
+on top of the previously constructed image. This helps saving
+bandwith and time as a misconfigured overlay can just be destroyed
+and re-built starting from a previous one.
+
+### Stage 1
+
+Creates a *stage 1* overlay with a minimal Ubuntu LXDE.
+
+#### Virtual disk
+
+(1) Create the `qcow2` image:
+
+```
+qemu-img create -f qcow2 einar2-stage1.img 8G
+```
+
+(2) Enable Network Block Device (nbd) on the kernel:
 
 ```
 modprobe nbd max_part=8
 ```
 
-Connect the image to a nbd:
+(3) Connect the image to a nbd:
 
 ```
-qemu-nbd --connect=/dev/nbd0 einar2.img
+qemu-nbd --connect=/dev/nbd0 einar2-stage1.img
 ```
 
-Now `/dev/nbd0` will act as a 4.7G disk device on the system.
+Now `/dev/nbd0` will act as a 8G disk device on the system.
 
-Partition the disk:
+(4) Partition the disk:
 
 ```
 fdisk /dev/nbd0
@@ -33,50 +56,53 @@ Follow the utility instructions for:
 * add a new partition (rest of device)
 * write table to disk and exit
 
+#### Filesystem
 
-Create a `fat32` filesystem on `*p1`:
+(1) Create a `fat32` filesystem on `*p1`:
 
 ```
 mkfs.vfat -F32 -n ESP /dev/nbd0p1
 ```
 
-Create a `ext4` filesystem on `*p2`:
+(2) Create a `ext4` filesystem on `*p2`:
 
 ```
 mkfs.ext4 -L ROOT /dev/nbd0p2
 ```
 
-Create a mount point for `ROOT`:
+(3) Create a mount point for `ROOT`:
 
 ```
 mkdir -p mnt
 ```
 
-Mount the `root` partition:
+(5) Mount the `root` partition:
 
 ```
 mount /dev/nbd0p2 mnt
 ```
 
-Create a mount point for `ESP`:
+(6) Create a mount point for `ESP`:
 
 ```
 mkdir -p mnt/efi
 ```
 
-Mount the `esp` partition:
+(7) Mount the `esp` partition:
 
 ```
 mount /dev/nbd0p1 mnt/efi
 ```
 
-Debootstrap an Ubuntu LTS:
+#### Installation
+
+(1) Debootstrap an Ubuntu LTS:
 
 ```
 debootstrap resolute mnt https://mirror.hnd.cl/ubuntu/
 ```
 
-Block installation of unnecessary packages:
+(2) Block installation of unnecessary packages:
 
 ```
 cat > mnt/etc/apt/preferences.d/ignored-packages << EOF
@@ -90,7 +116,7 @@ Pin-Priority: -1
 EOF
 ```
 
-Add repositories:
+(3) Add repositories:
 
 ```
 cat > mnt/etc/apt/sources.list << EOF
@@ -100,7 +126,7 @@ deb https://mirror.hnd.cl/ubuntu/ resolute-updates   main restricted universe
 EOF
 ```
 
-Enable creation of symlinks for `initrd` and `vmlinuz`:
+(4) Enable creation of symlinks for `initrd` and `vmlinuz`:
 
 ```
 cat > mnt/etc/kernel-img.conf << EOF
@@ -109,13 +135,13 @@ do_bootloader = no
 EOF
 ```
 
-Update filesystem table:
+(5) Update filesystem table:
 
 ```
 genfstab -U mnt >> mnt/etc/fstab
 ```
 
-Add kernel parameter for bootloader:
+(6) Add kernel parameter for bootloader:
 
 ```
 cat > mnt/etc/kernel/cmdline << EOF
@@ -123,19 +149,21 @@ root=UUID=<nbd0p2-uuid>
 EOF
 ```
 
-Chroot into the new system:
+#### Configuration
+
+(1) Chroot into the new system:
 
 ```
 arch-chroot mnt
 ```
 
-Populate the local repositories and update the system packages:
+(2) Populate the local repositories and update the system packages:
 
 ```
 apt update && apt upgrade -y
 ```
 
-Install essential packages for a proper VM:
+(3) Install essential packages for a proper Einar2 VM:
 
 ```
 apt install -y \
@@ -149,84 +177,136 @@ apt install -y \
   dnsutils \
   tcpdump \
   ncat \
+  socat \
   nmap \
   hping3 \
   lxde-core
 ```
 
-Clean packages cache:
-
-```
-apt clean && apt autoclean && apt autoremove
-```
-
-Set a hostname:
+(4) Set a hostname:
 
 ```
 echo "einar2" > /etc/hostname && echo "127.0.1.1 einar2" >> /etc/hosts
 ```
 
-Set `root` password as `einar2`:
+(5) Set `root` password as `einar2`:
 
 ```
 passwd
 ```
 
-Now exit the chroot.
+#### Clean up
 
-Umount the `esp` partition:
+(1) Exit the chroot.
+
+```
+exit
+```
+
+(2) Umount the `esp` partition:
 
 ```
 umount mnt/efi
 ```
 
-Umount the `root` partition:
+(3) Umount the `root` partition:
 
 ```
 umount mnt
 ```
 
-Disconnect the nbd:
+(4) Disconnect the nbd:
 
 ```
 qemu-nbd --disconnect /dev/nbd0
 ```
 
+### Stage 2
+
+Creates a *stage 2* overlay that adds `docker` & `firefox`.
+
+(1) Create the `qcow2` image:
+
+```
+qemu-img create -f qcow2 -F qcow2 -b einar2-stage1.img einar2-stage2.img
+```
+
+(2) Create a script to start the VM:
+
+> This assumes the existence of an OVMF firmware `einar2-uefi.fd`.
+> You can grab one from the `edk2-ovmf` package in ArchLinux.
+
+```
+cat > einar2-stage2.sh < EOF
+qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
+  -device virtio-serial-pci \
+  -spice port=5932,disable-ticketing=on \
+  -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
+  -chardev spicevmc,id=spicechannel0,name=vdagent \
+  -drive if=pflash,format=raw,file=einar2-uefi.fd \
+  -drive file=einar2-stage2.img,format=qcow2
+EOF
+```
+
+The VM will be available through `spice://localhost:5932`.
+
+> If your image doesn't boot, then you need to re-generate the initrd on *stage 1*
+> by explicitly specifing the kernel image as it read your host kernel instead:
+> ```
+> PATH=/usr/sbin:$PATH
+> update-initramfs -c -k <real-kernel-version-as-seen-in-/boot>
+> ```
+
+(3) Install firefox:
+
+> Multi-step as it fetches the `.deb` and not `snapd`.
+
+* https://support.mozilla.org/en-US/kb/install-firefox-linux
+
+(4) Install docker:
+
+> Multi-step as it adds GPG keys and a repository.
+
+* https://docs.docker.com/engine/install/ubuntu/
+
+
+### Stage 3
+
+Creates a *stage 3* overlay that adds `einar2-utils` and configures it.
+
+(1) Create the `qcow2` image:
+
+```
+qemu-img create -f qcow2 -F qcow2 -b einar2-stage2.img einar2-stage3.img
+```
+
+(2) Create a script to start the VM:
+
+> This assumes the existence of an OVMF firmware `einar2-uefi.fd`.
+> You can grab one from the `edk2-ovmf` package in ArchLinux.
+
+```
+cat > einar2-stage3.sh < EOF
+qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
+  -device virtio-serial-pci \
+  -spice port=5933,disable-ticketing=on \
+  -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
+  -chardev spicevmc,id=spicechannel0,name=vdagent \
+  -drive if=pflash,format=raw,file=einar2-uefi.fd \
+  -drive file=einar2-stage3.img,format=qcow2
+EOF
+```
+
+The VM will be available through `spice://localhost:5933`.
+
+<!---
 Convert the image to a VirtualBox-compatible image:
 
 ```
 qemu-img convert -f qcow2 -O vdi einar2.img einar2.vdi
 ```
 
-Alternatively, run it raw from qemu:
-
-> This assumes the existence of an OVMF firmware `einar2-uefi.fd`.
-> You can grab one from the `edk2-ovmf` package in ArchLinux.
-
-```
-qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
-  -device virtio-serial-pci \
-  -spice port=5930,disable-ticketing=on \
-  -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
-  -chardev spicevmc,id=spicechannel0,name=vdagent \
-  -drive if=pflash,format=raw,file=einar2-uefi.fd \
-  -drive file=einar2.img,format=qcow2
-
-```
-
-Then the VM is available through `spice://localhost:5930`.
-
-If your image doesn't boot, then you need to re-generate the initrd
-by explicitly specifing the kernel image as it read your host kernel instead:
-
-```
-PATH=/usr/sbin:$PATH
-update-initramfs -c -k <real-kernel-version-as-seen-in-/boot>
-```
-
-Install firefox (multi-step, see resources).
-
-Install docker (multi-step, see resources).
+-->
 
 ### Resources
 
@@ -237,4 +317,3 @@ Install docker (multi-step, see resources).
 * https://docs.openstack.org/image-guide/convert-images.html
 * https://arraybolt3.substack.com/p/making-hyper-minimal-ubuntu-virtual
 * https://askubuntu.com/questions/1360515/is-the-linux-firmware-package-actually-required-on-a-xen-vps
-* https://support.mozilla.org/en-US/kb/install-firefox-linux
