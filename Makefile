@@ -64,7 +64,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/netns
 
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
-	rm -f $(DESTDIR)$(systemduserdir)/einard.service
+	rm -f $(DESTDIR)$(systemdsysdir)/einard.service
 
 	rm -rf $(DESTDIR)$(libdir)
 	rm -rf $(DESTDIR)$(datadir)
