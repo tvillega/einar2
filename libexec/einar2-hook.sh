@@ -14,15 +14,11 @@ hook_run() {
 
   if [[ $s -lt 0 ]] ; then
     for a in "$PKG_HOOK_DIR"/*pre.run ; do
-      chmod +x $a
       $a "${@}"
-      chmod -x $a
     done
   else
     for a in "$PKG_HOOK_DIR"/*post.run ; do
-      chmod +x $a
       $a "${@}"
-      chmod -x $a
     done
   fi
 
@@ -34,15 +30,11 @@ hook_ipc() {
 
   if [[ $s -lt 0 ]] ; then
     for a in "$PKG_HOOK_DIR"/*pre.ipc ; do
-      chmod +x $a
       $a "${@}"
-      chmod -x $a
     done
   else
     for a in "$PKG_HOOK_DIR"/*post.ipc ; do
-      chmod +x $a
       $a "${@}"
-      chmod -x $a
     done
   fi
 
