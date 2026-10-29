@@ -237,7 +237,7 @@ qemu-img create -f qcow2 -F qcow2 -b einar2-stage1.img einar2-stage2.img
 > You can grab one from the `edk2-ovmf` package in ArchLinux.
 
 ```
-cat > einar2-stage2.sh < EOF
+cat > einar2-stage2.sh << EOF
 qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
   -device virtio-serial-pci \
   -spice port=5932,disable-ticketing=on \
@@ -286,7 +286,7 @@ qemu-img create -f qcow2 -F qcow2 -b einar2-stage2.img einar2-stage3.img
 > You can grab one from the `edk2-ovmf` package in ArchLinux.
 
 ```
-cat > einar2-stage3.sh < EOF
+cat > einar2-stage3.sh << EOF
 qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
   -device virtio-serial-pci \
   -spice port=5933,disable-ticketing=on \
