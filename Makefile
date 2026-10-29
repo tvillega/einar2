@@ -10,6 +10,7 @@ sysconfdir       = /etc/$(pkgname)
 localstatedir    = /var
 runstatedir      = $(localstatedir)/run
 docdir           = $(datarootdir)/doc/$(pkgname)
+systemduserdir   = $(prefix)/lib/systemd/user
 
 SHELL := /bin/bash
 
@@ -26,6 +27,7 @@ install:
 	install -d $(DESTDIR)$(datadir)
 	install -d $(DESTDIR)$(docdir)
 	install -d $(DESTDIR)$(sysconfdir)
+	install -d $(DESTDIR)$(systemduserdir)
 
 	install -d $(DESTDIR)/etc/profile.d
 	install -d $(DESTDIR)$(datadir)/archetypes
@@ -46,6 +48,8 @@ install:
 	install -m 644 docs/*.md              $(DESTDIR)$(docdir)/
 	install -m 644 docs/advguide/*.md     $(DESTDIR)$(docdir)/advguide/
 
+	install -m 644 lib/systemd/user/einard.service $(DESTDIR)$(systemduserdir)/einard.service
+
 	# Patch paths on executables
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
@@ -59,6 +63,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/netns
 
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
+	rm -f $(DESTDIR)$(systemduserdir)/einard.service
 
 	rm -rf $(DESTDIR)$(libdir)
 	rm -rf $(DESTDIR)$(datadir)
