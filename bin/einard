@@ -1,30 +1,60 @@
 #!/bin/bash
 
+LOG_FILE="/tmp/einar.log"
+
+log() {
+    local ts="$(date --utc +%Y-%m-%d-%H:%M:%S)"
+    printf -- "%s %s\n" "$ts" "$1" | tee -a "$LOG_FILE" > /dev/tty
+}
+
+launch() {
+    nohup "$@" >/dev/null 2>&1 &
+    disown "$!" 2>/dev/null
+}
+
+parse_namespace_open() {
+    local INS="$1" ; shift
+
+    case "$INS" in
+        lxterminal)
+            launch lxterminal
+            log "Terminal opened"
+            ;;
+        wireshark)
+            launch wireshark
+            log "Wireshark opened"
+            ;;
+        featherpad)
+            launch featherpad
+            log "Featherpad opened"
+            ;;
+        *)
+            log "unknown: open::$INS"
+            ;;
+    esac
+}
+
+parse_instruction() {
+    local INS="$1"
+
+    local INS_SAN="${INS//::/$'\t'}"
+    IFS=$'\t' read -r -a INS_ARRAY <<< "$INS_SAN"
+
+    local NS="${INS_ARRAY[0]}"
+    local NS_INS=("${INS_ARRAY[@]:1}")
+
+    case "$NS" in
+        open)
+            parse_namespace_open "${NS_INS[@]}"
+            ;;
+        system)
+            parse_nanespace_system "${NS_INS[@]}"
+            ;;
+        *)
+            log "unknown namespace: $INS"
+            ;;
+    esac
+}
+
 IFS= read -r INS
-
-TS="$(date --utc +%Y-%m-%d-%I:%M:%S)"
-LOG_FILE="/einar2/einar.log"
-MSG=""
-
-case "$INS" in
-  open_terminal)
-    nohup lxterminal >/dev/null 2>&1 &
-    disown
-    MSG="${TS} Terminal window opened"
-    ;;
-  open_docs)
-    nohup firefox http://localhost/docs >/dev/null 2>&1 &
-    disown
-    MSG="${TS} Documentation site opened"
-    ;;
-  open_labs)
-    nohups firefox http://localhost >/dev/null 2>&1 &
-    disown
-    MSG="${TS} Laboratory site opened"
-    ;;
-  *)
-    MSG="${TS}: unknown: ${INS}"
-    ;;
-esac
-
-echo $MSG | tee $LOG_FILE
+parse_instruction "$INS"
