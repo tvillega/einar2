@@ -327,10 +327,10 @@ qemu-img create -f qcow2 -F qcow2 -b einar2-stage2.img einar2-stage3.img
 > You can grab one from the `edk2-ovmf` package in ArchLinux.
 
 ```
-cat > einar2-stage3.sh << EOF
+cat > einar2.sh << EOF
 qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
   -device virtio-serial-pci \
-  -spice port=5933,disable-ticketing=on \
+  -spice port=5930,disable-ticketing=on \
   -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
   -chardev spicevmc,id=spicechannel0,name=vdagent \
   -drive if=pflash,format=raw,file=einar2-uefi.fd \
@@ -338,7 +338,7 @@ qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,
 EOF
 ```
 
-The VM will be available through `spice://localhost:5933`.
+The VM will be available through `spice://localhost:5930`.
 
 <!---
 Convert the image to a VirtualBox-compatible image:
