@@ -8,32 +8,33 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
+XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+SOCKET="${XDG_RUNTIME_DIR}/einar2.sock"
+
 ipc_listener() {
 
-  local socket="/var/run/einar.socket"
-  local daemon="${PKG_ROOT_DIR}/bin/einard"
+  local daemon="${PKG_BIN_DIR}/einard"
 
-  if [[ -S "$socket" ]] ; then
+  if [[ -S "$SOCKET" ]] ; then
     echo "Closing previous session"
-    rm -f "$socket"
+    rm -f "$SOCKET"
   fi
 
-  echo "Listening on socket $socket"
-  socat UNIX-LISTEN:"$socket",fork,reuseaddr SYSTEM:"$daemon"
+  echo "Listening on socket $SOCKET"
+  socat UNIX-LISTEN:"$SOCKET",fork,reuseaddr SYSTEM:"$daemon"
 
 }
 
 ipc_command() {
 
   local cmd="${1-}"
-  local socket="/var/run/einar.socket"
 
-  if [[ ! -S "$socket" ]] ; then
-    echo "failed to connect to the einar API at unix://${socket}"
+  if [[ ! -S "$SOCKET" ]] ; then
+    echo "failed to connect to the einar API at unix://${SOCKET}"
     exit
   fi
 
-  printf -- "$cmd" | socat - UNIX-CONNECT:"$socket"
+  printf -- "$cmd" | socat - UNIX-CONNECT:"$SOCKET"
 
 }
 
@@ -45,7 +46,7 @@ while [[ "$1" != "--" ]]; do case $1 in
     ipc_listener "${@}"
     exit
     ;;
-  *)
+  do)
     shift
     ipc_command "${@}"
     exit
