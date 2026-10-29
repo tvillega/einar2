@@ -18,7 +18,7 @@ RUN apk add --no-cache \
       docker-cli \
       docker-cli-compose
 
-COPY einar2-utils.tar.gz /tmp/
+COPY dist/einar2-utils.tar.gz /tmp/
 RUN tar -xzf /tmp/einar2-utils.tar.gz -C / && rm /tmp/einar2-utils.tar.gz
 
 RUN mkdir -pv /var/lib/php/sessions /etc/quagga

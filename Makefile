@@ -68,9 +68,9 @@ uninstall:
 package:
 	@echo "Building package..."
 
-	rm -rf ./temp-pkg ./einar2-utils.tar.gz
-	$(MAKE) install DESTDIR=./temp-pkg prefix=/usr
-	tar -czf einar2-utils.tar.gz -C ./temp-pkg .
-	rm -rf ./temp-pkg
+	rm -rf ./dist/temp-pkg ./dist/einar2-utils.tar.gz
+	$(MAKE) install DESTDIR=./dist/temp-pkg prefix=/usr
+	tar -czf dist/einar2-utils.tar.gz -C ./dist/temp-pkg .
+	rm -rf ./dist/temp-pkg
 
-	@echo "Package ready: ./einar2-utils.tar.gz"
+	@echo "Package ready: ./dist/einar2-utils.tar.gz"
