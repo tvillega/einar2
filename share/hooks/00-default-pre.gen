@@ -1,6 +1,0 @@
-#
-# Default pre-transaction hook for gen subcommand
-#
-
-#User args
-args="${@}"

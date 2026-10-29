@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+if [ -z "${PKG_ROOT_DIR:-}" ]; then
+    echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked directly" >&2
+    exit 1
+fi
+
+print_help() {
+
+cat << EOF
+usage: einar2 [CMD]
+
+Networking laboratory built on top of docker.
+
+Commands:
+
+  run : deploys laboratories.
+
+Run einar2 <subcommand> to read about a specific subcommand.
+Authored by Tom Villegas (tvillega)
+EOF
+}
+
+print_help_ipc() {
+
+cat <<EOF
+usage: einar2 ipc
+
+Run an instruction on the host without a privileged user.
+
+  <command> ::= listener
+              | do <instruction>
+
+  <instruction> all the allowed actions on the host.
+
+This command is used by einar2-webui for GUI actions
+that involve the host system (DooD architecture).
+EOF
+
+}
+
+print_help_sync() {
+
+cat <<EOF
+usage: einar2 sync
+
+Devel util. Sync configuration files to DOCUMENT_ROOT.
+
+  <command> ::= yay
+              | nay
+EOF
+
+}
+
+print_help_run() {
+
+cat <<EOF
+usage: einar2 run <command>
+
+Run a docker command. Requires a privileged user or sudo|doas.
+
+  <command> := list   <section>
+             | start  <lab>
+             | stop   <lab>
+             | shell  <lab>
+
+  <section> := services
+             | networks
+
+  <lab> is a relative directory with the following structure:
+
+       XX-labname
+       ├── docker-compose.yml
+       └── docker-compose-networks.yml
+EOF
+}
+
+[[ -z "${1-}" ]] && exit
+
+while [[ "$1" != "--" ]]; do case $1 in
+  help)
+    print_help
+    exit
+    ;;
+  sync)
+    print_help_sync
+    exit
+    ;;
+  run)
+    print_help_run
+    exit
+    ;;
+  ipc)
+    print_help_ipc
+    exit
+    ;;
+esac; shift; done
+if [[ "$1" == '--' ]]; then shift; fi

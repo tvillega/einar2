@@ -1,14 +1,15 @@
 #!/bin/bash
 
-PKG_BBIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-PKG_ROOT_DIR=$( cd "$PKG_BBIN_DIR/.." ; pwd -P )
+PKG_BIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_BIN_DIR/.." ; pwd -P )
 
-PKG_LIBX_DIR="${PKG_ROOT_DIR}/libexec"
+PKG_LIB_DIR="${PKG_ROOT_DIR}/libexec"
 PKG_SHARE_DIR="${PKG_ROOT_DIR}/share"
 PKG_ETC_DIR="${PKG_ROOT_DIR}/config"
 
 export PKG_ROOT_DIR
-export PKG_LIBX_DIR
+export PKG_BIN_DIR
+export PKG_LIB_DIR
 export PKG_SHARE_DIR
 export PKG_ETC_DIR
 
@@ -21,56 +22,40 @@ export PKG_HOOK_DIR
 # default settings
 source "${PKG_SHARE_DIR}/defaults.conf"
 
-# default settings overrides
-[[ -f ~/.einar.conf ]] && source ~/.einar.conf
-[[ -f /etc/einar.conf ]] && source /etc/einar.conf
-[[ -f /usr/local/etc/einar.conf ]] && source /usr/local/etc/einar.conf
+# settings overrides
+[[ -f /etc/einar2/einar2.conf ]] && source /etc/einar2/einar2.conf
+[[ -f /usr/local/etc/einar2/einar2.conf ]] && source /usr/local/etc/einar2/einar2.conf
+[[ -f ~/.einar2.conf ]] && source ~/.einar2.conf
 
-export DOCKER_IMAGE
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+[[ -f "$XDG_CONFIG_HOME/einar2/einar2.conf" ]] && source "$XDG_CONFIG_HOME/einar2/einar2.conf"
 
 cmd_run() {
 
   local what="$1"
 
   if [[ -z "$what" ]] ; then
-    $PKG_LIBX_DIR/e2-help.sh run
+    $PKG_LIB_DIR/einar2-help.sh run
     exit
   else
-    $PKG_LIBX_DIR/e2-hook.sh run -1 "${@}"
-    $PKG_LIBX_DIR/e2-run.sh "${@}"
-    $PKG_LIBX_DIR/e2-hook.sh run  1 "${@}"
+    $PKG_LIB_DIR/einar2-hook.sh run -1 "${@}"
+    $PKG_LIB_DIR/einar2-run.sh "${@}"
+    $PKG_LIB_DIR/einar2-hook.sh run  1 "${@}"
   fi
 
 }
 
-cmd_edit() {
-
-  local what="$1"
-
-  [[ -z "$EDITOR" ]] && echo "EDITOR unset" && exit
-
-  if [[ -z "$what" ]] ; then
-    $PKG_LIBX_DIR/e2-help.sh edit
-    exit
-  else
-    $PKG_LIBX_DIR/e2-hook.sh edit -1 "${@}"
-    $PKG_LIBX_DIR/e2-edit.sh "${@}"
-    $PKG_LIBX_DIR/e2-hook.sh edit  1 "${@}"
-  fi
-
-}
-
-cmd_gen() {
+cmd_ipc() {
 
   local what="$1"
 
   if [[ -z "$what" ]] ; then
-    $PKG_LIBX_DIR/e2-help.sh gen
+    $PKG_LIB_DIR/einar2-help.sh ipc
     exit
   else
-    $PKG_LIBX_DIR/e2-hook.sh gen -1 "${@}"
-    $PKG_LIBX_DIR/e2-gen.sh "${@}"
-    $PKG_LIBX_DIR/e2-hook.sh gen  1 "${@}"
+    $PKG_LIB_DIR/einar2-hook.sh ipc -1 "${@}"
+    $PKG_LIB_DIR/einar2-ipc.sh "${@}"
+    $PKG_LIB_DIR/einar2-hook.sh ipc  1 "${@}"
   fi
 
 }
@@ -78,21 +63,17 @@ cmd_gen() {
 cmd="$1"
 
 if [[ -z "$cmd" ]] ; then
-  $PKG_LIBX_DIR/e2-help.sh help
+  $PKG_LIB_DIR/einar2-help.sh help
   exit
 
-elif [[ "$cmd" == "run" || "$cmd" == "r" ]] ; then
+elif [[ "$cmd" == "run" ]] ; then
   shift
   cmd_run "${@}"
 
-elif [[ "$cmd" == "edit" || "$cmd" == "e" ]] ; then
+elif [[ "$cmd" == "ipc" ]] ; then
   shift
-  cmd_edit "${@}"
-
-elif [[ "$cmd" == "gen" || "$cmd" == "g" ]] ; then
-  shift
-  cmd_gen "${@}"
+  cmd_ipc "${@}"
 
 else
-  echo "Unknown command: $cmd"
+  echo "${BASH_SOURCE[0]##*/}: unknown command: $cmd" >&2
 fi

@@ -1,5 +1,4 @@
-registry/
-e2
+dist/
 labs
 www/archetypes
 www/docs/**/*.md
