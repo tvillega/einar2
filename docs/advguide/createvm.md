@@ -76,19 +76,19 @@ mkfs.ext4 -L ROOT /dev/nbd0p2
 mkdir -p mnt
 ```
 
-(5) Mount the `root` partition:
+(4) Mount the `root` partition:
 
 ```
 mount /dev/nbd0p2 mnt
 ```
 
-(6) Create a mount point for `ESP`:
+(5) Create a mount point for `ESP`:
 
 ```
 mkdir -p mnt/efi
 ```
 
-(7) Mount the `esp` partition:
+(6) Mount the `esp` partition:
 
 ```
 mount /dev/nbd0p1 mnt/efi
@@ -225,50 +225,91 @@ qemu-nbd --disconnect /dev/nbd0
 
 Creates a *stage 2* overlay that adds `docker` & `firefox`.
 
+#### Preparation
+
 (1) Create the `qcow2` image:
 
 ```
 qemu-img create -f qcow2 -F qcow2 -b einar2-stage1.img einar2-stage2.img
 ```
 
-(2) Create a script to start the VM:
-
-> This assumes the existence of an OVMF firmware `einar2-uefi.fd`.
-> You can grab one from the `edk2-ovmf` package in ArchLinux.
+(2) Connect the image to a nbd:
 
 ```
-cat > einar2-stage2.sh << EOF
-qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
-  -device virtio-serial-pci \
-  -spice port=5932,disable-ticketing=on \
-  -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
-  -chardev spicevmc,id=spicechannel0,name=vdagent \
-  -drive if=pflash,format=raw,file=einar2-uefi.fd \
-  -drive file=einar2-stage2.img,format=qcow2
-EOF
+qemu-nbd --connect=/dev/nbd0 einar2-stage2.img
 ```
 
-The VM will be available through `spice://localhost:5932`.
+Now /dev/nbd0 will act as the *stage 2* 8G disk device on the system.
 
-> If your image doesn't boot, then you need to re-generate the initrd on *stage 1*
-> by explicitly specifing the kernel image as it read your host kernel instead:
-> ```
-> PATH=/usr/sbin:$PATH
-> update-initramfs -c -k <real-kernel-version-as-seen-in-/boot>
-> ```
+(3) Create a mount point for `ROOT`:
 
-(3) Install firefox:
+```
+mkdir -p mnt
+```
 
-> Multi-step as it fetches the `.deb` and not `snapd`.
+(4) Mount the `root` partition:
+
+```
+mount /dev/nbd0p2 mnt
+```
+
+(5) Create a mount point for `ESP`:
+
+```
+mkdir -p mnt/efi
+```
+
+(6) Mount the `esp` partition:
+
+```
+mount /dev/nbd0p1 mnt/efi
+```
+
+(7) Chroot into the *stage 2* system:
+
+```
+arch-chroot mnt
+```
+
+#### Installation
+
+(1) Install firefox:
+
+> Multi-step as it fetches the `.deb` and not the `snapd`.
 
 * https://support.mozilla.org/en-US/kb/install-firefox-linux
 
-(4) Install docker:
+(2) Install docker:
 
 > Multi-step as it adds GPG keys and a repository.
 
 * https://docs.docker.com/engine/install/ubuntu/
 
+#### Clean up
+
+(1) Exit the chroot:
+
+```
+exit
+```
+
+(2) Umount the `esp` partition:
+
+```
+umount mnt/efi
+```
+
+(3) Umount the `root` partition:
+
+```
+umount mnt
+```
+
+(4) Disconnect the nbd:
+
+```
+qemu-nbd --disconnect /dev/nbd0
+```
 
 ### Stage 3
 
