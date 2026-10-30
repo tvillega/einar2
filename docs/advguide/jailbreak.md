@@ -1,51 +1,77 @@
 ## Jailbreak
 
 Einar2 is designed to be independent from its host by containing all of its resources inside a docker image.
-However, there will be situations where you will want to interact with the host and run commands outside the container.
+However, due to the nature of containerization it is unable to run commands outside its namespace.
 
-The Einar2 VM runs a jailbreaked container that can run arbitrary commands on the host.
-To achieve this it is necessary to escape a host shell through a named pipe.
+Unfortunately, because of limitations with X11 and XWayland this will only work under the root account (UID 0).
 
-Start by creating named pipes on the host:
+### 3-step jailbreak process
+
+#### Docker-out-of-Docker (DooD)
+
+Install `docker` and enable its systemd unit:
 
 ```
-mkfifo -m a+rw ./ch0
-mkfifo -m a+rw ./ch1
+systemctl enable --now docker
 ```
 
-Spin up a `docker-compose.yml` that bind mounts the named pipes:
+We will bind-mount its socket `/var/run/docker.sock` to the Einar2 container,
+this will allow it to manage `dockerd` through its API.
+
+#### Einar-out-of-Einar (EooE)
+
+Install `einar2-utils` and enable its systemd unit:
+
+```
+systemctl enable --now einard
+```
+
+We will bind-mount its socket `/var/run/einar2.sock` to the Einar2 container,
+this will allow it to manage `einard` through its API.
+
+#### Docker Compose
+
+Changing the entrypoint enables jailbreak mode in Einar2 settings.
 
 ```
 services:
 
-  einar2-website:   
+  einar2-jailbreak:   
     image: tvillega/einar2:latest
-    container_name: einar2-website
-    restart: always 
+    container_name: einar2-jailbreak
+    restart: always
     ports:
       - "80:80"
     volumes:
-      - ./labs:/einar2/labs
-      - type: bind    
-        source: ./ch0
-        target: /einar2/ch0
-      - type: bind
-        source: ./ch1
-        target: /einar2/ch1
-
+      - /root/Desktop/config:/einar2/config
+      - /root/Desktop/labs:/einar2/labs
+      - /var/run/docker.socket:/var/run/docker.socket:ro
+      - /var/run/einar2.socket:/var/run/einar2.socket:ro
     entrypoint: /einar2/jailbreak.sh
 ```
 
-Run the following in a host terminal:
+### einard API
 
-```
-while true; do (read -r < ch0 && exec $REPLY &> ch1); done
-```
+Open directives: 
 
-Now your jailbreaked einar2 is capable of running commands on your host machine.
+* `open::lxterminal`
+* `open::wireshark`
+* `open::featherpad`
+* `open::firefox::docs`
+* `open::firefox::labs`
+* `open::firefox::einar1`
 
-* **ch0**: handles `fd0` (standard input)
-* **ch1**: handles `fd1` and `fd2` combined (standard output + standard error output)
+System directives:
+
+* `system::os-release`
+* `system::network::dhcpcd`
+* `system::keyboard::swedish`
+* `system::keyboard::english`
+* `system::mouse::focus-click`
+* `system::mouse::focus-hover`
+* `system::session::shutdown`
+* `system::session::reboot`
+* `system::session::logout`
 
 ### Resources
 
@@ -56,3 +82,8 @@ Now your jailbreaked einar2 is capable of running commands on your host machine.
 * https://stackoverflow.com/questions/26965342/how-to-set-a-timeout-on-fopen-with-named-pipes
 * https://stackoverflow.com/questions/25249892/how-to-prevent-fopen-from-hanging-when-opening-up-a-named-pipe-in-php
 * https://www.php.net/manual/en/function.stream-set-blocking.php
+* https://unix.stackexchange.com/questions/698278/custom-location-for-systemd-services
+* https://superuser.com/questions/45342/when-should-i-use-dev-shm-and-when-should-i-use-tmp
+* https://linuxvox.com/blog/devshm-in-linux/
+* https://www.geeksforgeeks.org/operating-systems/inter-process-communication-ipc/
+* https://lours.me/posts/compose-tip-069-pid-ipc/
