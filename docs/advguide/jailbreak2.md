@@ -3,33 +3,30 @@
 Einar2 is designed to be independent from its host by containing all of its resources inside a docker image.
 However, due to the nature of containerization it is unable to run commands outside its namespace.
 
+Unfortunately, because of limitations with X11 and XWayland this will only work under the root account (UID 0).
+
 ### 3-step jailbreak process
 
 #### Docker-out-of-Docker (DooD)
 
-The first step is to bind-mount `/var/run/docker.socket` to the Einar2 container,
+Install `docker` and enable its systemd unit:
+
+```
+systemctl enable --now docker
+```
+
+We will bind-mount its socket `/var/run/docker.sock` to the Einar2 container,
 this will allow it to manage `dockerd` through its API.
 
-#### Einar Daemon
+#### Einar-out-of-Einar (EooE)
 
-The second step is to run an `einard` instance on the host system.
-
-```
-cp /opt/einar2/lib/systemd/user/einard.service $HOME/.config/systemd/user/einard.service
-```
-
-Now run it with the `--user` flag:
+Install `einar2-utils` and enable its systemd unit:
 
 ```
-systemd --user start einard
+systemctl enable --now einard
 ```
 
-This daemon is in charge of running new processes on your system, to simplify launching GUI programs
-you must run the daemon under your user to avoid conflicts with your display server.
-
-#### Einar-out-of-Einar
-
-The third step is to bind-mount `/var/run/einar.socket` to the Einar2 container,
+We will bind-mount its socket `/var/run/einar2.sock` to the Einar2 container,
 this will allow it to manage `einard` through its API.
 
 ### Docker Compose
@@ -42,13 +39,14 @@ services:
   einar2-jailbreak:   
     image: tvillega/einar2:latest
     container_name: einar2-jailbreak
-    restart: always 
+    restart: always
     ports:
       - "80:80"
     volumes:
-      - ./labs:/einar2/labs
+      - /root/Desktop/config:/einar2/config
+      - /root/Desktop/labs:/einar2/labs
       - /var/run/docker.socket:/var/run/docker.socket:ro
-      - /var/run/einar.socket:/var/run/einar.socket:ro
+      - /var/run/einar2.socket:/var/run/einar2.socket:ro
     entrypoint: /einar2/jailbreak.sh
 ```
 

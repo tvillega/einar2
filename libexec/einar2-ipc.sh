@@ -8,7 +8,7 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
-SOCKET="/tmp/einar2.sock"
+SOCKET="/var/run/einar2.sock"
 
 ipc_listener() {
 
