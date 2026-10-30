@@ -29,7 +29,7 @@ systemctl enable --now einard
 We will bind-mount its socket `/var/run/einar2.sock` to the Einar2 container,
 this will allow it to manage `einard` through its API.
 
-### Docker Compose
+#### Docker Compose
 
 Changing the entrypoint enables jailbreak mode in Einar2 settings.
 
