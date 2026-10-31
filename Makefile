@@ -36,6 +36,7 @@ install:
 
 	install -m 755 bin/einar2             $(DESTDIR)$(bindir)/einar2
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
+	install -m 755 bin/eterm              $(DESTDIR)$(bindir)/eterm
 	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
 
 	install -m 644 etc/profile.d/*        $(DESTDIR)/etc/profile.d/
@@ -62,6 +63,7 @@ uninstall:
 
 	rm -f $(DESTDIR)$(bindir)/einar2
 	rm -f $(DESTDIR)$(bindir)/einard
+	rm -f $(DESTDIR)$(bindir)/eterm
 	rm -f $(DESTDIR)$(bindir)/netns
 
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
