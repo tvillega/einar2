@@ -1,15 +1,19 @@
 #!/bin/bash
 
-LOG_FILE="/tmp/einar.log"
+LOG_FILE="/var/run/einar.log"
 
 log() {
     local ts="$(date --utc +%Y-%m-%d-%H:%M:%S)"
-    printf -- "%s %s\n" "$ts" "$1" | tee -a "$LOG_FILE"
+    printf -- "%s %s\n" "$ts" "$1" >> "$LOG_FILE"
 }
 
 launch() {
     nohup "$@" >> "/tmp/einar.log" 2>&1 &
     disown "$!" 2>/dev/null
+}
+
+response() {
+    printf -- "%s" "$1"
 }
 
 parse_namespace_open() {
@@ -19,17 +23,45 @@ parse_namespace_open() {
         lxterminal)
             launch lxterminal
             log "Terminal opened"
+            response "OK"
             ;;
         wireshark)
             launch wireshark
             log "Wireshark opened"
+            response "OK"
             ;;
         featherpad)
             launch featherpad
             log "Featherpad opened"
+            response "OK"
             ;;
         *)
             log "unknown: open::$INS"
+            response "FAILED"
+            ;;
+    esac
+}
+
+parse_namespace_docker() {
+    local INS="$1"
+    local ARG="$2"
+
+    case "$INS" in
+        list)
+            RES=$(einar2 run list $ARG)
+            response "$RES"
+            ;;
+        start)
+            RES=$(einar2 run start $ARG)
+            response "$RES"
+            ;;
+        stop)
+            RES=$(einar2 run start $ARG)
+            response "$RES"
+            ;;
+        *)
+            log "unknown: docker::$INS"
+            response "FAILED"
             ;;
     esac
 }
@@ -49,6 +81,9 @@ parse_instruction() {
             ;;
         system)
             parse_nanespace_system "${NS_INS[@]}"
+            ;;
+        docker)
+            parse_namespace_docker "${NS_INS[@]}"
             ;;
         *)
             log "unknown namespace: $INS"
