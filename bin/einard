@@ -42,6 +42,34 @@ parse_namespace_open() {
     esac
 }
 
+parse_namespace_eterm() {
+    local INS="$1" ; shift
+    local ARG="$2"
+
+    case "$INS" in
+        docker::list)
+            eterm --simple einar2 run list $ARG
+            response "DONE"
+            ;;
+        docker::start)
+            eterm --simple einar2 run start $ARG
+            response "DONE"
+            ;;
+        docker::stop)
+            eterm --simple einar2 run stop $ARG
+            response "DONE"
+            ;;
+        docker::shell)
+            eterm --simple einar2 run shell $ARG
+            response "DONE"
+            ;;
+        *)
+            log "unknown: open::$INS"
+            response "FAILED"
+            ;;
+    esac
+}
+
 parse_namespace_docker() {
     local INS="$1"
     local ARG="$2"
@@ -58,6 +86,10 @@ parse_namespace_docker() {
         stop)
             RES=$(einar2 run start $ARG)
             response "$RES"
+            ;;
+        shell)
+            eterm einar2 run shell $ARG
+            response "DONE"
             ;;
         *)
             log "unknown: docker::$INS"
@@ -78,6 +110,9 @@ parse_instruction() {
     case "$NS" in
         open)
             parse_namespace_open "${NS_INS[@]}"
+            ;;
+        eterm)
+            parse_namespace_eterm "${NS_INS[@]}"
             ;;
         system)
             parse_nanespace_system "${NS_INS[@]}"
