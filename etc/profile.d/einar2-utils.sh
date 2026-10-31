@@ -21,7 +21,7 @@ e2() {
             einar2 run stop "$@"
             ;;
         sh)
-            einar2 run shell "$@"
+            eterm einar2 run shell "$@"
             ;;
         do)
             einar2 ipc do "$@"
