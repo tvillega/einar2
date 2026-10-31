@@ -3,7 +3,7 @@
 Start by cloning the repository:
 
 ```
-git clone https://github.com/tvillega/einar2.git
+git clone https://github.com/tvillega/einar2.git $CLONEDIR
 ```
 
 Now enter the `dist/` directory before proceeding:
@@ -315,6 +315,8 @@ qemu-nbd --disconnect /dev/nbd0
 
 Creates a *stage 3* overlay that adds `einar2-utils` and configures it.
 
+#### Preparation
+
 (1) Create the `qcow2` image:
 
 ```
@@ -334,11 +336,138 @@ qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,
   -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
   -chardev spicevmc,id=spicechannel0,name=vdagent \
   -drive if=pflash,format=raw,file=einar2-uefi.fd \
-  -drive file=einar2-stage3.img,format=qcow2
+  -drive file=einar2-stage3.img,format=qcow2 \
+  -netdev user,id=net0 \
+  -device virtio-net-pci,netdev=net0
 EOF
 ```
 
-The VM will be available through `spice://localhost:5930`.
+(3) Multi-terminal environment to start development.
+
+Some commands will run in the foreground and you'll need a secondary
+terminal to continue the remaining steps.
+
+(3.1) **Terminal 1**: Enter the root directory of the project.
+
+```
+cd $CLONEDIR
+```
+
+(3.2) **Terminal 2**: Enter the `dist` directory of the project:
+
+```
+cd $CLONEDIR/dist
+```
+
+(3.3) **Terminal 3**: (Also) the `dist directory of the project:
+
+```
+cd $CLONE/dist
+```
+
+(4) **Terminal 2**: Leave the Einar2 VM instance running:
+
+> The VM will be available through `spice://localhost:5930`.
+
+```
+./einar2.sh
+```
+
+(5) **Terminal 3**: Leave a basic web server instance running:
+
+> Inside the VM, it will be accessible through `10.0.2.2:8000`.
+
+```
+python -m http.server
+```
+
+(6) **Terminal 1**: Generate an Einar2 docker image:
+
+```
+docker build -t tvillega/einar2:latest .
+```
+
+(7) **Terminal 1**: Dump the Einar2 docker image:
+
+```
+docker save tvillega/einar2:latest | gzip > dist/einar2-image.tar.gz
+```
+
+(8) **Terminal 1**: Generate an `einar2-utils` tarball:
+
+```
+make package
+```
+
+Now you'll have the following files inside `dist/`:
+
+```
+dist/
+├── einar2-image.tar.gz
+├── einar2.sh
+├── einar2-stage1.img
+├── einar2-stage2.img
+├── einar2-stage3.img
+├── einar2-uefi.fd
+├── einar2-utils.tar.gz
+└── mnt
+
+2 directories, 7 files
+```
+
+Now we will call Terminal 1 -> *Host Terminal* while Terminal 2 & 3 remain open.
+
+#### Installation
+
+(1) Enter the Einar2 VM from `spice://localhost:5930`:
+
+> The user is `root` and the password is `einar2`.
+
+(2) Fetch the `einar2-utils` package from the host:
+
+```
+curl 10.0.2.2:8000/einar2-utils.tar.gz --output ~/Desktop/einar2-utils.tar.gz
+```
+
+(3) Install `einar2-utils` on the system:
+
+> Remember to `systemctl daemon-reload` each time you do this.
+
+```
+tar -vxzf ~/Desktop/einar2-utils.tar.gz -C /
+```
+
+(4) Fetch the einar2 docker image from the host:
+
+```
+curl 10.0.2.2:8000/einar2-image.tar.gz --output ~/Desktop/einar2-image.tar.gz
+```
+
+(5) Load the einar2 docker image on the system:
+
+```
+docker load < ~/Desktop/einar2-image.tar.gz
+```
+
+(6)
+
+#### Configuration
+
+(1) Enable `dockerd` with systemd:
+
+> Should be ready, but just to be certain.
+
+```
+systemctl enable --now docker
+```
+
+(2) Enable `einard` with systemd:
+
+> Part of `einar2-utils`.
+
+```
+systemctl enable --now einard
+```
 
 <!---
 Convert the image to a VirtualBox-compatible image:
