@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mode="simple"
+mode="halt-on-error"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -16,9 +16,13 @@ while [[ $# -gt 0 ]]; do
             mode="forking"
             shift
             ;;
+        --halt-on-error)
+            mode="halt-on-error"
+            shift
+            ;;
         -*)
             echo "eterm: unknown option: $1" >&2
-            echo "usage: eterm [--oneshot|--simple|--forking] <cmd> [arg...]" >&2
+            echo "usage: eterm [--oneshot|--simple|--forking|--halt-on-error] <cmd> [arg...]" >&2
             exit 1
             ;;
         *)
@@ -28,7 +32,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ $# -eq 0 ]]; then
-    echo "usage: eterm [--oneshot|--simple|--forking] <cmd> [arg...]"
+    echo "usage: eterm [--oneshot|--simple|--forking|--halt-on-error] <cmd> [arg...]"
     exit 1
 fi
 
@@ -43,6 +47,9 @@ case "$mode" in
     forking)
         cmd="$pre_cmd ; bash -l"
         ;;
+    halt-on-error)
+        cmd="$pre_cmd || { echo -e '\n[Process halted]'; read -p 'Press Enter to close terminal...'; }"
+        ;;
 esac
 
-lxterminal -e "$cmd"
+lxterminal -e "$cmd" &
