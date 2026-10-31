@@ -6,6 +6,7 @@ RUN apk add --no-cache \
       nano \
       tmux \
       curl \
+      socat \
       iproute2 \
       php85 \
       tcpdump \
