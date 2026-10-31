@@ -1,0 +1,48 @@
+#!/bin/bash
+
+mode="simple"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --oneshot)
+            mode="oneshot"
+            shift
+            ;;
+        --simple)
+            mode="simple"
+            shift
+            ;;
+        --forking)
+            mode="forking"
+            shift
+            ;;
+        -*)
+            echo "eterm: unknown option: $1" >&2
+            echo "usage: eterm [--oneshot|--simple|--forking] <cmd> [arg...]" >&2
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [[ $# -eq 0 ]]; then
+    echo "usage: eterm [--oneshot|--simple|--forking] <cmd> [arg...]"
+    exit 1
+fi
+
+pre_cmd="$*"
+case "$mode" in
+    oneshot)
+        cmd="$pre_cmd"
+        ;;
+    simple)
+        cmd="$pre_cmd ; echo -e '\n[Process completed]'; read -p 'Press Enter to close terminal...'"
+        ;;
+    forking)
+        cmd="$pre_cmd ; bash -l"
+        ;;
+esac
+
+lxterminal -e "$cmd"
