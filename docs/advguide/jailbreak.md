@@ -45,8 +45,8 @@ services:
     volumes:
       - /root/Desktop/config:/einar2/config
       - /root/Desktop/labs:/einar2/labs
-      - /var/run/docker.socket:/var/run/docker.socket:ro
-      - /var/run/einar2.socket:/var/run/einar2.socket:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/einar2.sock:/var/run/einar2.sock:ro
     entrypoint: /einar2/jailbreak.sh
 ```
 
