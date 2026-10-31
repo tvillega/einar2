@@ -160,7 +160,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Terminal<span></p>
                     <?php else: ?>
-                        <p><a href="/startprogram.php?program=lxterminal">Terminal</a></p>
+                        <p><a href="/startprogram.php?program=open::lxterminal">Terminal</a></p>
                     <?php endif; ?>
 
                 </div>
@@ -177,7 +177,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Wireshark<span></p>
                     <?php else: ?>
-                        <p><a href="/startprogram.php?program=wireshark">Wireshark</a></p>
+                        <p><a href="/startprogram.php?program=open::wireshark">Wireshark</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;"> 
@@ -193,7 +193,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Featherpad<span></p>
                     <?php else: ?>
-                        <p><a href="/startprogram.php?program=featherpad">Featherpad</a></p>
+                        <p><a href="/startprogram.php?program=open::featherpad">Featherpad</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
