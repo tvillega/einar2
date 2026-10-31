@@ -1,0 +1,14 @@
+services:
+
+  einar2-webui:
+    image: tvillega/einar2:latest
+    container_name: einar2-webui
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - /root/Desktop/config:/einar2/config
+      - /root/Desktop/labs:/einar2/labs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/einar2.sock:/var/run/einar2.sock:ro
+    entrypoint: /einar2/jailbreak.sh
