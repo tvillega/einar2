@@ -14,7 +14,7 @@ systemdsysdir    = $(prefix)/lib/systemd/system
 
 SHELL := /bin/bash
 
-.PHONY: all install uninstall package
+.PHONY: all install uninstall package image
 
 all:
 	@echo "Ready to install."
@@ -83,3 +83,11 @@ package:
 	rm -rf ./dist/temp-pkg
 
 	@echo "Package ready: ./dist/einar2-utils.tar.gz"
+
+image:
+	@echo "Building image..."
+
+	rm -f ./dist/einar2-image.tar.gz
+	docker build -t tvillega/einar2:latest .
+	docker save tvillega/einar2:latest | gzip > dist/einar2-image.tar.gz.
+	@echo "Image ready: ./dist/einar2-image.tar.gz"
