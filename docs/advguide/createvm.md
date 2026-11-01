@@ -342,58 +342,19 @@ qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,
 EOF
 ```
 
-(3) Multi-terminal environment to start development.
-
-Some commands will run in the foreground and you'll need a secondary
-terminal to continue the remaining steps.
-
-(3.1) **Terminal 1**: Enter the root directory of the project.
+(3) Enter the root directory of the project.
 
 ```
 cd $CLONEDIR
 ```
 
-(3.2) **Terminal 2**: Enter the `dist` directory of the project:
+(4) Generate an Einar2 docker image:
 
 ```
-cd $CLONEDIR/dist
+make image
 ```
 
-(3.3) **Terminal 3**: (Also) the `dist directory of the project:
-
-```
-cd $CLONE/dist
-```
-
-(4) **Terminal 2**: Leave the Einar2 VM instance running:
-
-> The VM will be available through `spice://localhost:5930`.
-
-```
-./einar2.sh
-```
-
-(5) **Terminal 3**: Leave a basic web server instance running:
-
-> Inside the VM, it will be accessible through `10.0.2.2:8000`.
-
-```
-python -m http.server
-```
-
-(6) **Terminal 1**: Generate an Einar2 docker image:
-
-```
-docker build -t tvillega/einar2:latest .
-```
-
-(7) **Terminal 1**: Dump the Einar2 docker image:
-
-```
-docker save tvillega/einar2:latest | gzip > dist/einar2-image.tar.gz
-```
-
-(8) **Terminal 1**: Generate an `einar2-utils` tarball:
+(5) Generate an `einar2-utils` tarball:
 
 ```
 make package
@@ -415,7 +376,21 @@ dist/
 2 directories, 7 files
 ```
 
-Now we will call Terminal 1 -> *Host Terminal* while Terminal 2 & 3 remain open.
+(4) Leave the Einar2 VM instance running in the background:
+
+> The VM will be available through `spice://localhost:5930`.
+
+```
+./dist/einar2.sh &
+```
+
+(5) Leave a basic web server instance running:
+
+> It will be accessible inside the VM through `10.0.2.2:8000`.
+
+```
+python -m http.server
+```
 
 #### Installation
 
@@ -448,8 +423,6 @@ curl 10.0.2.2:8000/einar2-image.tar.gz --output ~/Desktop/einar2-image.tar.gz
 ```
 docker load < ~/Desktop/einar2-image.tar.gz
 ```
-
-(6)
 
 #### Configuration
 
