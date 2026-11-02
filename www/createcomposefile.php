@@ -66,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $archetypeJoinNetworkString      = stripComments(file_get_contents($archetypeJoinNetworkPath));
   $archetypeNetworkBridgeString    = stripComments(file_get_contents($archetypeNetworkBridgePath));
 
+  $archetypeComposeServicesString = str_replace('{{ LabName }}', $labData['lab_name'], $archetypeComposeServicesString);
+
   file_put_contents($outputComposeServicesFile, $archetypeComposeServicesString);
   file_put_contents($outputComposeNetworksFile, $archetypeComposeNetworksString);
 
