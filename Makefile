@@ -48,6 +48,7 @@ install:
 
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
 	install -m 644 share/compose.yml      $(DESTDIR)$(datadir)/
+	install -m 644 share/wallpaper.jpg    $(DESTDIR)$(datadir)/
 	install -m 644 share/defaults.conf    $(DESTDIR)$(datadir)/
 	install -m 755 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
 
