@@ -442,14 +442,55 @@ systemctl enable --now docker
 systemctl enable --now einard
 ```
 
-<!---
-Convert the image to a VirtualBox-compatible image:
+(3) Enable autologin
+
+1. Create group `autologin`
+2. Add root to `autologin` group
+3. Remove `user != root` condition for lightdm in `/etc/pam.d`
+
+(4) Trim all empty space to shrink the release image:
+
+> This must always be the last step after you finish configurations.
 
 ```
-qemu-img convert -f qcow2 -O vdi einar2.img einar2.vdi
+fstrim -av
 ```
 
--->
+#### Distribution
+
+(1) Create a release image from the stage3 image:
+
+> This will merge all overlays on the final image.
+
+```
+qemu-img convert -O einar2-stage3.img einar2-<tag>.img
+```
+
+(2) Create a compressed version of the image:
+
+> This is for archiving purposes only.
+
+```
+qemu-img convert -p -m 8 -O qcow2 -c -o compression_type=zstd,cluster_size=64k einar2-stage3.img einar2-<tag>_compressed.img
+```
+
+(3) Create a **Virtual Box compatible** disk:
+
+> This is not a full VM, only the disk to create it.
+
+```
+qemu-img convert -p -m 8 -O vdi einar2-<tag>.img einar2-<tag>.vdi
+```
+
+(4) Continue configuration on Virtual Box:
+
+1. Enable UEFI and **disable** secure boot.
+2. Set 2GB of RAM and 2 cores (it doesn't need more).
+3. Install the Guest Additions from the ISO for better integration.
+  a. You'll need to install `bzip2`, `gcc`, `make` and `perl` I think.
+4. Export the whole VM to a `einar2-<tag>.ova`.
+
+The final image is about `2.3GB`.
 
 ### Resources
 
