@@ -61,6 +61,7 @@ install:
 	install -m 644 lib/systemd/system/einard.service                 $(DESTDIR)$(systemdsysdir)/einard.service
 
 	install -m 644 etc/xdg/autostart/einar2-webui.desktop            $(DESTDIR)/etc/xdg/autostart/einar2-webui.desktop
+	install -m 644 etc/xdg/autostart/poke-docker.desktop             $(DESTDIR)/etc/xdg/autostart/poke-docker.desktop
 
 	# Patch paths on executables
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
@@ -79,6 +80,7 @@ uninstall:
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
 	rm -f $(DESTDIR)$(systemdsysdir)/einard.service
 	rm -f $(DESTDIR)/etc/xdg/autostart/einar2-webui.desktop
+	rm -f $(DESTDIR)/etc/xdg/autostart/poke-docker.desktop
 
 	rm -rf $(DESTDIR)$(libdir)
 	rm -rf $(DESTDIR)$(datadir)
