@@ -12,7 +12,7 @@ runstatedir      = $(localstatedir)/run
 docdir           = $(datarootdir)/doc/$(pkgname)
 
 systemdsysdir    = $(prefix)/lib/systemd/system
-dockerovrdir     = $(prefix)/etc/systemd/system/docker.service.d
+dockerovrdir     = /etc/systemd/system/docker.service.d
 
 SHELL := /bin/bash
 
