@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Poke Docker
+Comment=I don't know why the webui doesn't work otherwise
+Exec=eterm --oneshot docker ps
+X-GNOME-Autostart-enabled=true
