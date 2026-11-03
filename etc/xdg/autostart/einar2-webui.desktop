@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Einar2 WebUI
+Comment=Main interface to interact with Einar2
+Exec=firefox --new-window http://localhost
+Categories=Network;WebBrowser;
+X-GNOME-Autostart-enabled=true

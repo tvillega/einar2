@@ -34,6 +34,7 @@ install:
 	install -d $(DESTDIR)$(dockerovrdir)
 
 	install -d $(DESTDIR)/etc/profile.d
+	install -d $(DESTDIR)/etc/xdg/autostart
 	install -d $(DESTDIR)$(datadir)/archetypes
 	install -d $(DESTDIR)$(datadir)/hooks
 	install -d $(DESTDIR)$(docdir)/advguide
@@ -58,6 +59,8 @@ install:
 	install -m 644 etc/systemd/system/docker.service.d/override.conf $(DESTDIR)$(dockerovrdir)/override.conf
 	install -m 644 lib/systemd/system/einard.service                 $(DESTDIR)$(systemdsysdir)/einard.service
 
+	install -m 644 etc/xdg/autostart/einar2-webui.desktop            $(DESTDIR)/etc/xdg/autostart/einar2-webui.desktop
+
 	# Patch paths on executables
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
@@ -74,6 +77,7 @@ uninstall:
 	rm -f $(DESTDIR)$(dockerovrdir)/override.conf
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
 	rm -f $(DESTDIR)$(systemdsysdir)/einard.service
+	rm -f $(DESTDIR)/etc/xdg/autostart/einar2-webui.desktop
 
 	rm -rf $(DESTDIR)$(libdir)
 	rm -rf $(DESTDIR)$(datadir)
@@ -96,5 +100,5 @@ image:
 
 	rm -f ./dist/einar2-image.tar.gz
 	docker build -t tvillega/einar2:latest .
-	docker save tvillega/einar2:latest | gzip > dist/einar2-image.tar.gz.
+	docker save tvillega/einar2:latest | gzip > dist/einar2-image.tar.gz
 	@echo "Image ready: ./dist/einar2-image.tar.gz"
