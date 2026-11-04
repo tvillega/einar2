@@ -35,6 +35,9 @@ install:
 
 	install -d $(DESTDIR)/etc/profile.d
 	install -d $(DESTDIR)/etc/xdg/autostart
+	install -d $(DESTDIR)/etc/lightdm/lightdm.conf.d
+	install -d $(DESTDIR)/etc/pam.d
+
 	install -d $(DESTDIR)$(datadir)/archetypes
 	install -d $(DESTDIR)$(datadir)/hooks
 	install -d $(DESTDIR)$(docdir)/advguide
@@ -43,8 +46,6 @@ install:
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
 	install -m 755 bin/eterm              $(DESTDIR)$(bindir)/eterm
 	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
-
-	install -m 644 etc/profile.d/*        $(DESTDIR)/etc/profile.d/
 
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
 	install -m 644 share/compose.yml      $(DESTDIR)$(datadir)/
@@ -56,6 +57,10 @@ install:
 
 	install -m 644 docs/*.md              $(DESTDIR)$(docdir)/
 	install -m 644 docs/advguide/*.md     $(DESTDIR)$(docdir)/advguide/
+
+	install -m 644 etc/profile.d/*                                   $(DESTDIR)/etc/profile.d/
+	install -m 644 etc/lightdm/lightdm.conf.d/einar2.conf            $(DESTDIR)/etc/lightdm/lightdm.conf.d/einar2.conf
+	install -m 644 etc/pam.d/lightdm-autologin                       $(DESTDIR)/etc/pam.d/lightdm-autologin
 
 	install -m 644 etc/systemd/system/docker.service.d/override.conf $(DESTDIR)$(dockerovrdir)/override.conf
 	install -m 644 lib/systemd/system/einard.service                 $(DESTDIR)$(systemdsysdir)/einard.service
@@ -78,6 +83,7 @@ uninstall:
 
 	rm -f $(DESTDIR)$(dockerovrdir)/override.conf
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
+	rm -f $(DESTDIR)/etc/lightdm/lightdm.conf.d/einar2.conf
 	rm -f $(DESTDIR)$(systemdsysdir)/einard.service
 	rm -f $(DESTDIR)/etc/xdg/autostart/einar2-webui.desktop
 	rm -f $(DESTDIR)/etc/xdg/autostart/poke-docker.desktop
