@@ -19,7 +19,7 @@ and re-built starting from a previous one.
 
 ### Stage 1
 
-Creates a *stage 1* overlay with a minimal Ubuntu LXDE.
+Creates a *stage 1* overlay of a minimal Ubuntu.
 
 #### Virtual disk
 
@@ -94,128 +94,28 @@ mkdir -p mnt/efi
 mount /dev/nbd0p1 mnt/efi
 ```
 
-#### Installation
 
-(1) Debootstrap an Ubuntu LTS:
+(7) Debootstrap an Ubuntu LTS:
 
 ```
 debootstrap resolute mnt https://mirror.hnd.cl/ubuntu/
 ```
 
-(2) Block installation of unnecessary packages:
-
-```
-cat > mnt/etc/apt/preferences.d/ignored-packages << EOF
-Package: grub-common grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists
-Pin: release *
-Pin-Priority: -1
-
-Package: snapd cloud-init landscape-common popularity-contest ubuntu-advantage-tools
-Pin: release *
-Pin-Priority: -1
-EOF
-```
-
-(3) Add repositories:
-
-```
-cat > mnt/etc/apt/sources.list << EOF
-deb https://mirror.hnd.cl/ubuntu/ resolute           main restricted universe
-deb https://mirror.hnd.cl/ubuntu/ resolute-security  main restricted universe
-deb https://mirror.hnd.cl/ubuntu/ resolute-updates   main restricted universe
-EOF
-```
-
-(4) Enable creation of symlinks for `initrd` and `vmlinuz`:
-
-```
-cat > mnt/etc/kernel-img.conf << EOF
-do_symlinks   = yes
-do_bootloader = no
-EOF
-```
-
-(5) Update filesystem table:
-
-```
-genfstab -U mnt >> mnt/etc/fstab
-```
-
-(6) Add kernel parameter for bootloader:
-
-```
-cat > mnt/etc/kernel/cmdline << EOF
-root=UUID=<nbd0p2-uuid>
-EOF
-```
-
-#### Configuration
-
-(1) Chroot into the new system:
-
-```
-arch-chroot mnt
-```
-
-(2) Populate the local repositories and update the system packages:
-
-```
-apt update && apt upgrade -y
-```
-
-(3) Install essential packages for a proper Einar2 VM:
-
-```
-apt install -y \
-  linux-{,image-,headers-}virtual \
-  initramfs-tools \
-  systemd-boot \
-  dhcpcd \
-  nano \
-  zstd \
-  wireshark \
-  dnsutils \
-  tcpdump \
-  ncat \
-  socat \
-  nmap \
-  hping3 \
-  lxde-core
-```
-
-(4) Set a hostname:
-
-```
-echo "einar2" > /etc/hostname && echo "127.0.1.1 einar2" >> /etc/hosts
-```
-
-(5) Set `root` password as `einar2`:
-
-```
-passwd
-```
-
 #### Clean up
 
-(1) Exit the chroot.
-
-```
-exit
-```
-
-(2) Umount the `esp` partition:
+(1) Umount the `esp` partition:
 
 ```
 umount mnt/efi
 ```
 
-(3) Umount the `root` partition:
+(2) Umount the `root` partition:
 
 ```
 umount mnt
 ```
 
-(4) Disconnect the nbd:
+(3) Disconnect the nbd:
 
 ```
 qemu-nbd --disconnect /dev/nbd0
@@ -223,7 +123,7 @@ qemu-nbd --disconnect /dev/nbd0
 
 ### Stage 2
 
-Creates a *stage 2* overlay that adds `docker` & `firefox`.
+Creates a *stage 2* overlay with required packages.
 
 #### Preparation
 
@@ -265,25 +165,112 @@ mkdir -p mnt/efi
 mount /dev/nbd0p1 mnt/efi
 ```
 
-(7) Chroot into the *stage 2* system:
+#### Configuration
+
+(1) Block installation of unnecessary packages:
+
+```
+cat > mnt/etc/apt/preferences.d/ignored-packages << EOF
+Package: grub-common grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists
+Pin: release *
+Pin-Priority: -1
+
+Package: snapd cloud-init landscape-common popularity-contest ubuntu-advantage-tools
+Pin: release *
+Pin-Priority: -1
+EOF
+```
+
+(2) Add repositories:
+
+```
+cat > mnt/etc/apt/sources.list << EOF
+deb https://mirror.hnd.cl/ubuntu/ resolute           main restricted universe
+deb https://mirror.hnd.cl/ubuntu/ resolute-security  main restricted universe
+deb https://mirror.hnd.cl/ubuntu/ resolute-updates   main restricted universe
+EOF
+```
+
+(3) Enable creation of symlinks for `initrd` and `vmlinuz`:
+
+```
+cat > mnt/etc/kernel-img.conf << EOF
+do_symlinks   = yes
+do_bootloader = no
+EOF
+```
+
+(4) Update filesystem table:
+
+```
+genfstab -U mnt >> mnt/etc/fstab
+```
+
+(5) Add kernel parameter for bootloader:
+
+```
+cat > mnt/etc/kernel/cmdline << EOF
+root=UUID=<nbd0p2-uuid>
+EOF
+```
+
+#### Installation
+
+(1) Chroot into the new system:
 
 ```
 arch-chroot mnt
 ```
 
-#### Installation
+(2) Populate the local repositories and update the system packages:
 
-(1) Install firefox:
+```
+apt update && apt upgrade -y
+```
+
+(3) Install essential packages:
+
+```
+apt install -y \
+  linux-{,image-,headers-}virtual \
+  initramfs-tools \
+  systemd-boot \
+  dhcpcd \
+  nano \
+  zstd \
+  wireshark \
+  dnsutils \
+  tcpdump \
+  ncat \
+  socat \
+  nmap \
+  hping3 \
+  lxde-core
+```
+
+(4) Install firefox:
 
 > Multi-step as it fetches the `.deb` and not the `snapd`.
 
 * https://support.mozilla.org/en-US/kb/install-firefox-linux
 
-(2) Install docker:
+(5) Install docker:
 
 > Multi-step as it adds GPG keys and a repository.
 
 * https://docs.docker.com/engine/install/ubuntu/
+
+(6) Set a hostname:
+
+```
+echo "einar2" > /etc/hostname && echo "127.0.1.1 einar2" >> /etc/hosts
+```
+
+(5) Set `root` password as `einar2`:
+
+```
+passwd
+```
 
 #### Clean up
 
@@ -348,16 +335,16 @@ EOF
 cd $CLONEDIR
 ```
 
-(4) Generate an Einar2 docker image:
-
-```
-make image
-```
-
-(5) Generate an `einar2-utils` tarball:
+(4) Generate an `einar2-utils` tarball:
 
 ```
 make package
+```
+
+(5) Generate an Einar2 docker image:
+
+```
+make image
 ```
 
 Now you'll have the following files inside `dist/`:
@@ -381,7 +368,7 @@ dist/
 > The VM will be available through `spice://localhost:5930`.
 
 ```
-./dist/einar2.sh &
+cd dist && einar2.sh &
 ```
 
 (5) Leave a basic web server instance running:
@@ -442,19 +429,29 @@ systemctl enable --now docker
 systemctl enable --now einard
 ```
 
-(3) Enable autologin
+(3) Create `autologin` group
 
-1. Create group `autologin`
-2. Add root to `autologin` group
-3. Remove `user != root` condition for lightdm in `/etc/pam.d`
+```
+groupadd -r autologin
+```
 
-(4) Trim all empty space to shrink the release image:
+(4) Add `root` user to `autologin` group:
+
+```
+gpasswd -a username autologin
+```
+
+(5) Do all your customizations in this step.
+
+(6) Trim all empty space to shrink the release image:
 
 > This must always be the last step after you finish configurations.
 
 ```
 fstrim -av
 ```
+
+(7) Shut down the VM.
 
 #### Distribution
 
