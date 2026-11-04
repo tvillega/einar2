@@ -300,7 +300,7 @@ qemu-nbd --disconnect /dev/nbd0
 
 ### Stage 3
 
-Creates a *stage 3* overlay that adds `einar2-utils` and configures it.
+Creates a *stage 3* overlay that adds and setups `einar2-utils`.
 
 #### Preparation
 
@@ -363,19 +363,21 @@ dist/
 2 directories, 7 files
 ```
 
-(4) Leave the Einar2 VM instance running in the background:
+(4) Start an Einar2 VM instance on another terminal:
 
 > The VM will be available through `spice://localhost:5930`.
 
 ```
-cd dist && einar2.sh &
+cd $CLONEDIR/dist
+einar2.sh
 ```
 
-(5) Leave a basic web server instance running:
+(5) Start a basic web server on another terminal:
 
 > It will be accessible inside the VM through `10.0.2.2:8000`.
 
 ```
+cd $CLONEDIR/dist
 python -m http.server
 ```
 
@@ -453,6 +455,10 @@ fstrim -av
 
 (7) Shut down the VM.
 
+### Stage 4
+
+This stage creates a ready-to-use VM to export.
+
 #### Distribution
 
 (1) Create a release image from the stage3 image:
@@ -460,26 +466,18 @@ fstrim -av
 > This will merge all overlays on the final image.
 
 ```
-qemu-img convert -O einar2-stage3.img einar2-<tag>.img
+qemu-img convert -p -m 8 -O qcow2 -c -o compression_type=zstd,cluster_size=64k einar2-stage3.img einar2-$TAG.img
 ```
 
-(2) Create a compressed version of the image:
-
-> This is for archiving purposes only.
-
-```
-qemu-img convert -p -m 8 -O qcow2 -c -o compression_type=zstd,cluster_size=64k einar2-stage3.img einar2-<tag>_compressed.img
-```
-
-(3) Create a **Virtual Box compatible** disk:
+(2) Create a **Virtual Box compatible** disk:
 
 > This is not a full VM, only the disk to create it.
 
 ```
-qemu-img convert -p -m 8 -O vdi einar2-<tag>.img einar2-<tag>.vdi
+qemu-img convert -p -m 8 -O vdi einar2-$TAG.img einar2-$TAG.vdi
 ```
 
-(4) Continue configuration on Virtual Box:
+(3) Continue configuration on Virtual Box:
 
 1. Enable UEFI and **disable** secure boot.
 2. Set 2GB of RAM and 2 cores (it doesn't need more).
