@@ -1,18 +1,20 @@
-.PHONY: stage2 stage2-disk stage2-mount stage2-config stage2-apt-firefox stage2-apt-docker stage2-apt stage2-install stage2-umount
+.PHONY: stage2 stage2-disk stage2-mount stage2-config stage2-apt-firefox stage2-apt-docker stage2-apt stage2-install stage2-readonly stage2-umount
 
 stage2:
 	@echo "==> Starting Stage 2 VM build process..."
-	@echo "==> [1/6] Creating Stage 2 overlay disk..."
+	@echo "==> [1/7] Creating Stage 2 overlay disk..."
 	@$(MAKE) stage2-disk
-	@echo "==> [2/6] Mounting filesystems..."
+	@echo "==> [2/7] Mounting filesystems..."
 	@$(MAKE) stage2-mount
-	@echo "==> [3/6] Writing system configurations..."
+	@echo "==> [3/7] Writing system configurations..."
 	@$(MAKE) stage2-config
-	@echo "==> [4/6] Setting up external APT repositories..."
+	@echo "==> [4/7] Setting up external APT repositories..."
 	@$(MAKE) stage2-apt
-	@echo "==> [5/6] Running package installation and chroot setup..."
+	@echo "==> [5/7] Running package installation and chroot setup..."
 	@$(MAKE) stage2-install
-	@echo "==> [6/6] Unmounting and cleaning up..."
+	@echo "==> [6/7] Setting image as read-only..."
+	@$(MAKE) stage2-readonly
+	@echo "==> [7/7] Unmounting and cleaning up..."
 	@$(MAKE) stage2-umount
 	@echo "==> Stage 2 completed successfully: dist/einar2-stage2.img is ready."
 
@@ -142,6 +144,17 @@ echo "  -> Setting root password..."
 echo "root:einar2" | chpasswd
 EOF
 	echo "==> Package installation and chroot setup completed."
+
+stage2-readonly:
+	@set -e; \
+	if [ -f dist/einar2-stage2.img ]; then \
+		echo "  -> Removing write permissions..."; \
+		chmod -w dist/einar2-stage2.img; \
+		echo "==> Base image successfully locked."; \
+	else \
+		echo "==> ERROR: Image file not found." >&2; \
+		exit 1; \
+	fi
 
 stage2-umount:
 	@set -e; \

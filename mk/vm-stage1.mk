@@ -1,13 +1,15 @@
-.PHONY: stage1 stage1-disk stage1-filesystem stage1-mount stage1-bootstrap stage1-umount
+.PHONY: stage1 stage1-disk stage1-filesystem stage1-mount stage1-bootstrap stage1-readonly stage1-umount
 
 stage1:
 	@echo "==> Starting Stage 1 VM build process..."
-	@echo "==> [1/3] Virtual disk setup..."
+	@echo "==> [1/4] Virtual disk setup..."
 	@$(MAKE) stage1-disk
-	@echo "==> [2/3] Formatting filesystems..."
+	@echo "==> [2/4] Formatting filesystems..."
 	@$(MAKE) stage1-filesystem
-	@echo "==> [3/3] Running bootstrap..."
+	@echo "==> [3/4] Running bootstrap..."
 	@$(MAKE) stage1-bootstrap
+	@echo "==> [4/4] Setting image as read-only..."
+	@$(MAKE) stage1-readonly
 	@echo "==> Stage 1 completed successfully: dist/einar2-stage1.img is ready."
 
 stage1-disk:
@@ -68,6 +70,17 @@ stage1-bootstrap:
 	debootstrap resolute dist/mnt https://mirror.hnd.cl/ubuntu/; \
 	echo "==> Bootstrap completed successfully."; \
 	$(MAKE) stage1-umount
+
+stage1-readonly:
+	@set -e; \
+	if [ -f dist/einar2-stage1.img ]; then \
+		echo "  -> Removing write permissions..."; \
+		chmod -w dist/einar2-stage1.img; \
+		echo "==> Base image successfully locked."; \
+	else \
+		echo "==> ERROR: Image file not found." >&2; \
+		exit 1; \
+	fi
 
 stage1-umount:
 	@set -e; \
