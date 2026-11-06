@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/bin/sh
+
+set -eu
+IFS='
+	'
 
 echo "WARNING: Einar2 is jailbreaked and has shell access to your host system"
 
