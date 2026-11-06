@@ -27,11 +27,11 @@ stage1-disk:
 	echo "  -> Connecting image to /dev/nbd0..."; \
 	qemu-nbd --connect=/dev/nbd0 dist/einar2-stage1.img; \
 	echo "  -> Partitioning disk with sfdisk..."; \
-	sfdisk /dev/nbd0 <<EOF; \
-label: gpt
-size=300M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B
-type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
-EOF
+	{ \
+		printf "label: gpt\n"; \
+		printf "size=300M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B\n"; \
+		printf "type=0FC63DAF-8483-4772-8E79-3D69D8477DE4\n"; \
+	} | sfdisk /dev/nbd0; \
 	echo "  -> Disconnecting NBD after partitioning..."; \
 	qemu-nbd --disconnect /dev/nbd0; \
 	echo "==> Disk and partition setup completed."

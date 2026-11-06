@@ -52,10 +52,10 @@ stage2-config:
 	@set -e; \
 	trap 'echo "==> ERROR: Configuration failed."; exit 1' ERR; \
 	echo "  -> Configuring initrd and vmlinuz symlink rules..."; \
-	cat > dist/mnt/etc/kernel-img.conf << 'EOF'; \
-do_symlinks   = yes
-do_bootloader = no
-EOF
+	{ \
+		printf "do_symlinks   = yes\n"; \
+		printf "do_bootloader = no\n"; \
+	} > dist/mnt/etc/kernel-img.conf; \
 	echo "  -> Generating filesystem table (fstab)..."; \
 	genfstab -U dist/mnt >> dist/mnt/etc/fstab; \
 	echo "  -> Capturing root partition UUID for kernel command line..."; \
@@ -89,21 +89,20 @@ stage2-apt:
 	@set -e; \
 	echo "  -> Blocking unnecessary packages via apt preferences..."; \
 	mkdir -p dist/mnt/etc/apt/preferences.d; \
-	cat > dist/mnt/etc/apt/preferences.d/ignored-packages << 'EOF'; \
-Package: grub-common grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists
-Pin: release *
-Pin-Priority: -1
-
-Package: snapd cloud-init landscape-common popularity-contest ubuntu-advantage-tools
-Pin: release *
-Pin-Priority: -1
-EOF
+	{ \
+		printf "Package: grub-common grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists\n"; \
+		printf "Pin: release *\n"; \
+		printf "Pin-Priority: -1\n\n"; \
+		printf "Package: snapd cloud-init landscape-common popularity-contest ubuntu-advantage-tools\n"; \
+		printf "Pin: release *\n"; \
+		printf "Pin-Priority: -1\n"; \
+	} > dist/mnt/etc/apt/preferences.d/ignored-packages; \
 	echo "  -> Adding base Ubuntu apt repositories..."; \
-	cat > dist/mnt/etc/apt/sources.list << 'EOF'; \
-deb https://mirror.hnd.cl/ubuntu/ resolute        main restricted universe
-deb https://mirror.hnd.cl/ubuntu/ resolute-security   main restricted universe
-deb https://mirror.hnd.cl/ubuntu/ resolute-updates    main restricted universe
-EOF
+	{ \
+		printf "deb https://mirror.hnd.cl/ubuntu/ resolute        main restricted universe\n"; \
+		printf "deb https://mirror.hnd.cl/ubuntu/ resolute-security   main restricted universe\n"; \
+		printf "deb https://mirror.hnd.cl/ubuntu/ resolute-updates    main restricted universe\n"; \
+	} > dist/mnt/etc/apt/sources.list; \
 	@$(MAKE) stage2-apt-firefox; \
 	@$(MAKE) stage2-apt-docker; \
 	echo "==> All APT repositories and preferences configured."
@@ -112,37 +111,35 @@ stage2-install:
 	@set -e; \
 	trap 'echo "==> ERROR: Installation/Chroot step failed."; exit 1' ERR; \
 	echo "  -> Entering chroot and updating system packages..."; \
-	arch-chroot dist/mnt bash -s << 'EOF'; \
-export DEBIAN_FRONTEND=noninteractive
-apt update && apt upgrade -y
-
-echo "  -> Installing essential system and utility packages..."
-apt install -y \
-  linux-image-virtual \
-  linux-headers-virtual \
-  initramfs-tools \
-  systemd-boot \
-  dhcpcd \
-  nano \
-  zstd \
-  wireshark \
-  dnsutils \
-  tcpdump \
-  ncat \
-  socat \
-  nmap \
-  hping3 \
-  lxde-core \
-  firefox \
-  docker-ce \
-  docker-ce-cli \
-  containerd.io \
-  docker-buildx-plugin \
-  docker-compose-plugin
-
-echo "  -> Setting root password..."
-echo "root:einar2" | chpasswd
-EOF
+	{ \
+		printf "export DEBIAN_FRONTEND=noninteractive\n"; \
+		printf "apt update && apt upgrade -y\n\n"; \
+		printf "echo \"  -> Installing essential system and utility packages...\"\n"; \
+		printf "apt install -y \\\n"; \
+		printf "  linux-image-virtual \\\n"; \
+		printf "  linux-headers-virtual \\\n"; \
+		printf "  initramfs-tools \\\n"; \
+		printf "  systemd-boot \\\n"; \
+		printf "  dhcpcd \\\n"; \
+		printf "  nano \\\n"; \
+		printf "  zstd \\\n"; \
+		printf "  wireshark \\\n"; \
+		printf "  dnsutils \\\n"; \
+		printf "  tcpdump \\\n"; \
+		printf "  ncat \\\n"; \
+		printf "  socat \\\n"; \
+		printf "  nmap \\\n"; \
+		printf "  hping3 \\\n"; \
+		printf "  lxde-core \\\n"; \
+		printf "  firefox \\\n"; \
+		printf "  docker-ce \\\n"; \
+		printf "  docker-ce-cli \\\n"; \
+		printf "  containerd.io \\\n"; \
+		printf "  docker-buildx-plugin \\\n"; \
+		printf "  docker-compose-plugin\n\n"; \
+		printf "echo \"  -> Setting root password...\"\n"; \
+		printf "echo \"root:einar2\" | chpasswd\n"; \
+	} | arch-chroot dist/mnt bash -s; \
 	echo "==> Package installation and chroot setup completed."
 
 stage2-readonly:
