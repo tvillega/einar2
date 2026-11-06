@@ -1,100 +1,65 @@
-#!/bin/bash
+#!/bin/sh
 
 # Find docker netns list /run/docker/netns
 # and append it to system netns list /run/netns
 
 cmd_attach() {
+    echo "-> ip net list"
+    ip net list
 
-  echo "-> ip net list"
-  ip net list
+    echo ":: Attaching einar2 docker containers"
 
-  echo ":: Getting docker container names"
+    for c in $(docker ps --format '{{.Names}}'); do
+        case "$c" in
+            e2-*)
+                P=$(docker inspect --format '{{ .State.Pid }}' "$c" 2>/dev/null)
+                if [ -n "$P" ] && [ "$P" != "0" ]; then
+                    echo "$c -> $P"
+                    ip netns attach "$c" "$P"
+                else
+                    echo "Warning: Could not get valid PID for $c" >&2
+                fi
+                ;;
+        esac
+    done
 
-  ALL_CONTAINERS=( $( docker ps --format "table {{ .Names }}") )
-
-  CONTAINERS=( )
-  for k in "${!ALL_CONTAINERS[@]}" ; do
-    c="${ALL_CONTAINERS[$k]}"
-    if [[ "${c:0:3}" == "e2-" ]] ; then
-      CONTAINERS+=("$c")
-      echo $c
-    fi
-  done
-
-  echo ":: Getting docker containers PIDs"
-
-  PIDS=()
-  for k in "${!CONTAINERS[@]}" ; do
-    P=( $(docker inspect --format '{{ .State.Pid }}' "${CONTAINERS[$k]}") )
-    PIDS+=( $P )
-    echo "$c -> $P"
-  done
-
-  echo ":: Attaching to docker network namespaces"
-
-  for k in "${!CONTAINERS[@]}" ; do
-    ip netns attach "${CONTAINERS[$k]}" "${PIDS[$k]}"
-  done
-
-  echo "-> ip net list"
-  ip net list
-
+    echo "-> ip net list"
+    ip net list
 }
 
 # Find docker netns under /run/nets
 # and delete them from the system
 
 cmd_detach() {
+    echo "-> ip net list"
+    ip net list
 
-  echo "-> ip net list"
-  ip net list
+    echo ":: Detaching einar2 docker containers"
 
-  echo ":: Getting docker container names"
+    for c in $(docker ps --format '{{.Names}}'); do
+        case "$c" in
+            e2-*)
+                echo "Detaching $c"
+                ip netns delete "$c" 2>/dev/null || true
+                ;;
+        esac
+    done
 
-  ALL_CONTAINERS=( $( docker ps --format "table {{ .Names }}") )
-
-  CONTAINERS=( )
-  for k in "${!ALL_CONTAINERS[@]}" ; do
-    c="${ALL_CONTAINERS[$k]}"
-    if [[ "${c:0:3}" == "e2-" ]] ; then
-      CONTAINERS+=("$c")
-      echo $c
-    fi
-  done
-
-  echo ":: Getting docker containers PIDs"
-
-  PIDS=()
-  for k in "${!CONTAINERS[@]}" ; do
-    P=( $(docker inspect --format '{{ .State.Pid }}' "${CONTAINERS[$k]}") )
-    PIDS+=( $P )
-    echo "$c -> $P"
-  done
-
-  echo ":: Detaching from docker network namespaces"
-
-  for k in "${!CONTAINERS[@]}" ; do
-    ip netns delete "${CONTAINERS[$k]}" "${PIDS[$k]}"
-  done
-
-  echo "-> ip net list"
-  ip net list
-
+    echo "-> ip net list"
+    ip net list
 }
 
 cmd="$1"
 
-if [[ -z "$cmd" ]] ; then
-  exit
-
-elif [[ "$cmd" == "attach" || "$cmd" == "a" ]] ; then
-  shift
-  cmd_attach "${@}"
-
-elif [[ "$cmd" == "detach" || "$cmd" == "d" ]] ; then
-  shift
-  cmd_detach "${@}"
-
+if [ -z "$cmd" ]; then
+    exit 0
+elif [ "$cmd" = "attach" ] ; then
+    shift
+    cmd_attach "$@"
+elif [ "$cmd" = "detach" ] ; then
+    shift
+    cmd_detach "$@"
 else
-  echo "Unknown command: $cmd"
+    echo "Unknown command: $cmd" >&2
+    exit 1
 fi

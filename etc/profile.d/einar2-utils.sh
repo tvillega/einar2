@@ -1,13 +1,13 @@
 e2() {
-
-    if [[ $# -eq 0 ]] ; then
+    if [ "$#" -eq 0 ]; then
         e2_help
-        return
+        return 0
     fi
 
-    local s="$1" ; shift
+    e2_cmd="$1"
+    shift
 
-    case "$s" in
+    case "$e2_cmd" in
         ls)
             einar2 run list services "$@"
             ;;
@@ -33,8 +33,7 @@ e2() {
 }
 
 e2_help() {
-
-cat << EOF
+cat << 'EOF'
 usage: e2 [SHORTHAND]
 
 Shorthands for common einar2 commands:
@@ -49,5 +48,4 @@ Shorthands for common einar2 commands:
 Run einar2 <subcommand> to read about a specific subcommand.
 Authored by Tom Villegas (tvillega)
 EOF
-
 }

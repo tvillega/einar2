@@ -1,16 +1,16 @@
-#!/bin/bash
+#!/bin/sh
 
-set -euo pipefail
-IFS=$'\n\t'
+set -eu
+IFS='
+	'
 
 if [ -z "${PKG_ROOT_DIR:-}" ]; then
-    echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked directly" >&2
+    echo "err: ${0##*/} cannot be invoked directly" >&2
     exit 1
 fi
 
 print_help() {
-
-cat << EOF
+cat << 'EOF'
 usage: einar2 [CMD]
 
 Networking laboratory built on top of docker.
@@ -25,8 +25,7 @@ EOF
 }
 
 print_help_ipc() {
-
-cat <<EOF
+cat << 'EOF'
 usage: einar2 ipc
 
 Run an instruction on the host without a privileged user.
@@ -39,12 +38,10 @@ Run an instruction on the host without a privileged user.
 This command is used by einar2-webui for GUI actions
 that involve the host system (DooD architecture).
 EOF
-
 }
 
 print_help_sync() {
-
-cat <<EOF
+cat << 'EOF'
 usage: einar2 sync
 
 Devel util. Sync configuration files to DOCUMENT_ROOT.
@@ -52,12 +49,10 @@ Devel util. Sync configuration files to DOCUMENT_ROOT.
   <command> ::= yay
               | nay
 EOF
-
 }
 
 print_help_run() {
-
-cat <<EOF
+cat << 'EOF'
 usage: einar2 run <command>
 
 Run a docker command. Requires a privileged user or sudo|doas.
@@ -73,29 +68,38 @@ Run a docker command. Requires a privileged user or sudo|doas.
   <lab> is a relative directory with the following structure:
 
        XX-labname
-       ├── docker-compose.yml
-       └── docker-compose-networks.yml
+       ├── docker-compose.yml
+       └── docker-compose-networks.yml
 EOF
 }
 
-[[ -z "${1-}" ]] && exit
+[ -z "${1-}" ] && exit 0
 
-while [[ "$1" != "--" ]]; do case $1 in
-  help)
-    print_help
-    exit
-    ;;
-  sync)
-    print_help_sync
-    exit
-    ;;
-  run)
-    print_help_run
-    exit
-    ;;
-  ipc)
-    print_help_ipc
-    exit
-    ;;
-esac; shift; done
-if [[ "$1" == '--' ]]; then shift; fi
+while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
+    case "$1" in
+        help)
+            print_help
+            exit 0
+            ;;
+        sync)
+            print_help_sync
+            exit 0
+            ;;
+        run)
+            print_help_run
+            exit 0
+            ;;
+        ipc)
+            print_help_ipc
+            exit 0
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+
+if [ "${1-}" = '--' ]; then
+    shift
+fi
