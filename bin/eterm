@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 mode="halt-on-error"
 
-while [[ $# -gt 0 ]]; do
+while [ "$#" -gt 0 ]; do
     case "$1" in
         --oneshot)
             mode="oneshot"
@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ $# -eq 0 ]]; then
+if [ "$#" -eq 0 ]; then
     echo "usage: eterm [--oneshot|--simple|--forking|--halt-on-error] <cmd> [arg...]"
     exit 1
 fi
@@ -42,13 +42,13 @@ case "$mode" in
         cmd="$pre_cmd"
         ;;
     simple)
-        cmd="$pre_cmd ; echo -e '\n[Process completed]'; read -p 'Press Enter to close terminal...'"
+        cmd="$pre_cmd; printf '\n[Process completed]\n'; printf 'Press Enter to close terminal...'; read ANS"
         ;;
     forking)
-        cmd="$pre_cmd ; bash -l"
+        cmd="$pre_cmd; bash -l"
         ;;
     halt-on-error)
-        cmd="$pre_cmd || { echo -e '\n[Process halted]'; read -p 'Press Enter to close terminal...'; }"
+        cmd="$pre_cmd || { printf '\n[Process halted]\n'; printf 'Press Enter to close terminal...'; read ANS; }"
         ;;
 esac
 
