@@ -123,7 +123,7 @@ fun_sync_all() {
 cmd="$1"
 
 if [[ -z "$cmd" ]] ; then
-  $PKG_LIBX_DIR/e2-help.sh sync
+  $PKG_LIBX_DIR/einar2-help.sh sync
   exit
 
 elif [[ "$cmd" == "yay" || "$cmd" == "y" ]] ; then
