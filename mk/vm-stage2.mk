@@ -73,11 +73,15 @@ stage2-config:
 
 stage2-apt-firefox:
 	@set -e; \
-	echo "  -> Setting up Mozilla APT repository for Firefox..."; \
+	echo "  -> Setting up Mozilla APT repository for native Firefox (.deb)..."; \
 	mkdir -p dist/mnt/etc/apt/keyrings; \
 	wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | tee dist/mnt/etc/apt/keyrings/packages.mozilla.org.asc > /dev/null; \
-	echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt package main" | tee dist/mnt/etc/apt/sources.list.d/mozilla.list > /dev/null; \
-	echo 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000' | tee dist/mnt/etc/apt/preferences.d/mozilla > /dev/null; \
+	echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | tee dist/mnt/etc/apt/sources.list.d/mozilla.list > /dev/null; \
+	{ \
+		printf "Package: firefox*\n"; \
+		printf "Pin: origin packages.mozilla.org\n"; \
+		printf "Pin-Priority: 1000\n"; \
+	} > dist/mnt/etc/apt/preferences.d/mozilla; \
 	echo "==> Mozilla/Firefox repository configured."
 
 stage2-apt-docker:
@@ -91,13 +95,16 @@ stage2-apt-docker:
 
 stage2-apt:
 	@set -e; \
-	echo "  -> Blocking unnecessary packages via apt preferences..."; \
+	echo "  -> Blocking snapd and unnecessary packages via apt preferences..."; \
 	mkdir -p dist/mnt/etc/apt/preferences.d; \
 	{ \
 		printf "Package: grub-common grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists\n"; \
 		printf "Pin: release *\n"; \
 		printf "Pin-Priority: -1\n\n"; \
-		printf "Package: snapd cloud-init landscape-common popularity-contest ubuntu-advantage-tools\n"; \
+		printf "Package: snapd\n"; \
+		printf "Pin: release *\n"; \
+		printf "Pin-Priority: -1\n\n"; \
+		printf "Package: cloud-init landscape-common popularity-contest ubuntu-advantage-tools\n"; \
 		printf "Pin: release *\n"; \
 		printf "Pin-Priority: -1\n"; \
 	} > dist/mnt/etc/apt/preferences.d/ignored-packages; \
@@ -117,30 +124,10 @@ stage2-install:
 	echo "  -> Entering chroot and updating system packages..."; \
 	{ \
 		printf "export DEBIAN_FRONTEND=noninteractive\n"; \
+		printf "export PATH=\"/usr/sbin:/usr/bin:/sbin:/bin\"\n"; \
 		printf "apt update && apt upgrade -y\n\n"; \
 		printf "echo \"  -> Installing essential system and utility packages...\"\n"; \
-		printf "apt install -y \\\n"; \
-		printf "  linux-image-virtual \\\n"; \
-		printf "  linux-headers-virtual \\\n"; \
-		printf "  initramfs-tools \\\n"; \
-		printf "  systemd-boot \\\n"; \
-		printf "  dhcpcd \\\n"; \
-		printf "  nano \\\n"; \
-		printf "  zstd \\\n"; \
-		printf "  wireshark \\\n"; \
-		printf "  dnsutils \\\n"; \
-		printf "  tcpdump \\\n"; \
-		printf "  ncat \\\n"; \
-		printf "  socat \\\n"; \
-		printf "  nmap \\\n"; \
-		printf "  hping3 \\\n"; \
-		printf "  lxde-core \\\n"; \
-		printf "  firefox \\\n"; \
-		printf "  docker-ce \\\n"; \
-		printf "  docker-ce-cli \\\n"; \
-		printf "  containerd.io \\\n"; \
-		printf "  docker-buildx-plugin \\\n"; \
-		printf "  docker-compose-plugin\n\n"; \
+		printf "apt install -y linux-image-virtual linux-headers-virtual initramfs-tools systemd-boot dhcpcd nano zstd wireshark dnsutils tcpdump ncat socat nmap hping3 lxde-core firefox docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin\n\n"; \
 		printf "echo \"  -> Setting root password...\"\n"; \
 		printf "echo \"root:einar2\" | chpasswd\n"; \
 	} | arch-chroot dist/mnt bash -s; \
