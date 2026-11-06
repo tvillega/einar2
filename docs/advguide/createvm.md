@@ -47,32 +47,26 @@ qemu-img create -f qcow2 -F qcow2 -b einar2-stage2.img einar2-stage3.img
 > You can grab one from the `edk2-ovmf` package in ArchLinux.
 
 ```
-cat > einar2.sh << EOF
+cat > dist/einar2.sh << EOF
 qemu-system-x86_64 -enable-kvm -cpu host -m 4G -smp cores=2,threads=2,sockets=1,maxcpus=4 -vga qxl \
   -device virtio-serial-pci \
   -spice port=5930,disable-ticketing=on \
   -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
   -chardev spicevmc,id=spicechannel0,name=vdagent \
-  -drive if=pflash,format=raw,file=einar2-uefi.fd \
-  -drive file=einar2-stage3.img,format=qcow2 \
+  -drive if=pflash,format=raw,file=dist/einar2-uefi.fd \
+  -drive file=dist/einar2-stage3.img,format=qcow2 \
   -netdev user,id=net0 \
   -device virtio-net-pci,netdev=net0
 EOF
 ```
 
-(3) Enter the root directory of the project.
-
-```
-cd $CLONEDIR
-```
-
-(4) Generate an `einar2-utils` tarball:
+(3) Generate an `einar2-utils` tarball:
 
 ```
 make package
 ```
 
-(5) Generate an Einar2 docker image:
+(4) Generate an Einar2 docker image:
 
 ```
 make image
@@ -94,7 +88,7 @@ dist/
 2 directories, 7 files
 ```
 
-(4) Start an Einar2 VM instance on another terminal:
+(5) Start an Einar2 VM instance on another terminal:
 
 > The VM will be available through `spice://localhost:5930`.
 
@@ -103,7 +97,7 @@ cd $CLONEDIR/dist
 einar2.sh
 ```
 
-(5) Start a basic web server on another terminal:
+(6) Start a basic web server on another terminal:
 
 > It will be accessible inside the VM through `10.0.2.2:8000`.
 
