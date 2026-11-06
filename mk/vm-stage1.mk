@@ -41,6 +41,8 @@ stage1-filesystem:
 	modprobe nbd max_part=8; \
 	qemu-nbd --connect=/dev/nbd0 dist/einar2-stage1.img; \
 	trap 'echo "==> ERROR: Formatting failed."; qemu-nbd --disconnect /dev/nbd0 2>/dev/null || true; exit 1' ERR; \
+	echo "  -> Waiting for kernel to recognize partitions..."; \
+	partprobe /dev/nbd0 || sleep 1; \
 	echo "  -> Formatting ESP partition (/dev/nbd0p1) as VFAT..."; \
 	mkfs.vfat -F32 -n ESP /dev/nbd0p1; \
 	echo "  -> Formatting ROOT partition (/dev/nbd0p2) as EXT4..."; \
@@ -54,10 +56,14 @@ stage1-mount:
 	modprobe nbd max_part=8; \
 	qemu-nbd --connect=/dev/nbd0 dist/einar2-stage1.img; \
 	trap 'echo "==> ERROR: Mounting failed. Rolling back..."; $(MAKE) stage1-umount; exit 1' ERR; \
-	echo "  -> Creating mount directories..."; \
-	mkdir -p dist/mnt dist/mnt/efi; \
+	echo "  -> Waiting for kernel to recognize partitions..."; \
+	partprobe /dev/nbd0 || sleep 1; \
+	echo "  -> Creating root mount directory..."; \
+	mkdir -p dist/mnt; \
 	echo "  -> Mounting root partition..."; \
 	mount /dev/nbd0p2 dist/mnt; \
+	echo "  -> Creating EFI mount directory inside root..."; \
+	mkdir -p dist/mnt/efi; \
 	echo "  -> Mounting EFI partition..."; \
 	mount /dev/nbd0p1 dist/mnt/efi; \
 	echo "==> Filesystems successfully mounted."
