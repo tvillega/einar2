@@ -1,106 +1,97 @@
-#!/bin/bash
+#!/bin/sh
 
-set -euo pipefail
-IFS=$'\n\t'
+set -eu
+IFS='
+	'
 
 if [ -z "${PKG_ROOT_DIR:-}" ]; then
-    echo "err: ${BASH_SOURCE[0]##*/} cannot be invoked directly" >&2
+    echo "err: ${0##*/} cannot be invoked directly" >&2
     exit 1
 fi
 
-run_start()     {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "usage: run start <lab>"
-    exit 1
-
-  else
-    docker compose -f "${1%%/}/docker-compose.yml" up
-  fi
+run_start() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: run start <lab>"
+        exit 1
+    else
+        docker compose -f "${1%%/}/docker-compose.yml" up
+    fi
 }
 
-run_stop()      {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "usage: run stop <lab>"
-    exit 1
-
-  else
-    docker compose -f "${1%%/}/docker-compose.yml" down
-  fi
+run_stop() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: run stop <lab>"
+        exit 1
+    else
+        docker compose -f "${1%%/}/docker-compose.yml" down
+    fi
 }
 
-run_shell()      {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "usage: run shell <container>"
-    exit 1
-
-  else
-    docker exec -it "$what" bash
-  fi
+run_shell() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: run shell <container>"
+        exit 1
+    else
+        docker exec -it "$1" bash
+    fi
 }
 
 run_list_services() {
-  docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Ports}}"
+    docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Ports}}"
 }
 
 run_list_networks() {
-  docker network ls --format "table {{.Driver}}\t{{.Name}}"
+    docker network ls --format "table {{.Driver}}\t{{.Name}}"
 }
 
-run_list()      {
-
-  local what="${1-}"
-
-  if [[ -z "$what" ]] ; then
-    echo "usage: run list services|networks"
-    exit 1
-  elif [[ "$what" == "services" ]] ; then
-    run_list_services
-    exit
-  elif [[ "$what" == "networks" ]] ; then
-    run_list_networks
-    exit
-  else
-    run_list_services
-    exit
-  fi 
-
+run_list() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: run list services|networks"
+        exit 1
+    elif [ "$1" = "services" ]; then
+        run_list_services
+        exit 0
+    elif [ "$1" = "networks" ]; then
+        run_list_networks
+        exit 0
+    else
+        run_list_services
+        exit 0
+    fi
 }
 
-[[ -z "${1-}" ]] && exit
+[ -z "${1-}" ] && exit 0
 
-while [[ "$1" != "--" ]]; do case $1 in
-  list)
+while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
+    case "$1" in
+        list)
+            shift
+            run_list "$@"
+            exit 0
+            ;;
+        shell)
+            shift
+            run_shell "$@"
+            exit 0
+            ;;
+        start)
+            shift
+            run_start "$@"
+            exit 0
+            ;;
+        stop)
+            shift
+            run_stop "$@"
+            exit 0
+            ;;
+        *)
+            "$PKG_LIB_DIR/e2-help.sh" run
+            exit 0
+            ;;
+    esac
     shift
-    run_list "${@}"
-    exit
-    ;;
-  shell)
+done
+
+if [ "${1-}" = '--' ]; then
     shift
-    run_shell "${@}"
-    exit
-    ;;
-  start)
-    shift
-    run_start "${@}"
-    exit
-    ;;
-  stop)
-    shift
-    run_stop "${@}"
-    exit
-    ;;
-  *)
-    $PKG_LIB_DIR/e2-help.sh run
-    exit
-    ;;
-esac; shift; done
-if [[ "$1" == '--' ]]; then shift; fi
+fi
