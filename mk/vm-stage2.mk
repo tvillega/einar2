@@ -36,14 +36,18 @@ stage2-disk:
 
 stage2-mount:
 	@set -e; \
+	trap 'echo "==> ERROR: Mounting failed. Rolling back..."; $(MAKE) stage2-umount; exit 1' ERR; \
 	modprobe nbd max_part=8; \
 	echo "  -> Connecting stage 2 image to /dev/nbd0..."; \
 	qemu-nbd --connect=/dev/nbd0 dist/einar2-stage2.img; \
-	trap 'echo "==> ERROR: Mounting failed. Rolling back..."; $(MAKE) stage2-umount; exit 1' ERR; \
-	echo "  -> Creating mount directories..."; \
-	mkdir -p dist/mnt dist/mnt/efi; \
+	echo "  -> Waiting for kernel to recognize partitions..."; \
+	partprobe /dev/nbd0 || sleep 1; \
+	echo "  -> Creating root mount directory..."; \
+	mkdir -p dist/mnt; \
 	echo "  -> Mounting root partition..."; \
 	mount /dev/nbd0p2 dist/mnt; \
+	echo "  -> Creating EFI mount directory inside root..."; \
+	mkdir -p dist/mnt/efi; \
 	echo "  -> Mounting EFI partition..."; \
 	mount /dev/nbd0p1 dist/mnt/efi; \
 	echo "==> Filesystems successfully mounted."
@@ -102,10 +106,10 @@ stage2-apt:
 		printf "deb https://mirror.hnd.cl/ubuntu/ resolute        main restricted universe\n"; \
 		printf "deb https://mirror.hnd.cl/ubuntu/ resolute-security   main restricted universe\n"; \
 		printf "deb https://mirror.hnd.cl/ubuntu/ resolute-updates    main restricted universe\n"; \
-	} > dist/mnt/etc/apt/sources.list; \
-	@$(MAKE) stage2-apt-firefox; \
-	@$(MAKE) stage2-apt-docker; \
-	echo "==> All APT repositories and preferences configured."
+	} > dist/mnt/etc/apt/sources.list
+	@$(MAKE) stage2-apt-firefox
+	@$(MAKE) stage2-apt-docker
+	@echo "==> All APT repositories and preferences configured."
 
 stage2-install:
 	@set -e; \
@@ -156,9 +160,12 @@ stage2-readonly:
 stage2-umount:
 	@set -e; \
 	echo "  -> Unmounting EFI partition..."; \
-	umount dist/mnt/efi 2>/dev/null || true; \
+	umount -lf dist/mnt/efi 2>/dev/null || true; \
 	echo "  -> Unmounting root partition..."; \
-	umount dist/mnt 2>/dev/null || true; \
+	umount -lf dist/mnt 2>/dev/null || true; \
 	echo "  -> Disconnecting NBD device..."; \
 	qemu-nbd --disconnect /dev/nbd0 2>/dev/null || true; \
+	sleep 1; \
+	echo "  -> Unloading nbd module..."; \
+	rmmod nbd 2>/dev/null || true; \
 	echo "==> Unmount and cleanup completed successfully."
