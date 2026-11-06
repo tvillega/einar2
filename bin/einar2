@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-PKG_BIN_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+PKG_BIN_DIR=$( cd "$(dirname "$0")" ; pwd -P )
 PKG_ROOT_DIR=$( cd "$PKG_BIN_DIR/.." ; pwd -P )
 
 PKG_LIB_DIR="${PKG_ROOT_DIR}/libexec"
@@ -20,60 +20,52 @@ export PKG_ARCH_DIR
 export PKG_HOOK_DIR
 
 # default settings
-source "${PKG_SHARE_DIR}/defaults.conf"
+. "${PKG_SHARE_DIR}/defaults.conf"
 
 # settings overrides
-[[ -f /etc/einar2/einar2.conf ]] && source /etc/einar2/einar2.conf
-[[ -f /usr/local/etc/einar2/einar2.conf ]] && source /usr/local/etc/einar2/einar2.conf
-[[ -f ~/.einar2.conf ]] && source ~/.einar2.conf
+[ -f /etc/einar2/einar2.conf ] && . /etc/einar2/einar2.conf
+[ -f /usr/local/etc/einar2/einar2.conf ] && . /usr/local/etc/einar2/einar2.conf
+[ -f ~/.einar2.conf ] && . ~/.einar2.conf
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-[[ -f "$XDG_CONFIG_HOME/einar2/einar2.conf" ]] && source "$XDG_CONFIG_HOME/einar2/einar2.conf"
+[ -f "$XDG_CONFIG_HOME/einar2/einar2.conf" ] && . "$XDG_CONFIG_HOME/einar2/einar2.conf"
 
 cmd_run() {
-
-  local what="$1"
-
-  if [[ -z "$what" ]] ; then
-    $PKG_LIB_DIR/einar2-help.sh run
+  if [ "$#" -eq 0 ] ; then
+    "$PKG_LIB_DIR/einar2-help.sh" run
     exit
   else
-    $PKG_LIB_DIR/einar2-hook.sh run -1 "${@}"
-    $PKG_LIB_DIR/einar2-run.sh "${@}"
-    $PKG_LIB_DIR/einar2-hook.sh run  1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" run -1 "${@}"
+    "$PKG_LIB_DIR/einar2-run.sh" "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" run 1 "${@}"
   fi
-
 }
 
 cmd_ipc() {
-
-  local what="$1"
-
-  if [[ -z "$what" ]] ; then
-    $PKG_LIB_DIR/einar2-help.sh ipc
+  if [ "$#" -eq 0 ] ; then
+    "$PKG_LIB_DIR/einar2-help.sh" ipc
     exit
   else
-    $PKG_LIB_DIR/einar2-hook.sh ipc -1 "${@}"
-    $PKG_LIB_DIR/einar2-ipc.sh "${@}"
-    $PKG_LIB_DIR/einar2-hook.sh ipc  1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" ipc -1 "${@}"
+    "$PKG_LIB_DIR/einar2-ipc.sh" "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" ipc 1 "${@}"
   fi
-
 }
 
 cmd="$1"
 
-if [[ -z "$cmd" ]] ; then
-  $PKG_LIB_DIR/einar2-help.sh help
+if [ -z "$cmd" ] ; then
+  "$PKG_LIB_DIR/einar2-help.sh" help
   exit
 
-elif [[ "$cmd" == "run" ]] ; then
+elif [ "$cmd" = "run" ] ; then
   shift
   cmd_run "${@}"
 
-elif [[ "$cmd" == "ipc" ]] ; then
+elif [ "$cmd" = "ipc" ] ; then
   shift
   cmd_ipc "${@}"
 
 else
-  echo "${BASH_SOURCE[0]##*/}: unknown command: $cmd" >&2
+  echo "$(basename "$0"): unknown command: $cmd" >&2
 fi
