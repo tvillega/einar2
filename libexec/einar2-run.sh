@@ -32,7 +32,7 @@ run_shell() {
         echo "usage: run shell <container>"
         exit 1
     else
-        docker exec -it "$1" bash
+        docker exec -it "$1" sh
     fi
 }
 
