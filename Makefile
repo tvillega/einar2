@@ -112,5 +112,6 @@ image:
 	docker save tvillega/einar2:latest | gzip > dist/einar2-image.tar.gz
 	@echo "Image ready: ./dist/einar2-image.tar.gz"
 
+include mk/vm-utils.mk
 include mk/vm-stage1.mk
 include mk/vm-stage2.mk
