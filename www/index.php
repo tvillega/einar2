@@ -160,7 +160,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Terminal<span></p>
                     <?php else: ?>
-                        <p><a href="/startprogram.php?program=open::lxterminal">Terminal</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'open::lxterminal')">Terminal</a></p>
                     <?php endif; ?>
 
                 </div>
@@ -177,7 +177,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Wireshark<span></p>
                     <?php else: ?>
-                        <p><a href="/startprogram.php?program=open::wireshark">Wireshark</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'open::wireshark')">Wireshark</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;"> 
@@ -193,7 +193,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Featherpad<span></p>
                     <?php else: ?>
-                        <p><a href="/startprogram.php?program=open::featherpad">Featherpad</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'open::featherpad')">Featherpad</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
@@ -236,4 +236,20 @@ $settingsData  = json_decode($settingsRaw, true);
         </div>
         <hr>
     </body>
+    <script>
+        function callEinarDaemon(event, payload) {
+            event.preventDefault();
+
+            fetch('/startprogram.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'payload=' + encodeURIComponent(payload)
+            })
+            .then(response => response.text())
+            .then(data => {})
+            .catch(error => {console.error('Error:', error);});
+        }
+    </script>
 </html>

@@ -11,14 +11,17 @@ if (!$settingsData["einar2"]["jailbreak"]) {
   die("Action forbidden: container isolated from host");
 }
 
-if (isset($_GET["program"])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["payload"])) {
 
-    $command = 'echo "' . $_GET["program"] . '" | socat - UNIX-CONNECT:/var/run/einar2.sock';
+    $payload = $_POST["payload"];
+    $command = 'echo ' . escapeshellarg($payload) . ' | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
     $response = shell_exec($command);
 
     echo "<pre>";
     echo trim($response);
     echo "</pre>";
-}
+  } else {
+    die("Invalid request");
+  }
 
 ?>
