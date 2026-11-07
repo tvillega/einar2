@@ -72,6 +72,7 @@ install:
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/config|/etc/$(pkgname)|g'  $(DESTDIR)$(bindir)/$(pkgname)
+	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/einard
 
 uninstall:
 	@echo "Uninstalling from $(DESTDIR)$(prefix)..."

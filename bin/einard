@@ -2,6 +2,13 @@
 
 LOG_FILE="/var/run/einar.log"
 
+PKG_BIN_DIR=$( cd "$(dirname "$0")" ; pwd -P )
+PKG_ROOT_DIR=$( cd "$PKG_BIN_DIR/.." ; pwd -P )
+
+PKG_SHARE_DIR="${PKG_ROOT_DIR}/share"
+
+BUILTIN_LABDIR="$PKG_SHARE_DIR/labs"
+
 log() {
     ts="$(date -u +%Y-%m-%d-%H:%M:%S)"
     printf -- "%s %s\n" "$ts" "$1" >> "$LOG_FILE"
@@ -17,8 +24,7 @@ reply() {
 }
 
 parse_launch() {
-    INS="${1#launch }"
-    case "$INS" in
+    case "$1" in
         lxterminal)
             launch lxterminal
             log "Terminal opened"
@@ -35,6 +41,19 @@ parse_launch() {
             reply "DONE"
             ;;
         *)
+            log "unknown: open $INS"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+parse_run() {
+    case "$1" in
+        list-builtin-labs)
+            RESP=$(find "$BUILTIN_LABDIR" -maxdepth 1)
+            reply "$RESP"
+            ;;
+        *)
             log "unknown: open::$INS"
             reply "FAILED"
             ;;
@@ -44,7 +63,10 @@ parse_launch() {
 parse_instruction() {
     case "$1" in
         launch*)
-            parse_launch "$1"
+            parse_launch "${1#launch }"
+            ;;
+        run*)
+            parse_run "${1#run }"
             ;;
         *)
             log "unknown instruction: $1"

@@ -1,3 +1,20 @@
+<?php
+
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/defaults.json';
+if (!file_exists($settingsFile)) {
+  die("File defaults.json missing at document root");
+}
+$settingsRaw   = file_get_contents($settingsFile);
+$settingsData  = json_decode($settingsRaw, true);
+
+if (!$settingsData["einar2"]["jailbreak"]) {
+  die("Action forbidden: container isolated from host");
+}
+
+$command = 'echo "run list-builtin-labs" | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
+$output = shell_exec($command);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,23 +41,27 @@
 </head>
 <body>
 
-    <!-- Send POST with form data to myself (executes the code at the top)  -->
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?laboratory=" . $_GET['laboratory']; ?>" method="post">
+        <h1>Start a lab</h1>
 
-    <h1>Start a lab</h1>
-
-    <h2>Currently available laboratories</h2>
-    <center><p><b>Built-in laboratories</b></p></center>
-    <center><p><b>Your laboratories</b></p></center>
-        <div style="padding-top: 15px;">
-            <button type="submit">Submit</button>
-        </div>
+        <center><p><b>Built-in laboratories</b></p></center>
+        <?php
+          $array = array_filter(explode("\n", $output));
+          echo "<pre>";
+          echo print_r($array);
+          echo "</pre>";
+        ?>
+        <center><p><b>Your laboratories</b></p></center>
+        <?php
+          echo "<pre>";
+          $dirs = scandir($_SERVER["DOCUMENT_ROOT"] . "/labs");
+          array_shift($dirs);
+          array_shift($dirs);
+          echo print_r($dirs);
+          echo "</pre>";
+        ?>
 
         <div style="margin-top: 15px;">
-            <a href="/setupservices.php<?php echo "?laboratory=" . $_GET['laboratory']; ?>">Previous (Edit Services)</a>
-            <a href="/index.php"> | Home</a>
+            <a href="/index.php">Home</a>
         </div>
-
-
-</body>
+    </body>
 </html>
