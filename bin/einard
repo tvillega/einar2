@@ -12,119 +12,43 @@ launch() {
     disown "$!" 2>/dev/null || true
 }
 
-response() {
+reply() {
     printf -- "%s" "$1"
 }
 
-parse_namespace_open() {
-    INS="$1"
-
+parse_launch() {
+    INS="${1#launch }"
     case "$INS" in
         lxterminal)
             launch lxterminal
             log "Terminal opened"
-            response "OK"
+            reply "DONE"
             ;;
         wireshark)
             launch wireshark
             log "Wireshark opened"
-            response "OK"
+            reply "DONE"
             ;;
         featherpad)
             launch featherpad
             log "Featherpad opened"
-            response "OK"
+            reply "DONE"
             ;;
         *)
             log "unknown: open::$INS"
-            response "FAILED"
-            ;;
-    esac
-}
-
-parse_namespace_eterm() {
-    SUB="$1"
-
-    case "$SUB" in
-        docker::list*)
-            ARG="${SUB#docker::list}"
-            ARG="${ARG# }"
-            eterm --simple einar2 run list $ARG
-            response "DONE"
-            ;;
-        docker::start*)
-            ARG="${SUB#docker::start}"
-            ARG="${ARG# }"
-            eterm --simple einar2 run start $ARG
-            response "DONE"
-            ;;
-        docker::stop*)
-            ARG="${SUB#docker::stop}"
-            ARG="${ARG# }"
-            eterm --simple einar2 run stop $ARG
-            response "DONE"
-            ;;
-        docker::shell*)
-            ARG="${SUB#docker::shell}"
-            ARG="${ARG# }"
-            eterm --simple einar2 run shell $ARG
-            response "DONE"
-            ;;
-        *)
-            log "unknown: eterm::$SUB"
-            response "FAILED"
-            ;;
-    esac
-}
-
-parse_namespace_docker() {
-    INS="$1"
-    ARG="$2"
-
-    case "$INS" in
-        list)
-            RES=$(einar2 run list "$ARG")
-            response "$RES"
-            ;;
-        start)
-            RES=$(einar2 run start "$ARG")
-            response "$RES"
-            ;;
-        stop)
-            RES=$(einar2 run stop "$ARG")
-            response "$RES"
-            ;;
-        shell)
-            eterm einar2 run shell "$ARG"
-            response "DONE"
-            ;;
-        *)
-            log "unknown: docker::$INS"
-            response "FAILED"
+            reply "FAILED"
             ;;
     esac
 }
 
 parse_instruction() {
-    INS="$1"
-    NS="${INS%%::*}"
-    REST="${INS#*::}"
-
-    case "$NS" in
-        open)
-            parse_namespace_open "$REST"
-            ;;
-        eterm)
-            parse_namespace_eterm "$REST"
-            ;;
-        system)
-            parse_namespace_system "$REST"
-            ;;
-        docker)
-            parse_namespace_docker "$REST"
+    case "$1" in
+        launch*)
+            parse_launch "$1"
             ;;
         *)
-            log "unknown namespace: $INS"
+            log "unknown instruction: $1"
+            reply "FAILED"
             ;;
     esac
 }
