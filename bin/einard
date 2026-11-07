@@ -1,79 +1,24 @@
 #!/bin/sh
 
-LOG_FILE="/var/run/einar.log"
+set -eu
+IFS='
+	'
 
 PKG_BIN_DIR=$( cd "$(dirname "$0")" ; pwd -P )
 PKG_ROOT_DIR=$( cd "$PKG_BIN_DIR/.." ; pwd -P )
 
-PKG_SHARE_DIR="${PKG_ROOT_DIR}/share"
+if [ "$(id -u)" -eq 0 ]; then
+    SOCKET="/var/run/einar2.sock"
+else
+    SOCKET="/run/user/$(id -u)/einar2.sock"
+fi
 
-BUILTIN_LABDIR="$PKG_SHARE_DIR/labs"
+WORKER="${PKG_BIN_DIR}/ework"
 
-log() {
-    ts="$(date -u +%Y-%m-%d-%H:%M:%S)"
-    printf -- "%s %s\n" "$ts" "$1" >> "$LOG_FILE"
-}
+if [ -S "$SOCKET" ]; then
+    echo "Closing previous session"
+    rm -f "$SOCKET"
+fi
 
-launch() {
-    nohup "$@" >> "/tmp/einar.log" 2>&1 &
-    disown "$!" 2>/dev/null || true
-}
-
-reply() {
-    printf -- "%s" "$1"
-}
-
-parse_launch() {
-    case "$1" in
-        lxterminal)
-            launch lxterminal
-            log "Terminal opened"
-            reply "DONE"
-            ;;
-        wireshark)
-            launch wireshark
-            log "Wireshark opened"
-            reply "DONE"
-            ;;
-        featherpad)
-            launch featherpad
-            log "Featherpad opened"
-            reply "DONE"
-            ;;
-        *)
-            log "unknown: open $INS"
-            reply "FAILED"
-            ;;
-    esac
-}
-
-parse_run() {
-    case "$1" in
-        list-builtin-labs)
-            RESP=$(find "$BUILTIN_LABDIR" -maxdepth 1)
-            reply "$RESP"
-            ;;
-        *)
-            log "unknown: open::$INS"
-            reply "FAILED"
-            ;;
-    esac
-}
-
-parse_instruction() {
-    case "$1" in
-        launch*)
-            parse_launch "${1#launch }"
-            ;;
-        run*)
-            parse_run "${1#run }"
-            ;;
-        *)
-            log "unknown instruction: $1"
-            reply "FAILED"
-            ;;
-    esac
-}
-
-IFS= read -r INS
-parse_instruction "$INS"
+echo "Listening on socket $SOCKET"
+socat UNIX-LISTEN:"$SOCKET",fork,reuseaddr SYSTEM:"$WORKER"

@@ -1,0 +1,81 @@
+#!/bin/sh
+
+set -eu
+IFS='
+	'
+
+launch() {
+    nohup "$@" >> /dev/null 2>&1 &
+    disown "$!" 2>/dev/null || true
+}
+
+log() {
+    lv="${2:-I}"
+    ts=$(date "+%Y/%m/%d %H:%M:%S")
+    printf "%s ework[%d] %s %s\n" "$ts" "$$" "$lv" "$1" >&2
+}
+
+reply() {
+    printf -- "%s" "$1"
+}
+
+parse_launch() {
+    case "$1" in
+        lxterminal)
+            launch lxterminal
+            log "lxterminal: launching on display"
+            reply "DONE"
+            ;;
+        wireshark)
+            launch wireshark
+            log "wireshark: launching on display"
+            reply "DONE"
+            ;;
+        featherpad)
+            launch featherpad
+            log "featherpad: launching on display"
+            reply "DONE"
+            ;;
+        webui)
+            launch firefox "http://localhost:80"
+            log "firefox: launching on display"
+            reply "DONE"
+            ;;
+        *)
+            log "$1: not recognized as an einar worker launchable" "E"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+parse_run() {
+    case "$1" in
+        ls-bin)
+            RESP=$(find /usr/bin -maxdepth 1)
+            log "runnable: action triggered"
+            reply "${RESP}"
+            ;;
+        *)
+            log "$1: not recognized as an einar worker runnable" "E"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+parse_instruction() {
+    case "$1" in
+        launch*)
+            parse_launch "${1#launch }"
+            ;;
+        run*)
+            parse_run "${1#run }"
+            ;;
+        *)
+            log "$1: not recognized as an einar worker instruction" "E"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+IFS= read -r INS
+parse_instruction "$INS"
