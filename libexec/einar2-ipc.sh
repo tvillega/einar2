@@ -9,7 +9,11 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
-SOCKET="/var/run/einar2.sock"
+if [ "$(id -u)" -eq 0 ]; then
+    SOCKET="/var/run/einar2.sock"
+else
+    SOCKET="/run/user/$(id -u)/einar2.sock"
+fi
 
 ipc_listener() {
     daemon="${PKG_BIN_DIR}/einard"
