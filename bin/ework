@@ -78,7 +78,7 @@ parser_exec() {
             ;;
         dnsfix*)
             log "executing $1"
-            RESP=$(rm /etc/resolve.conf && echo "nameserver 8.8.8.8" > /etc/resolv.conf)
+            RESP=$(rm /etc/resolv.conf && echo "nameserver 8.8.8.8" > /etc/resolv.conf)
             reply "$RESP"
             ;;
         setxkbmap*)
