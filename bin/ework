@@ -19,7 +19,7 @@ reply() {
     printf -- "%s" "$1"
 }
 
-parse_launch() {
+parser_launch() {
     case "$1" in
         lxterminal)
             launch lxterminal
@@ -38,7 +38,7 @@ parse_launch() {
             ;;
         webui)
             launch firefox "http://localhost:80"
-            log "firefox: launching on display"
+            log "webui: launching on display"
             reply "DONE"
             ;;
         *)
@@ -48,12 +48,17 @@ parse_launch() {
     esac
 }
 
-parse_run() {
+parser_exec() {
     case "$1" in
-        ls-bin)
-            RESP=$(find /usr/bin -maxdepth 1)
-            log "runnable: action triggered"
-            reply "${RESP}"
+        einar2*)
+            RESP=$(einar2 "${1#einar2 }")
+            log "executing $1"
+            reply "DONE"
+            ;;
+        eterm*)
+            RESP=$(eterm "${1#eterm }")
+            log "executing $1"
+            reply "DONE"
             ;;
         *)
             log "$1: not recognized as an einar worker runnable" "E"
@@ -62,13 +67,13 @@ parse_run() {
     esac
 }
 
-parse_instruction() {
+parser() {
     case "$1" in
         launch*)
-            parse_launch "${1#launch }"
+            parser_launch "${1#launch }"
             ;;
-        run*)
-            parse_run "${1#run }"
+        exec*)
+            parser_exec "${1#exec }"
             ;;
         *)
             log "$1: not recognized as an einar worker instruction" "E"
@@ -78,4 +83,4 @@ parse_instruction() {
 }
 
 IFS= read -r INS
-parse_instruction "$INS"
+parser "$INS"
