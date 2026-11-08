@@ -40,11 +40,13 @@ install:
 
 	install -d $(DESTDIR)$(datadir)/archetypes
 	install -d $(DESTDIR)$(datadir)/hooks
+	install -d $(DESTDIR)$(datadir)/labs
 	install -d $(DESTDIR)$(docdir)/advguide
 
 	install -m 755 bin/einar2             $(DESTDIR)$(bindir)/einar2
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
 	install -m 755 bin/eterm              $(DESTDIR)$(bindir)/eterm
+	install -m 755 bin/ework              $(DESTDIR)$(bindir)/ework
 	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
 
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
@@ -73,6 +75,7 @@ install:
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/config|/etc/$(pkgname)|g'  $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/einard
+	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/ework
 
 uninstall:
 	@echo "Uninstalling from $(DESTDIR)$(prefix)..."
@@ -80,6 +83,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/einar2
 	rm -f $(DESTDIR)$(bindir)/einard
 	rm -f $(DESTDIR)$(bindir)/eterm
+	rm -f $(DESTDIR)$(bindir)/ework
 	rm -f $(DESTDIR)$(bindir)/netns
 
 	rm -f $(DESTDIR)$(dockerovrdir)/override.conf
