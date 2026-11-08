@@ -80,6 +80,9 @@ install:
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/einard
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/ework
 
+	# Package manifest for better uninstallation
+	find $(DESTDIR) -mindepth 1 | sed 's|^$(DESTDIR)||' | sort > $(DESTDIR)$(datadir)/files.list
+
 uninstall:
 	@echo "Uninstalling from $(DESTDIR)$(prefix)..."
 
