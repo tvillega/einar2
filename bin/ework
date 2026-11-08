@@ -9,6 +9,9 @@ IFS='
 [ -f /usr/local/etc/einar2/einard.conf ] && . /usr/local/etc/einar2/einard.conf
 [ -f ~/.einard.conf ] && . ~/.einard.conf
 
+# systemd unit does not set $HOME
+HOME="${HOME:-$(getent passwd "$(id -u)" | cut -d: -f6)}"
+
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ -f "$XDG_CONFIG_HOME/einar2/einard.conf" ] && . "$XDG_CONFIG_HOME/einar2/einard.conf"
 
