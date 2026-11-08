@@ -4,8 +4,6 @@ set -eu
 IFS='
 	'
 
-echo "WARNING: Einar2 is jailbreaked and has shell access to your host system"
-
-sed -i 's|jailbreak": false|jailbreak": true|' /einar2/webui.json
+echo "WARNING: Einar2 is jailbroken and has shell access to your host system"
 
 exec lighttpd -D -f /einar2/lighttpd.conf
