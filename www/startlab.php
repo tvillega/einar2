@@ -1,8 +1,8 @@
 <?php
 
-$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/defaults.json';
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/webui.json';
 if (!file_exists($settingsFile)) {
-  die("File defaults.json missing at document root");
+  die("File webui.json missing at document root");
 }
 $settingsRaw   = file_get_contents($settingsFile);
 $settingsData  = json_decode($settingsRaw, true);
@@ -11,7 +11,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
   die("Action forbidden: container isolated from host");
 }
 
-$command = 'echo "run list-builtin-labs" | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
+$command = 'echo "einar2 run list labs" | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
 $output = shell_exec($command);
 
 ?>
