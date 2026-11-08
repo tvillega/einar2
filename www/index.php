@@ -205,7 +205,12 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Keyboard layout</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Keyboard layout<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec eterm setxkbmap se')">Keyboard layout</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>The default keyboard layout is US, this will change to Swedish</p>
@@ -227,7 +232,12 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Shutdown</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Shutdown<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec eterm shutdown')">Shutdown</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>Shutdown the computer</p>
