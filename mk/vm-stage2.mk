@@ -127,7 +127,7 @@ stage2-install:
 		printf "export PATH=\"/usr/sbin:/usr/bin:/sbin:/bin\"\n"; \
 		printf "apt update && apt upgrade -y\n\n"; \
 		printf "echo \"  -> Installing essential system and utility packages...\"\n"; \
-		printf "apt install -y linux-image-virtual linux-headers-virtual initramfs-tools systemd-boot dhcpcd nano zstd wireshark dnsutils tcpdump ncat socat nmap hping3 lxde-core firefox docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin\n\n"; \
+		printf "apt install -y linux-image-virtual linux-headers-virtual initramfs-tools systemd-boot curl dhcpcd nano zstd wireshark dnsutils tcpdump ncat socat nmap hping3 lxde-core l3afpad firefox docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin\n\n"; \
 		printf "echo \"  -> Setting root password...\"\n"; \
 		printf "echo \"root:einar2\" | chpasswd\n"; \
 	} | arch-chroot dist/mnt bash -s; \

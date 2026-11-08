@@ -112,6 +112,7 @@ apt install -y \
   linux-{,image-,headers-}virtual \
   initramfs-tools \
   systemd-boot \
+  curl \
   dhcpcd \
   nano \
   zstd \
@@ -122,7 +123,8 @@ apt install -y \
   socat \
   nmap \
   hping3 \
-  lxde-core
+  lxde-core \
+  l3afpad
 ```
 
 (4) Install firefox:
