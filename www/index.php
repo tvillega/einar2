@@ -164,9 +164,26 @@ $settingsData  = json_decode($settingsRaw, true);
                 <div style="width: 160px; display: table-cell;">
                     <?php if (!$settingsData['einar2']['jailbreak']): ?>
                         <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Reset dns<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec dnsfix')">Reset dns</a></p>
+                    <?php endif; ?>
+
+                </div>
+                <div style="display: table-cell;">
+                    <p>Systemd overwrites resolv.conf, this will try to reset it to 8.8.8.8</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Terminal<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'launch lxterminal')">Terminal</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch terminal')">Terminal</a></p>
                     <?php endif; ?>
 
                 </div>
@@ -197,9 +214,9 @@ $settingsData  = json_decode($settingsRaw, true);
                 <div style="width: 160px; display: table-cell;">
                     <?php if (!$settingsData['einar2']['jailbreak']): ?>
                         <p><span style="color: gray; cursor: not-allowed;"
-                                 title="Only available on jailbroken Einar2">Featherpad<span></p>
+                                 title="Only available on jailbroken Einar2">Notepad<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'launch featherpad')">Featherpad</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch notepad')">Notepad</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">

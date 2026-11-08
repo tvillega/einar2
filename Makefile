@@ -49,10 +49,12 @@ install:
 	install -m 755 bin/ework              $(DESTDIR)$(bindir)/ework
 	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
 
+	install -m 644 etc/einar2.conf        $(DESTDIR)$(sysconfdir)/einar2.conf
+	install -m 644 etc/einard.conf        $(DESTDIR)$(sysconfdir)/einard.conf
+
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
 	install -m 644 share/compose.yml      $(DESTDIR)$(datadir)/
 	install -m 644 share/wallpaper.jpg    $(DESTDIR)$(datadir)/
-	install -m 644 share/defaults.conf    $(DESTDIR)$(datadir)/
 	install -m 755 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
 
 	install -m 755 libexec/*              $(DESTDIR)$(libdir)/

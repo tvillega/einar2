@@ -19,9 +19,6 @@ PKG_HOOK_DIR=$( cd "${PKG_SHARE_DIR}/hooks" ; pwd -P )
 export PKG_ARCH_DIR
 export PKG_HOOK_DIR
 
-# default settings
-. "${PKG_SHARE_DIR}/defaults.conf"
-
 # settings overrides
 [ -f /etc/einar2/einar2.conf ] && . /etc/einar2/einar2.conf
 [ -f /usr/local/etc/einar2/einar2.conf ] && . /usr/local/etc/einar2/einar2.conf

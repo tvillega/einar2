@@ -4,6 +4,14 @@ set -eu
 IFS='
 	'
 
+# settings overrides
+[ -f /etc/einar2/einard.conf ] && . /etc/einar2/einard.conf
+[ -f /usr/local/etc/einar2/einard.conf ] && . /usr/local/etc/einar2/einard.conf
+[ -f ~/.einard.conf ] && . ~/.einard.conf
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+[ -f "$XDG_CONFIG_HOME/einar2/einard.conf" ] && . "$XDG_CONFIG_HOME/einar2/einard.conf"
+
 launch() {
     nohup "$@" >> /dev/null 2>&1 &
     disown "$!" 2>/dev/null || true
@@ -21,9 +29,9 @@ reply() {
 
 parser_launch() {
     case "$1" in
-        lxterminal)
-            log "lxterminal: launching on display"
-            launch lxterminal
+        terminal)
+            log "terminal: launching on display"
+            launch "$TERM"
             reply "DONE"
             ;;
         wireshark)
@@ -31,14 +39,14 @@ parser_launch() {
             launch wireshark
             reply "DONE"
             ;;
-        featherpad)
-            log "featherpad: launching on display"
-            launch featherpad
+        notepad)
+            log "notepad: launching on display"
+            launch "$NOTES"
             reply "DONE"
             ;;
         webui)
             log "webui: launching on display"
-            launch firefox "http://localhost:80"
+            launch "$BROWSER" "http://localhost:80"
             reply "DONE"
             ;;
         *)
@@ -64,6 +72,11 @@ parser_exec() {
             log "executing $1"
             dhcpcd -k ; dhcpcd
             reply "DONE"
+            ;;
+        dnsfix*)
+            log "executing $1"
+            RESP=$(rm /etc/resolve.conf && echo "nameserver 8.8.8.8" > /etc/resolv.conf)
+            reply "$RESP"
             ;;
         setxkbmap*)
             log "executing $1"
