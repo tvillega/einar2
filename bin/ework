@@ -22,23 +22,23 @@ reply() {
 parser_launch() {
     case "$1" in
         lxterminal)
-            launch lxterminal
             log "lxterminal: launching on display"
+            launch lxterminal
             reply "DONE"
             ;;
         wireshark)
-            launch wireshark
             log "wireshark: launching on display"
+            launch wireshark
             reply "DONE"
             ;;
         featherpad)
-            launch featherpad
             log "featherpad: launching on display"
+            launch featherpad
             reply "DONE"
             ;;
         webui)
-            launch firefox "http://localhost:80"
             log "webui: launching on display"
+            launch firefox "http://localhost:80"
             reply "DONE"
             ;;
         *)
@@ -51,13 +51,28 @@ parser_launch() {
 parser_exec() {
     case "$1" in
         einar2*)
-            RESP=$(einar2 "${1#einar2 }")
             log "executing $1"
-            reply "DONE"
+            RESP=$(einar2 "${1#einar2 }")
+            reply "$RESP"
             ;;
         eterm*)
-            RESP=$(eterm "${1#eterm }")
             log "executing $1"
+            RESP=$(eterm "${1#eterm }")
+            reply "DONE"
+            ;;
+        dhcpcd*)
+            log "executing $1"
+            dhcpcd -k ; dhcpcd
+            reply "DONE"
+            ;;
+        setxkbmap*)
+            log "executing $1"
+            setxkbmap "${1#setxkbmap }"
+            reply "DONE"
+            ;;
+        shutdown)
+            log "shutting down system"
+            shutdown
             reply "DONE"
             ;;
         *)

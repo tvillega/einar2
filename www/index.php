@@ -145,7 +145,13 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Renew ip</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Renew ip<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec dhcpcd')">Renew ip</a></p>
+                    <?php endif; ?>
+
                 </div>
                 <div style="display: table-cell;">
                     <p>There is no IP set by default, this will try to renew with DHCP. Consider setting up the firewall first.</p>
@@ -209,7 +215,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Keyboard layout<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'exec eterm setxkbmap se')">Keyboard layout</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec setxkbmap se')">Keyboard layout</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
@@ -236,7 +242,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Shutdown<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'exec eterm shutdown')">Shutdown</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec shutdown')">Shutdown</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
