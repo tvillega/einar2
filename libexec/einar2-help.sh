@@ -24,22 +24,6 @@ Authored by Tom Villegas (tvillega)
 EOF
 }
 
-print_help_ipc() {
-cat << 'EOF'
-usage: einar2 ipc
-
-Run an instruction on the host without a privileged user.
-
-  <command> ::= listener
-              | do <instruction>
-
-  <instruction> all the allowed actions on the host.
-
-This command is used by einar2-webui for GUI actions
-that involve the host system (DooD architecture).
-EOF
-}
-
 print_help_sync() {
 cat << 'EOF'
 usage: einar2 sync
@@ -87,10 +71,6 @@ while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
             ;;
         run)
             print_help_run
-            exit 0
-            ;;
-        ipc)
-            print_help_ipc
             exit 0
             ;;
         *)
