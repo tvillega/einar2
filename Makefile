@@ -40,17 +40,22 @@ install:
 
 	install -d $(DESTDIR)$(datadir)/archetypes
 	install -d $(DESTDIR)$(datadir)/hooks
+	install -d $(DESTDIR)$(datadir)/labs
 	install -d $(DESTDIR)$(docdir)/advguide
 
 	install -m 755 bin/einar2             $(DESTDIR)$(bindir)/einar2
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
 	install -m 755 bin/eterm              $(DESTDIR)$(bindir)/eterm
+	install -m 755 bin/ework              $(DESTDIR)$(bindir)/ework
 	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
+
+	install -m 644 etc/einar2.conf        $(DESTDIR)$(sysconfdir)/einar2.conf
+	install -m 644 etc/einard.conf        $(DESTDIR)$(sysconfdir)/einard.conf
+	install -m 644 etc/webui.json         $(DESTDIR)$(sysconfdir)/webui.json
 
 	install -m 644 share/archetypes/*     $(DESTDIR)$(datadir)/archetypes/
 	install -m 644 share/compose.yml      $(DESTDIR)$(datadir)/
 	install -m 644 share/wallpaper.jpg    $(DESTDIR)$(datadir)/
-	install -m 644 share/defaults.conf    $(DESTDIR)$(datadir)/
 	install -m 755 share/hooks/*          $(DESTDIR)$(datadir)/hooks/
 
 	install -m 755 libexec/*              $(DESTDIR)$(libdir)/
@@ -72,6 +77,11 @@ install:
 	sed -i 's|/libexec|/lib/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/$(pkgname)
 	sed -i 's|/config|/etc/$(pkgname)|g'  $(DESTDIR)$(bindir)/$(pkgname)
+	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/einard
+	sed -i 's|/share|/share/$(pkgname)|g' $(DESTDIR)$(bindir)/ework
+
+	# Package manifest for better uninstallation
+	find $(DESTDIR) -mindepth 1 | sed 's|^$(DESTDIR)||' | sort > $(DESTDIR)$(datadir)/files.list
 
 uninstall:
 	@echo "Uninstalling from $(DESTDIR)$(prefix)..."
@@ -79,6 +89,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/einar2
 	rm -f $(DESTDIR)$(bindir)/einard
 	rm -f $(DESTDIR)$(bindir)/eterm
+	rm -f $(DESTDIR)$(bindir)/ework
 	rm -f $(DESTDIR)$(bindir)/netns
 
 	rm -f $(DESTDIR)$(dockerovrdir)/override.conf

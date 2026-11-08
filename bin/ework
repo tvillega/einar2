@@ -1,0 +1,117 @@
+#!/bin/sh
+
+set -eu
+IFS='
+	'
+
+# settings overrides
+[ -f /etc/einar2/einard.conf ] && . /etc/einar2/einard.conf
+[ -f /usr/local/etc/einar2/einard.conf ] && . /usr/local/etc/einar2/einard.conf
+[ -f ~/.einard.conf ] && . ~/.einard.conf
+
+# systemd unit does not set $HOME
+HOME="${HOME:-$(getent passwd "$(id -u)" | cut -d: -f6)}"
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+[ -f "$XDG_CONFIG_HOME/einar2/einard.conf" ] && . "$XDG_CONFIG_HOME/einar2/einard.conf"
+
+launch() {
+    nohup "$@" >> /dev/null 2>&1 &
+    disown "$!" 2>/dev/null || true
+}
+
+log() {
+    lv="${2:-I}"
+    ts=$(date "+%Y/%m/%d %H:%M:%S")
+    printf "%s ework[%d] %s %s\n" "$ts" "$$" "$lv" "$1" >&2
+}
+
+reply() {
+    printf -- "%s" "$1"
+}
+
+parser_launch() {
+    case "$1" in
+        terminal)
+            log "terminal: launching on display"
+            launch "$TERM"
+            reply "DONE"
+            ;;
+        wireshark)
+            log "wireshark: launching on display"
+            launch wireshark
+            reply "DONE"
+            ;;
+        notepad)
+            log "notepad: launching on display"
+            launch "$NOTES"
+            reply "DONE"
+            ;;
+        webui)
+            log "webui: launching on display"
+            launch "$BROWSER" "http://localhost:80"
+            reply "DONE"
+            ;;
+        *)
+            log "$1: not recognized as an einar worker launchable" "E"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+parser_exec() {
+    case "$1" in
+        einar2*)
+            log "executing $1"
+            RESP=$(einar2 "${1#einar2 }")
+            reply "$RESP"
+            ;;
+        eterm*)
+            log "executing $1"
+            RESP=$(eterm "${1#eterm }")
+            reply "DONE"
+            ;;
+        dhcpcd*)
+            log "executing $1"
+            dhcpcd -k ; dhcpcd
+            reply "DONE"
+            ;;
+        dnsfix*)
+            log "executing $1"
+            RESP=$(rm /etc/resolv.conf && echo "nameserver 8.8.8.8" > /etc/resolv.conf)
+            reply "$RESP"
+            ;;
+        setxkbmap*)
+            log "executing $1"
+            setxkbmap "${1#setxkbmap }"
+            reply "DONE"
+            ;;
+        shutdown)
+            log "shutting down system"
+            shutdown
+            reply "DONE"
+            ;;
+        *)
+            log "$1: not recognized as an einar worker runnable" "E"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+parser() {
+    case "$1" in
+        launch*)
+            parser_launch "${1#launch }"
+            ;;
+        exec*)
+            parser_exec "${1#exec }"
+            ;;
+        *)
+            log "$1: not recognized as an einar worker instruction" "E"
+            reply "FAILED"
+            ;;
+    esac
+}
+
+IFS= read -r INS
+parser "$INS"

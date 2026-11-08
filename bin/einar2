@@ -19,9 +19,6 @@ PKG_HOOK_DIR=$( cd "${PKG_SHARE_DIR}/hooks" ; pwd -P )
 export PKG_ARCH_DIR
 export PKG_HOOK_DIR
 
-# default settings
-. "${PKG_SHARE_DIR}/defaults.conf"
-
 # settings overrides
 [ -f /etc/einar2/einar2.conf ] && . /etc/einar2/einar2.conf
 [ -f /usr/local/etc/einar2/einar2.conf ] && . /usr/local/etc/einar2/einar2.conf
@@ -41,17 +38,6 @@ cmd_run() {
   fi
 }
 
-cmd_ipc() {
-  if [ "$#" -eq 0 ] ; then
-    "$PKG_LIB_DIR/einar2-help.sh" ipc
-    exit
-  else
-    "$PKG_LIB_DIR/einar2-hook.sh" ipc -1 "${@}"
-    "$PKG_LIB_DIR/einar2-ipc.sh" "${@}"
-    "$PKG_LIB_DIR/einar2-hook.sh" ipc 1 "${@}"
-  fi
-}
-
 cmd="$1"
 
 if [ -z "$cmd" ] ; then
@@ -61,10 +47,6 @@ if [ -z "$cmd" ] ; then
 elif [ "$cmd" = "run" ] ; then
   shift
   cmd_run "${@}"
-
-elif [ "$cmd" = "ipc" ] ; then
-  shift
-  cmd_ipc "${@}"
 
 else
   echo "$(basename "$0"): unknown command: $cmd" >&2

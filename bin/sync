@@ -5,6 +5,7 @@ PKG_ROOT_DIR=$( cd "${PKG_BBIN_DIR}/.." ; pwd -P )
 
 PKG_SHARE_DIR="${PKG_ROOT_DIR}/share"
 PKG_LIBX_DIR="${PKG_ROOT_DIR}/libexec"
+PKG_ETC_DIR="${PKG_ROOT_DIR}/etc"
 
 export PKG_ROOT_DIR
 
@@ -88,9 +89,9 @@ fun_sync_defaults() {
   local s="$1" ; shift
 
   if [[ $s -lt 0 ]] ; then
-    rm -v "$PKG_WWW_DIR"/defaults.json
+    rm -v "$PKG_WWW_DIR"/webui.json
   else
-    cp -v  --remove-destination "$PKG_SHARE_DIR"/webui/defaults.json "$PKG_WWW_DIR"/defaults.json
+    cp -v  --remove-destination "$PKG_ETC_DIR"/webui/webui.json "$PKG_WWW_DIR"/webui.json
   fi
 
 }

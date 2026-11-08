@@ -5,20 +5,7 @@ However, due to the nature of containerization it is unable to run commands outs
 
 Unfortunately, because of limitations with X11 and XWayland this will only work under the root account (UID 0).
 
-### 3-step jailbreak process
-
-#### Docker-out-of-Docker (DooD)
-
-Install `docker` and enable its systemd unit:
-
-```
-systemctl enable --now docker
-```
-
-We will bind-mount its socket `/var/run/docker.sock` to the Einar2 container,
-this will allow it to manage `dockerd` through its API.
-
-#### Einar-out-of-Einar (EooE)
+### Einar-out-of-Einar (EooE)
 
 Install `einar2-utils` and enable its systemd unit:
 
@@ -27,51 +14,29 @@ systemctl enable --now einard
 ```
 
 We will bind-mount its socket `/var/run/einar2.sock` to the Einar2 container,
-this will allow it to manage `einard` through its API.
+this will allow it to talk to `einard` through its API.
 
-#### Docker Compose
+### Docker Compose
 
 Changing the entrypoint enables jailbreak mode in Einar2 settings.
 
 ```
 services:
 
-  einar2-jailbreak:   
+  einar2-webui:
     image: tvillega/einar2:latest
-    container_name: einar2-jailbreak
+    container_name: einar2-webui
     restart: always
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /root/Desktop/config:/einar2/config
       - /root/Desktop/labs:/einar2/labs
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/einar2/webui.json:/einar2/webui.json:ro
       - /var/run/einar2.sock:/var/run/einar2.sock:ro
     entrypoint: /einar2/jailbreak.sh
 ```
-
-### einard API
-
-Open directives: 
-
-* `open::lxterminal`
-* `open::wireshark`
-* `open::featherpad`
-* `open::firefox::docs`
-* `open::firefox::labs`
-* `open::firefox::einar1`
-
-System directives:
-
-* `system::os-release`
-* `system::network::dhcpcd`
-* `system::keyboard::swedish`
-* `system::keyboard::english`
-* `system::mouse::focus-click`
-* `system::mouse::focus-hover`
-* `system::session::shutdown`
-* `system::session::reboot`
-* `system::session::logout`
 
 ### Resources
 

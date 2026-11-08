@@ -8,7 +8,7 @@ Type=simple
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/root/.Xauthority
 Environment=XDG_RUNTIME_DIR=/run/user/0
-ExecStart=/usr/bin/einar2 ipc listener
+ExecStart=/usr/bin/einard
 Restart=on-failure
 RestartSec=5s
 

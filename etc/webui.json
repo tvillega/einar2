@@ -1,0 +1,9 @@
+{
+  "einar2": {
+    "image": "tvillega/einar2:latest",
+    "jailbreak": true
+  },
+  "einard": {
+    "socket": "/var/run/einar2.sock"
+  }
+}

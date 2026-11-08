@@ -14,12 +14,7 @@ RUN apk add --no-cache \
       bind-tools \
       traceroute \
       lighttpd \
-      php-cgi \
-      docker-cli \
-      docker-cli-compose
-
-COPY dist/einar2-utils.tar.gz /tmp/
-RUN tar -xzf /tmp/einar2-utils.tar.gz -C / && rm /tmp/einar2-utils.tar.gz
+      php-cgi
 
 RUN mkdir -pv /var/lib/php/sessions /etc/quagga
 
@@ -29,6 +24,7 @@ COPY share/archetypes/  /einar2/archetypes/
 COPY share/entrypoints/ /einar2/entrypoints/
 COPY share/server/      /einar2/server/
 COPY share/webui/       /einar2/
+COPY etc/webui.json     /einar2/webui.json
 
 RUN touch /etc/quagga/zebra.conf && echo "zebra=yes" > /etc/quagga/daemons
 

@@ -1,8 +1,8 @@
 <?php
 
-$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/defaults.json';
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/webui.json';
 if (!file_exists($settingsFile)) {
-  die("File defaults.json missing at document root");
+  die("File webui.json missing at document root");
 }
 $settingsRaw   = file_get_contents($settingsFile);
 $settingsData  = json_decode($settingsRaw, true);
@@ -145,7 +145,13 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Renew ip</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Renew ip<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec dhcpcd')">Renew ip</a></p>
+                    <?php endif; ?>
+
                 </div>
                 <div style="display: table-cell;">
                     <p>There is no IP set by default, this will try to renew with DHCP. Consider setting up the firewall first.</p>
@@ -158,9 +164,26 @@ $settingsData  = json_decode($settingsRaw, true);
                 <div style="width: 160px; display: table-cell;">
                     <?php if (!$settingsData['einar2']['jailbreak']): ?>
                         <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Reset dns<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec dnsfix')">Reset dns</a></p>
+                    <?php endif; ?>
+
+                </div>
+                <div style="display: table-cell;">
+                    <p>Systemd overwrites resolv.conf, this will try to reset it to 8.8.8.8</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Terminal<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'open::lxterminal')">Terminal</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch terminal')">Terminal</a></p>
                     <?php endif; ?>
 
                 </div>
@@ -177,7 +200,7 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Wireshark<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'open::wireshark')">Wireshark</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch wireshark')">Wireshark</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;"> 
@@ -191,9 +214,9 @@ $settingsData  = json_decode($settingsRaw, true);
                 <div style="width: 160px; display: table-cell;">
                     <?php if (!$settingsData['einar2']['jailbreak']): ?>
                         <p><span style="color: gray; cursor: not-allowed;"
-                                 title="Only available on jailbroken Einar2">Featherpad<span></p>
+                                 title="Only available on jailbroken Einar2">Notepad<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'open::featherpad')">Featherpad</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch notepad')">Notepad</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
@@ -205,7 +228,12 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Keyboard layout</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Keyboard layout<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec setxkbmap se')">Keyboard layout</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>The default keyboard layout is US, this will change to Swedish</p>
@@ -227,7 +255,12 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Shutdown</span></p>
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Shutdown<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec shutdown')">Shutdown</a></p>
+                    <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
                     <p>Shutdown the computer</p>

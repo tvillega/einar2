@@ -2,9 +2,9 @@
 
 require __DIR__ . '/createcomposefileAux.php';
 
-$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/defaults.json';
+$settingsFile  = $_SERVER['DOCUMENT_ROOT'] . '/webui.json';
 if (!file_exists($settingsFile)) {
-  die("File defaults.json missing at document root");
+  die("File webui.json missing at document root");
 }
 $settingsRaw   = file_get_contents($settingsFile);
 $settingsData  = json_decode($settingsRaw, true);
