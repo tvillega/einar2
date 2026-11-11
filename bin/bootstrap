@@ -4,6 +4,15 @@ set -eu
 IFS='
 	'
 
+LOCAL="/root/Desktop"
+UPSTREAM="10.0.2.2:8000"
+
+UTILS_TARBALL="einar2-utils.tar.gz"
+IMAGE_TARBALL="einar2-image.tar.gz"
+
+UPSTREAM_UTILS_URL="${UPSTREAM}/${UTILS_TARBALL}"
+UPSTREAM_IMAGE_URL="${UPSTREAM}/${IMAGE_TARBALL}"
+
 init_utils() {
     echo "==> Installing einar2-utils..."
     echo "  -> Fetching tarball from upstream..."
