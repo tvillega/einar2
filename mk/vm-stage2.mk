@@ -97,6 +97,12 @@ stage2-apt-docker:
 
 stage2-apt:
 	@set -e; \
+	echo "  -> Disabling recommended and suggested packages globally..."; \
+	mkdir -p dist/mnt/etc/apt/apt.conf.d; \
+	{ \
+		printf "APT::Install-Recommends \"false\";\n"; \
+		printf "APT::Install-Suggests \"false\";\n"; \
+	} > dist/mnt/etc/apt/apt.conf.d/99no-recommends; \
 	echo "  -> Blocking snapd and unnecessary packages via apt preferences..."; \
 	mkdir -p dist/mnt/etc/apt/preferences.d; \
 	{ \
