@@ -126,51 +126,17 @@ curl 10.0.2.2:8000/einar2-utils.tar.gz --output ~/Desktop/einar2-utils.tar.gz
 tar -vxzf ~/Desktop/einar2-utils.tar.gz -C /
 ```
 
-(4) Fetch the einar2 docker image from the host:
+(4) Run installer:
 
 ```
-curl 10.0.2.2:8000/einar2-image.tar.gz --output ~/Desktop/einar2-image.tar.gz
-```
-
-(5) Load the einar2 docker image on the system:
-
-```
-docker load < ~/Desktop/einar2-image.tar.gz
+einar2 install
 ```
 
 #### Configuration
 
-(1) Enable `dockerd` with systemd:
+(1) Do all your customizations in this step.
 
-> Should be ready, but just to be certain.
-
-```
-systemctl enable --now docker
-```
-
-(2) Enable `einard` with systemd:
-
-> Part of `einar2-utils`.
-
-```
-systemctl enable --now einard
-```
-
-(3) Create `autologin` group
-
-```
-groupadd -r autologin
-```
-
-(4) Add `root` user to `autologin` group:
-
-```
-gpasswd -a username autologin
-```
-
-(5) Do all your customizations in this step.
-
-(6) Trim all empty space to shrink the release image:
+(2) Trim all empty space to shrink the release image:
 
 > This must always be the last step after you finish configurations.
 
