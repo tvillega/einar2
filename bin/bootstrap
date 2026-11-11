@@ -13,7 +13,7 @@ IMAGE_TARBALL="einar2-image.tar.gz"
 UPSTREAM_UTILS_URL="${UPSTREAM}/${UTILS_TARBALL}"
 UPSTREAM_IMAGE_URL="${UPSTREAM}/${IMAGE_TARBALL}"
 
-init_utils() {
+bootstrap_utils() {
     echo "==> Installing einar2-utils..."
     echo "  -> Fetching tarball from upstream..."
     curl ${UPSTREAM_UTILS_URL} --output "${LOCAL}/${UTILS_TARBALL}"
@@ -25,7 +25,7 @@ init_utils() {
     tar -xzf "${LOCAL}/${UTILS_TARBALL}" -C /
 }
 
-init_image() {
+bootstrap_image() {
     echo "==> Installing einar2 image..."
     echo "  -> Fetching tarball from upstream..."
     curl "${UPSTREAM_IMAGE_URL}" --output "${LOCAL}/${IMAGE_TARBALL}"
@@ -37,7 +37,7 @@ init_image() {
     docker load < "${LOCAL}/${IMAGE_TARBALL}"
 }
 
-init_daemon_docker() {
+bootstrap_daemon_docker() {
     echo "  -> Enabling docker daemon..."
     systemctl enable --now docker.service
     if [ "$?" -ne 0 ]; then
@@ -46,7 +46,7 @@ init_daemon_docker() {
     fi
 }
 
-init_daemon_einard() {
+bootstrap_daemon_einard() {
     echo "  -> Enabling einar daemon..."
     systemctl enable --now einard.service
     if [ "$?" -ne 0 ]; then
@@ -55,19 +55,19 @@ init_daemon_einard() {
     fi
 }
 
-init_daemon_reload() {
+bootstrap_daemon_reload() {
     echo "  -> Reloading available daemons..."
     systemctl daemon-reload
 }
 
-init_daemon() {
+bootstrap_daemon() {
     echo "==> Setting up persistent daemons..."
-    init_daemon_reload
-    init_daemon_docker
-    init_daemon_einard
+    bootstrap_daemon_reload
+    bootstrap_daemon_docker
+    bootstrap_daemon_einard
 }
 
-init_group() {
+bootstrap_group() {
     echo "==> Setting up system groups..."
     echo "  -> Checking if autologin exists..."
     getent group autologin
@@ -82,7 +82,7 @@ init_group() {
     gpasswd -a "$(id -un)" autologin
 }
 
-init_utils
-init_image
-init_daemon
-init_group
+bootstrap_utils
+bootstrap_image
+bootstrap_daemon
+bootstrap_group
