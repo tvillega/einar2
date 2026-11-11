@@ -82,7 +82,15 @@ bootstrap_group() {
     gpasswd -a "$(id -un)" autologin
 }
 
+bootstrap_webui() {
+    echo "==> Starting webui..."
+    docker compose -f /usr/share/einar2/compose.yml up -d
+}
+
 bootstrap_utils
 bootstrap_image
 bootstrap_daemon
 bootstrap_group
+bootstrap_webui
+
+reboot
