@@ -89,16 +89,6 @@ while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
             init_image "$@"
             exit 0
             ;;
-        daemon)
-            shift
-            init_daemon "$@"
-            exit 0
-            ;;
-        group)
-            shift
-            init_group "$@"
-            exit 0
-            ;;
         *)
             "$PKG_LIB_DIR/einar2-help.sh" init
             exit 0
