@@ -1,0 +1,109 @@
+#!/bin/sh
+
+set -u
+IFS='
+	'
+
+LOCAL="/root/Desktop"
+UPSTREAM="10.0.2.2:8000"
+
+UTILS_TARBALL="einar2-utils.tar.gz"
+IMAGE_TARBALL="einar2-image.tar.gz"
+
+UPSTREAM_UTILS_URL="${UPSTREAM}/${UTILS_TARBALL}"
+UPSTREAM_IMAGE_URL="${UPSTREAM}/${IMAGE_TARBALL}"
+
+bootstrap_utils() {
+    echo "==> Installing einar2-utils..."
+    echo "  -> Fetching tarball from upstream..."
+    curl ${UPSTREAM_UTILS_URL} --output "${LOCAL}/${UTILS_TARBALL}"
+    if [ "$?" -ne 0 ]; then
+        echo "==> ERROR: Failed to fetch. Did you setup the server?"
+        exit 1
+    fi
+    echo "  -> Installing utilities on system..."
+    tar -xzf "${LOCAL}/${UTILS_TARBALL}" -C /
+}
+
+bootstrap_image() {
+    echo "==> Installing einar2 image..."
+    echo "  -> Fetching tarball from upstream..."
+    curl "${UPSTREAM_IMAGE_URL}" --output "${LOCAL}/${IMAGE_TARBALL}"
+    if [ "$?" -ne 0 ]; then
+        echo "==> ERROR: Failed to fetch. Did you setup the server?"
+        exit 1
+    fi
+    echo "  -> Installing image on system..."
+    docker load < "${LOCAL}/${IMAGE_TARBALL}"
+}
+
+bootstrap_daemon_docker() {
+    echo "  -> Enabling docker daemon..."
+    systemctl enable --now docker.service
+    if [ "$?" -ne 0 ]; then
+        echo "==> ERROR: Failed to start daemon. Is docker installed?"
+        exit 1
+    fi
+}
+
+bootstrap_daemon_einard() {
+    echo "  -> Enabling einar daemon..."
+    systemctl enable --now einard.service
+    if [ "$?" -ne 0 ]; then
+        echo "==> ERROR: Failed to start daemon. Is einar2-utils installed?"
+        exit 1
+    fi
+}
+
+bootstrap_daemon_reload() {
+    echo "  -> Reloading available daemons..."
+    systemctl daemon-reload
+}
+
+bootstrap_daemon() {
+    echo "==> Setting up persistent daemons..."
+    bootstrap_daemon_reload
+    bootstrap_daemon_docker
+    bootstrap_daemon_einard
+}
+
+bootstrap_group() {
+    echo "==> Setting up system groups..."
+    echo "  -> Checking if autologin exists..."
+    getent group autologin
+    if [ "$?" -eq 0 ]; then
+        echo "  -> Found. Skipping."
+    else
+        echo "  -> Not found. Creating..."
+        groupadd -r autologin
+    fi
+    echo "==> Setting up user groups..."
+    echo "  -> Adding "$(id -un)" to autologin..."
+    gpasswd -a "$(id -un)" autologin
+}
+
+bootstrap_webui() {
+    echo "==> Starting webui..."
+    docker compose -f /usr/share/einar2/compose.yml up -d
+    sleep 2
+}
+
+bootstrap_cosmetic() {
+    echo "==> Making cosmetic changes..."
+    echo "  -> Changing wallpaper..."
+    pcmanfm --set-wallpaper="/usr/share/einar2/wallpaper.jpg"
+    sleep 2
+    echo "  -> Adjusting wallpaper..."
+    pcmanfm --wallpaper-mode=fit
+    sleep 2
+
+}
+
+bootstrap_utils
+bootstrap_image
+bootstrap_daemon
+bootstrap_group
+bootstrap_webui
+bootstrap_cosmetic
+
+reboot

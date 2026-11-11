@@ -27,6 +27,21 @@ export PKG_HOOK_DIR
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ -f "$XDG_CONFIG_HOME/einar2/einar2.conf" ] && . "$XDG_CONFIG_HOME/einar2/einar2.conf"
 
+export LOCAL UPSTREAM
+export UTILS_TARBALL IMAGE_TARBALL
+export UPSTREAM_UTILS_URL UPSTREAM_IMAGE_URL
+
+cmd_init() {
+  if [ "$#" -eq 0 ] ; then
+    "$PKG_LIB_DIR/einar2-help.sh" init
+    exit
+  else
+    "$PKG_LIB_DIR/einar2-hook.sh" init -1 "${@}"
+    "$PKG_LIB_DIR/einar2-init.sh" "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" init 1 "${@}"
+  fi
+}
+
 cmd_run() {
   if [ "$#" -eq 0 ] ; then
     "$PKG_LIB_DIR/einar2-help.sh" run
@@ -43,6 +58,10 @@ cmd="$1"
 if [ -z "$cmd" ] ; then
   "$PKG_LIB_DIR/einar2-help.sh" help
   exit
+
+elif [ "$cmd" = "selfupdate" ] ; then
+  shift
+  cmd_init selfupdate
 
 elif [ "$cmd" = "run" ] ; then
   shift

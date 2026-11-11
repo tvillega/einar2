@@ -1,20 +1,22 @@
-.PHONY: stage2 stage2-disk stage2-mount stage2-config stage2-apt-firefox stage2-apt-docker stage2-apt stage2-install stage2-readonly stage2-umount
+.PHONY: stage2 stage2-disk stage2-mount stage2-config stage2-apt-firefox stage2-apt-docker stage2-apt stage2-install stage2-bootstrap stage2-readonly stage2-umount
 
 stage2:
 	@echo "==> Starting Stage 2 VM build process..."
-	@echo "==> [1/7] Creating Stage 2 overlay disk..."
+	@echo "==> [1/8] Creating Stage 2 overlay disk..."
 	@$(MAKE) stage2-disk
-	@echo "==> [2/7] Mounting filesystems..."
+	@echo "==> [2/8] Mounting filesystems..."
 	@$(MAKE) stage2-mount
-	@echo "==> [3/7] Writing system configurations..."
+	@echo "==> [3/8] Writing system configurations..."
 	@$(MAKE) stage2-config
-	@echo "==> [4/7] Setting up external APT repositories..."
+	@echo "==> [4/8] Setting up external APT repositories..."
 	@$(MAKE) stage2-apt
-	@echo "==> [5/7] Running package installation and chroot setup..."
+	@echo "==> [5/8] Running package installation and chroot setup..."
 	@$(MAKE) stage2-install
-	@echo "==> [6/7] Setting image as read-only..."
+	@echo "==> [6/8] Installing bootstrap instructions..."
+	@$(MAKE) stage2-bootstrap
+	@echo "==> [7/8] Setting image as read-only..."
 	@$(MAKE) stage2-readonly
-	@echo "==> [7/7] Unmounting and cleaning up..."
+	@echo "==> [8/8] Unmounting and cleaning up..."
 	@$(MAKE) stage2-umount
 	@echo "==> Stage 2 completed successfully: dist/einar2-stage2.img is ready."
 
@@ -95,6 +97,12 @@ stage2-apt-docker:
 
 stage2-apt:
 	@set -e; \
+	echo "  -> Disabling recommended and suggested packages globally..."; \
+	mkdir -p dist/mnt/etc/apt/apt.conf.d; \
+	{ \
+		printf "APT::Install-Recommends \"false\";\n"; \
+		printf "APT::Install-Suggests \"false\";\n"; \
+	} > dist/mnt/etc/apt/apt.conf.d/99no-recommends; \
 	echo "  -> Blocking snapd and unnecessary packages via apt preferences..."; \
 	mkdir -p dist/mnt/etc/apt/preferences.d; \
 	{ \
@@ -127,11 +135,18 @@ stage2-install:
 		printf "export PATH=\"/usr/sbin:/usr/bin:/sbin:/bin\"\n"; \
 		printf "apt update && apt upgrade -y\n\n"; \
 		printf "echo \"  -> Installing essential system and utility packages...\"\n"; \
-		printf "apt install -y linux-image-virtual linux-headers-virtual initramfs-tools systemd-boot curl dhcpcd nano zstd wireshark dnsutils tcpdump ncat socat nmap hping3 lxde-core l3afpad firefox docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin\n\n"; \
+		printf "apt install -y linux-image-virtual initramfs-tools systemd-boot curl dhcpcd nano zstd wireshark dnsutils tcpdump ncat socat nmap hping3 lxde-core lightdm lightdm-gtk-greeter xserver-xorg xinit lxterminal l3afpad firefox docker-ce docker-ce-cli containerd.io docker-compose-plugin\n\n"; \
 		printf "echo \"  -> Setting root password...\"\n"; \
 		printf "echo \"root:einar2\" | chpasswd\n"; \
 	} | arch-chroot dist/mnt bash -s; \
 	echo "==> Package installation and chroot setup completed."
+
+stage2-bootstrap:
+	@set -e; \
+	echo "  -> Installing bootstrap..."; \
+	cp bin/bootstrap dist/mnt/usr/bin/bootstrap; \
+	chmod +x dist/mnt/usr/bin/bootstrap; \
+	echo "==> Bootstrap installed successfully."
 
 stage2-readonly:
 	@set -e; \
