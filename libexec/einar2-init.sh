@@ -63,28 +63,6 @@ init_daemon() {
     init_daemon_einard
 }
 
-init_group() {
-    echo "==> Setting up system groups..."
-    echo "  -> Checking if autologin exists..."
-    getent group autologin
-    if [ "$?" -eq 0 ]; then
-        echo "  -> Found. Skipping."
-    else
-        echo "  -> Not found. Creating..."
-        groupadd -r autologin
-    fi
-    echo "==> Setting up user groups..."
-    echo "  -> Adding "$(id -un)" to autologin..."
-    gpasswd -a "$(id -un)" autologin
-}
-
-init_install() {
-    init_utils
-    init_image
-    init_daemon
-    init_group
-}
-
 init_selfupdate() {
     init_utils
     init_daemon_reload
@@ -96,11 +74,6 @@ init_selfupdate() {
 
 while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
     case "$1" in
-        install)
-            shift
-            init_autoconfig "$@"
-            exit 0
-            ;;
         selfupdate)
             shift
             init_selfupdate "$@"

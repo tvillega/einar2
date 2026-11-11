@@ -59,10 +59,6 @@ if [ -z "$cmd" ] ; then
   "$PKG_LIB_DIR/einar2-help.sh" help
   exit
 
-elif [ "$cmd" = "install" ] ; then
-  shift
-  cmd_init install
-
 elif [ "$cmd" = "selfupdate" ] ; then
   shift
   cmd_init selfupdate
