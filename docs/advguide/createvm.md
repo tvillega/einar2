@@ -112,24 +112,10 @@ python -m http.server
 
 > The user is `root` and the password is `einar2`.
 
-(2) Fetch the `einar2-utils` package from the host:
+(2) Bootstrap `einar2-utils` and setup Einar2 VM:
 
 ```
-curl 10.0.2.2:8000/einar2-utils.tar.gz --output ~/Desktop/einar2-utils.tar.gz
-```
-
-(3) Install `einar2-utils` on the system:
-
-> Remember to `systemctl daemon-reload` each time you do this.
-
-```
-tar -vxzf ~/Desktop/einar2-utils.tar.gz -C /
-```
-
-(4) Run installer:
-
-```
-einar2 install
+bootstrap
 ```
 
 #### Configuration
