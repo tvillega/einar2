@@ -85,6 +85,18 @@ bootstrap_group() {
 bootstrap_webui() {
     echo "==> Starting webui..."
     docker compose -f /usr/share/einar2/compose.yml up -d
+    sleep 2
+}
+
+bootstrap_cosmetic() {
+    echo "==> Making cosmetic changes..."
+    echo "  -> Changing wallpaper..."
+    pcmanfm --set-wallpaper="/usr/share/einar2/wallpaper.jpg"
+    sleep 2
+    echo "  -> Adjusting wallpaper..."
+    pcmanfm --wallpaper-mode=fit
+    sleep 2
+
 }
 
 bootstrap_utils
@@ -92,5 +104,6 @@ bootstrap_image
 bootstrap_daemon
 bootstrap_group
 bootstrap_webui
+bootstrap_cosmetic
 
 reboot
