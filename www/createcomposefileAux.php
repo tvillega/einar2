@@ -183,6 +183,9 @@ function generateArchetypeFromIni(
   /* [Environments] Patch mandatory variable */
   array_unshift($envArray, "DEFAULT_GATEWAY={{ DefaultGateway }}");
 
+  /* [Capabilities] Patch mandatory variable */
+  array_unshift($capArray, "NET_ADMIN");
+
   /* [Sysctls] Patch mandatory variables */
   array_unshift($sysArray, "net.ipv4.conf.default.rp_filter=0");
   array_unshift($sysArray, "net.ipv4.conf.all.rp_filter=0");
