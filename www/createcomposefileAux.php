@@ -56,65 +56,36 @@ function serviceBlockAppender(
   string $serviceJoinNetworkString,
   string $outputFile
 ) {
-
   foreach ($services as $serviceType => $serviceData) {
-
-    $knownType = KnownServiceTypes::tryFrom($serviceType);
-    //error_log($knownType->value);
     $serviceTypeName = str_replace("Type", "", $serviceType);
+    $knownType = KnownServiceTypes::tryFrom($serviceType);
 
     if (isset($knownType)) {
-
-      $port = 8080;
-
-      /*
-       * Einar2 provides by default 3 archetypes,
-       * each of them defining a service type
-       *
-       * This triggers the classic logic of listing all saved
-       * archetypes on the docker image and choosing one
-       *
-       */
-
-      $archetypeString = stripComments(file_get_contents(__DIR__ . "/archetypes/service-" . $serviceTypeName . ".yml"));
-
-      foreach ($serviceData as $serviceTypeItem) {
-        serviceBlockKnownTypeAppender(
-          $networks,
-          $settingsData,
-          $serviceType,
-          $serviceTypeItem,
-          $port++,
-          $archetypeString,
-          $serviceJoinNetworkString,
-          $outputFile
-        );
-      }
+      $filePath = __DIR__ . "/archetypes/service-" . $serviceTypeName . ".yml";
+      if (!file_exists($filePath)) continue;
+      $archetypeString = stripComments(file_get_contents($filePath));
     } else {
+      $iniPath = __DIR__ . '/config/machines/' . $serviceTypeName . '.ini';
+      if (!file_exists($iniPath)) continue;
 
-      $metaArchetypeString = stripComments(file_get_contents(__DIR__ . "/archetypes/service-custom.yml"));
-      $serviceTypeIniPath  = __DIR__ . '/config/machines/' . $serviceTypeName . '.ini';
+      $metaArchetype = stripComments(file_get_contents(__DIR__ . "/archetypes/service-custom.yml"));
+      $archetypeString = generateArchetypeFromIni($metaArchetype, $settingsData, $iniPath, $serviceTypeName);
+    }
 
-      if (!file_exists($serviceTypeIniPath)) continue; /* Generate custom archetype on-the-fly or quit */
-      $archetypeString = generateArchetypeFromIni($metaArchetypeString,
-                                                  $settingsData,
-                                                  $serviceTypeIniPath,
-                                                  $serviceTypeName);
+    $port = 8080;
+    foreach ($serviceData as $serviceTypeItem) {
+      $currentPort = ($serviceType === "serverType") ? $port++ : -1;
 
-      foreach ($serviceData as $serviceTypeItem) {
-        serviceBlockKnownTypeAppender(
-          $networks,
-          $settingsData,
-          $serviceType,
-          $serviceTypeItem,
-          -1, // {{ Port }} won't exist here
-          $archetypeString,
-          $serviceJoinNetworkString,
-          $outputFile
-        );
-
-
-      }
+      serviceBlockKnownTypeAppender(
+        $networks,
+        $settingsData,
+        $serviceType,
+        $serviceTypeItem,
+        $currentPort,
+        $archetypeString,
+        $serviceJoinNetworkString,
+        $outputFile
+      );
     }
   }
 }
