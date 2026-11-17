@@ -3,6 +3,7 @@
     image: {{ Image }}
     entrypoint: {{ Entrypoint }}
     command: {{ Command }}
+    user: {{ User }}
     stdin_open: true
     tty: true
     cap_add: {{ CapArray }}

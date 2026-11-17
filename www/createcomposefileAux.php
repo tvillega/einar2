@@ -160,6 +160,7 @@ function generateArchetypeFromIni(
   $dockerImage      = $docker['image']      ?? "!fail";
   $dockerEntrypoint = $docker['entrypoint'] ?? "!fail";
   $dockerCommand    = $docker['command']    ?? "!fail";
+  $dockerUser       = $docker['user']       ?? "!fail";
 
   /* [Docker] Patch mandatory variable */
   if ($dockerImage == "!fail") {
@@ -212,6 +213,7 @@ function generateArchetypeFromIni(
   $nonFailStringOrStripLine('{{ Image }}', $dockerImage, $archetype);
   $nonFailStringOrStripLine('{{ Entrypoint }}', $dockerEntrypoint, $archetype);
   $nonFailStringOrStripLine('{{ Command }}', $dockerCommand, $archetype);
+  $nonFailStringOrStripLine('{{ User }}', $dockerUser, $archetype);
 
   /* Replace all placeholders with their respective arrays */
   $nonEmptyArrayOrStripLine('{{ CapArray }}', $capArray, $archetype);
