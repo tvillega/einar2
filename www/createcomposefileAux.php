@@ -56,70 +56,41 @@ function serviceBlockAppender(
   string $serviceJoinNetworkString,
   string $outputFile
 ) {
-
   foreach ($services as $serviceType => $serviceData) {
-
-    $knownType = KnownServiceTypes::tryFrom($serviceType);
-    //error_log($knownType->value);
     $serviceTypeName = str_replace("Type", "", $serviceType);
+    $knownType = KnownServiceTypes::tryFrom($serviceType);
 
     if (isset($knownType)) {
-
-      $port = 8080;
-
-      /*
-       * Einar2 provides by default 3 archetypes,
-       * each of them defining a service type
-       *
-       * This triggers the classic logic of listing all saved
-       * archetypes on the docker image and choosing one
-       *
-       */
-
-      $archetypeString = stripComments(file_get_contents(__DIR__ . "/archetypes/service-" . $serviceTypeName . ".yml"));
-
-      foreach ($serviceData as $serviceTypeItem) {
-        serviceBlockKnownTypeAppender(
-          $networks,
-          $settingsData,
-          $serviceType,
-          $serviceTypeItem,
-          $port++,
-          $archetypeString,
-          $serviceJoinNetworkString,
-          $outputFile
-        );
-      }
+      $filePath = __DIR__ . "/archetypes/service-" . $serviceTypeName . ".yml";
+      if (!file_exists($filePath)) continue;
+      $archetypeString = stripComments(file_get_contents($filePath));
     } else {
+      $iniPath = __DIR__ . '/config/machines/' . $serviceTypeName . '.ini';
+      if (!file_exists($iniPath)) continue;
 
-      $metaArchetypeString = stripComments(file_get_contents(__DIR__ . "/archetypes/service-custom.yml"));
-      $serviceTypeIniPath  = __DIR__ . '/config/machines/' . $serviceTypeName . '.ini';
+      $metaArchetype = stripComments(file_get_contents(__DIR__ . "/archetypes/service-custom.yml"));
+      $archetypeString = generateArchetypeFromIni($metaArchetype, $settingsData, $iniPath, $serviceTypeName);
+    }
 
-      if (!file_exists($serviceTypeIniPath)) continue; /* Generate custom archetype on-the-fly or quit */
-      $archetypeString = generateArchetypeFromIni($metaArchetypeString,
-                                                  $settingsData,
-                                                  $serviceTypeIniPath,
-                                                  $serviceTypeName);
+    $port = 8080;
+    foreach ($serviceData as $serviceTypeItem) {
+      $currentPort = ($serviceType === "serverType") ? $port++ : -1;
 
-      foreach ($serviceData as $serviceTypeItem) {
-        serviceBlockKnownTypeAppender(
-          $networks,
-          $settingsData,
-          $serviceType,
-          $serviceTypeItem,
-          -1, // {{ Port }} won't exist here
-          $archetypeString,
-          $serviceJoinNetworkString,
-          $outputFile
-        );
-
-
-      }
+      appendService(
+        $networks,
+        $settingsData,
+        $serviceType,
+        $serviceTypeItem,
+        $currentPort,
+        $archetypeString,
+        $serviceJoinNetworkString,
+        $outputFile
+      );
     }
   }
 }
 
-function serviceBlockKnownTypeAppender(
+function appendService(
   array  $networks,
   array  $settingsData,
   string $deviceType,
@@ -170,18 +141,64 @@ function generateArchetypeFromIni(
   $config = parse_ini_file($iniPath, true);
   $archetype = $metaArchetype;
 
-  $docker         = $config['Docker'] ?? [];
-  $dockerImage    = $docker['image'] ?? "default";
-  $dockerCommand  = $docker['command'] ?? "sleep inf";
-  $dockerHostname = $docker['hostname'] ?? "{{ Type }}-{{ Name }}";
+  /* Get all sections or safely set as empty array */
+  $docker         = $config['Docker']       ?? [];
+  $environments   = $config['Environments'] ?? [];
+  $capabilities   = $config['Capabilities'] ?? [];
+  $sysctls        = $config['Sysctls']      ?? [];
+  $volumes        = $config['Volumes']      ?? [];
+  $ports          = $config['Ports']        ?? [];
 
+  /* Get arrays of each section or safely set as empty array */
+  $capArray  = $capabilities['CapArray'] ?? [];
+  $envArray  = $environments['EnvArray'] ?? [];
+  $sysArray  = $sysctls['SysArray']      ?? [];
+  $volArray  = $volumes['VolArray']      ?? [];
+  $portArray = $ports['PortArray']       ?? [];
 
-  if ($docker['image'] == "default") {
-    $docker['image'] = $settingsData["einar2"]["image"];
+  /* [Docker] Get variables or safely set as !fail string */
+  $dockerImage      = $docker['image']      ?? "!fail";
+  $dockerEntrypoint = $docker['entrypoint'] ?? "!fail";
+  $dockerCommand    = $docker['command']    ?? "!fail";
+  $dockerUser       = $docker['user']       ?? "!fail";
+
+  /* [Docker] Patch mandatory variable */
+  if ($dockerImage == "!fail") {
+    $dockerImage = $settingsData['einar2']['image'] ?? "!fail";
   }
-  $archetype = str_replace('{{ Image }}', $docker['image'], $archetype);
-  $archetype = str_replace('{{ Command }}', $docker['command'], $archetype);
-  $archetype = str_replace('{{ HostName }}', $docker['hostname'], $archetype);
+
+  /* Allow a single key=value if for whatever reason someone forgets it */
+  $ensureArray = function(&$arr) {
+    if (!is_array($arr)) {
+      $arr = ($arr !== '') ? [$arr] : [];
+    }
+  };
+
+  /* We need to do this here before patching their mandatory values */
+  $ensureArray($capArray);
+  $ensureArray($envArray);
+  $ensureArray($sysArray);
+  $ensureArray($volArray);
+  $ensureArray($portArray);
+
+  /* [Environments] Patch mandatory variable */
+  array_unshift($envArray, "DEFAULT_GATEWAY={{ DefaultGateway }}");
+
+  /* [Capabilities] Patch mandatory variable */
+  array_unshift($capArray, "NET_ADMIN");
+
+  /* [Sysctls] Patch mandatory variables */
+  array_unshift($sysArray, "net.ipv4.conf.default.rp_filter=0");
+  array_unshift($sysArray, "net.ipv4.conf.all.rp_filter=0");
+
+  $nonFailStringOrStripLine = function(string $placeholder, string $data, string &$text) {
+    if ($data == "!fail") {
+      $pattern = '/^[^\r\n]*' . preg_quote($placeholder, '/') . '[^\r\n]*(\r\n|\n)?/m';
+      $text = preg_replace($pattern, '', $text);
+    } else {
+      $text = str_replace($placeholder, $data, $text);
+    }
+  };
 
   $nonEmptyArrayOrStripLine = function(string $placeholder, array $items, string &$text) {
     if (empty($items)) {
@@ -192,27 +209,21 @@ function generateArchetypeFromIni(
     }
   };
 
-  $capabilities = $config['Capabilities'] ?? [];
-  $capArray = $capabilities['CapArray'] ?? [];
+  /* Replace all placeholders with their respective strings */
+  $nonFailStringOrStripLine('{{ Image }}', $dockerImage, $archetype);
+  $nonFailStringOrStripLine('{{ Entrypoint }}', $dockerEntrypoint, $archetype);
+  $nonFailStringOrStripLine('{{ Command }}', $dockerCommand, $archetype);
+  $nonFailStringOrStripLine('{{ User }}', $dockerUser, $archetype);
+
+  /* Replace all placeholders with their respective arrays */
   $nonEmptyArrayOrStripLine('{{ CapArray }}', $capArray, $archetype);
-
-  $environments = $config['Environments'] ?? [];
-  $envArray = $environments['EnvArray'] ?? [];
   $nonEmptyArrayOrStripLine('{{ EnvArray }}', $envArray, $archetype);
-
-  $sysctls = $config['Sysctls'] ?? [];
-  $sysArray = $sysctls['SysArray'] ?? [];
   $nonEmptyArrayOrStripLine('{{ SysArray }}', $sysArray, $archetype);
-
-  $volumes = $config['Volumes'] ?? [];
-  $volArray = $volumes['VolArray'] ?? [];
   $nonEmptyArrayOrStripLine('{{ VolArray }}', $volArray, $archetype);
-
-  $ports = $config['Ports'] ?? [];
-  $portArray = $ports['PortArray'] ?? [];
   $nonEmptyArrayOrStripLine('{{ PortArray }}', $portArray, $archetype);
 
-  /* Some arrays have this variable inside */
+  /* Should happen regardless of user preferences */
+  $archetype = str_replace('{{ HostName }}', '{{ Type }}-{{ Name }}', $archetype);
   $archetype = str_replace('{{ Type }}', $typeVar, $archetype);
 
   return $archetype;

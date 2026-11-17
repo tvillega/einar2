@@ -1,8 +1,9 @@
 
   {{ Type }}-{{ Name }}:
     image: {{ Image }}
-    entrypoint: /einar2/entrypoints/custom.sh
-    cmd: {{ Command }}
+    entrypoint: {{ Entrypoint }}
+    command: {{ Command }}
+    user: {{ User }}
     stdin_open: true
     tty: true
     cap_add: {{ CapArray }}
