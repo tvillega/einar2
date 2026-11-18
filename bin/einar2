@@ -31,6 +31,8 @@ export LOCAL UPSTREAM
 export UTILS_TARBALL IMAGE_TARBALL
 export UPSTREAM_UTILS_URL UPSTREAM_IMAGE_URL
 
+export LABS_ROOT
+
 cmd_init() {
   if [ "$#" -eq 0 ] ; then
     "$PKG_LIB_DIR/einar2-help.sh" init
