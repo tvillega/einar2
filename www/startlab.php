@@ -154,63 +154,94 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                 $phpArray = json_decode($response, true);
             }
 
-            if (!empty($phpArray) && is_array($phpArray)):
+            $groupedContainers = [];
+            $outcastContainersGroupName = 'System / Chores';
+            if (is_array($phpArray)) {
+                foreach ($phpArray as $row) {
+                    $nameValue = isset($row['Name']) ? $row['Name'] : '';
+
+                    // e2-<labname>-something for container grouping
+                    if (preg_match('/^e2-(.+?)-/', $nameValue, $matches)) {
+                        $labGroupName = $matches[1];
+                    } else {
+
+                        $labGroupName = $$outcastContainersGroupName;
+                    }
+
+                    $groupedContainers[$labGroupName][] = $row;
+                }
+            }
+
+            if (!empty($groupedContainers)): // This are tables of containers
+                echo '<div style="margin: 0 auto; width: 80%;">';
+
+                foreach ($groupedContainers as $labGroupName => $containers) {
         ?>
+                    <details open style="margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
+                        <summary style="padding: 10px 15px; background-color: #f4f4f4; font-family: monospace; font-weight: bold; cursor: pointer; user-select: none;">
+                            Lab: <?php echo htmlspecialchars($labGroupName); ?> (<?php echo count($containers); ?> containers)
+                        </summary>
 
-                <div style="margin: 0 auto; width: 80%;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: monospace;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #ccc; background-color: #f4f4f4;">
-                                <th style="padding: 8px;">MACHINE</th>
-                                <th style="padding: 8px;">IMAGE</th>
-                                <th style="padding: 8px;">NETWORKS</th>
-                                <th style="padding: 8px;">STATE</th>
-                                <th style="padding: 8px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: monospace; background: #fff;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #ccc; background-color: #fafafa;">
+                                    <th style="padding: 8px;">NAME</th>
+                                    <th style="padding: 8px;">IMAGE</th>
+                                    <th style="padding: 8px;">NETWORKS</th>
+                                    <th style="padding: 8px;">STATE</th>
+                                    <th style="padding: 8px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
         <?php
-                foreach ($phpArray as $row):
-                    $machineValue  = isset($row['Name']) ? htmlspecialchars($row['Name']) : '';
-                    $imageValue    = isset($row['Image']) ? htmlspecialchars($row['Image']) : '';
-                    $networksValue = isset($row['Networks']) ? htmlspecialchars($row['Networks']) : '';
-                    $stateValue    = isset($row['State']) ? htmlspecialchars($row['State']) : '';
+                    foreach ($containers as $row): // This are rows of containers
+                        $rawNameValue  = isset($row['Name']) ? $row['Name'] : '';
+                        $imageValue    = isset($row['Image']) ? htmlspecialchars($row['Image']) : '';
+                        $networksValue = isset($row['Networks']) ? htmlspecialchars($row['Networks']) : '';
+                        $stateValue    = isset($row['State']) ? htmlspecialchars($row['State']) : '';
+
+                        $displayName = $rawNameValue;
+                        if ($labGroupName != $$outcastContainersGroupName) {
+                            $prefix = 'e2-' . $labGroupName . '-';
+                            if (strpos($rawNameValue, $prefix) === 0) {
+                                $displayName = substr($rawNameValue, strlen($prefix));
+                            }
+                        }
         ?>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 8px; vertical-align: middle;"><?php echo htmlspecialchars($displayName); ?></td>
+                                    <td style="padding: 8px; vertical-align: middle;"><?php echo $imageValue; ?></td>
+                                    <td style="padding: 8px; vertical-align: middle;"><?php echo $networksValue; ?></td>
+                                    <td style="padding: 8px; vertical-align: middle;">
+                                        <?php
+                                            if ($stateValue === 'running') {
+                                                echo '<span style="color: green; font-weight: bold;">running</span>';
+                                            } else {
+                                                echo '<span style="color: chocolate; font-weight: bold;">' . $stateValue . '</span>';
+                                            }
+                                        ?>
+                                    </td>
+                                    <td style="padding: 8px; vertical-align: middle; text-align: right;">
 
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 8px; vertical-align: middle;"><?php echo $machineValue; ?></td>
-                                <td style="padding: 8px; vertical-align: middle;"><?php echo $imageValue; ?></td>
-                                <td style="padding: 8px; vertical-align: middle;"><?php echo $networksValue; ?></td>
-                                <td style="padding: 8px; vertical-align: middle;">
-
-                                    <?php
-                                        if ($stateValue === 'running') {
-                                            echo '<span style="color: green; font-weight: bold;">running</span>';
-                                        } else {
-                                            echo '<span style="color: chocolate; font-weight: bold;">' . $stateValue . '</span>';
-                                        }
-                                    ?>
-
-                                </td>
-                                <td style="padding: 8px; vertical-align: middle; text-align: right;">
-                                    <?php if ($machineValue === 'einar2-webui'): ?>
-                                        <span style="font-weight: bold; color: black;">WEBUI</span>
-                                    <?php else: ?>
-                                        <form method="GET" action="" style="margin: 0; display: inline-block;">
-                                            <input type="hidden" name="laboratory" value="<?php echo $machineValue; ?>">
-                                            <button type="submit" style="padding: 4px 10px; cursor: pointer;">Manage</button>
-                                        </form>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
+                                        <?php if ($rawNameValue === 'einar2-webui'): ?>
+                                            <span style="font-weight: bold; color: black;">WEBUI</span>
+                                        <?php else: ?>
+                                            <form method="GET" action="" style="margin: 0; display: inline-block;">
+                                                <input type="hidden" name="laboratory" value="<?php echo htmlspecialchars($rawNameValue); ?>">
+                                                <button type="submit" style="padding: 4px 10px; cursor: pointer;">Manage</button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
         <?php
-                endforeach;
+                    endforeach;
         ?>
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </details>
         <?php
+                }
+                echo '</div>';
             else:
                 echo '<p style="text-align: center;">No deployed laboratories found.</p>';
             endif;
