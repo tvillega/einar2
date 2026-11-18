@@ -74,8 +74,8 @@ parser_exec() {
         einar2)
             log "executing $*"
             shift
-            RESP=$(einar2 "$@")
-            reply "$RESP"
+            # $REPLY was buffering, we need live stream.
+            einar2 "$@"
             ;;
         eterm)
             log "executing $*"
