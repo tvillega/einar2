@@ -154,15 +154,48 @@ $settingsData  = json_decode($settingsRaw, true);
                         <p><span style="color: gray; cursor: not-allowed;"
                                  title="Only available on jailbroken Einar2">Edit webui<span></p>
                     <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'exec eterm')">Edit webui</a></p>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch notepad /etc/einar2/webui.json')">Edit webui</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
-                    <p>Starts wireshark to analyze network traffic</p>
+                    <p>Edits the configurations of this interface</p>
                 </div>
             </div>
         </div>
         <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Edit utils<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch notepad /etc/einar2/einar2.conf')">Edit utils</a></p>
+                    <?php endif; ?>
+                </div>
+                <div style="display: table-cell;">
+                    <p>Edits the configurations of the einar2 command</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Edit daemon<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'launch notepad /etc/einar2/einard.conf')">Edit daemon</a></p>
+                    <?php endif; ?>
+                </div>
+                <div style="display: table-cell;">
+                    <p>Edits the configurations of the einar daemon</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <br>
 
         <center><p><b>Chores</b></p></center>
 

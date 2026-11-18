@@ -31,6 +31,16 @@ reply() {
 }
 
 parser_launch() {
+
+    # Here the entire string is on $1 (sh is strict about it)
+    old_ifs="$IFS"
+    IFS=' '
+    set -f
+    set -- $1
+    set +f
+    IFS="$old_ifs"
+    # Now I have each arg on a $1 $2 .. and $@
+
     case "$1" in
         terminal)
             log "terminal: launching on display"
@@ -44,7 +54,8 @@ parser_launch() {
             ;;
         notepad)
             log "notepad: launching on display"
-            launch "$NOTES"
+            shift
+            launch "$NOTES" "$@"
             reply "DONE"
             ;;
         webui)
