@@ -11,6 +11,15 @@ if (!$settingsData["einar2"]["jailbreak"]) {
   die("Action forbidden: container isolated from host");
 }
 
+$command = 'echo exec einar2 labs list all | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
+$response = shell_exec($command);
+
+$phpArray = [];
+
+if ($response !== null && trim($response) !== '') {
+    $phpArray = json_decode($response, true);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -139,9 +148,23 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                                         <?php echo $machinesHtml; ?>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; vertical-align: middle; text-align: right;">
-                                    <form method="GET" action="/createlab.php" style="margin: 0;">
-                                        <input type="hidden" name="laboratory" value="<?php echo $labName; ?>">
+
+                                <td style="padding: 8px; vertical-align: middle; text-align: right; white-space: nowrap;">
+                                    <?php
+                                        $startCommand = 'exec einar2 labs start ' . $labName;
+                                        $stopCommand  = 'exec einar2 labs stop ' . $labName;
+                                    ?>
+
+                                    <button onclick="callStreamingEinarDaemon(event, '<?php echo htmlspecialchars($startCommand, ENT_QUOTES); ?>')" style="padding: 4px 10px; cursor: pointer; margin-right: 5px;">
+                                        Start
+                                    </button>
+
+                                    <button onclick="callStreamingEinarDaemon(event, '<?php echo htmlspecialchars($stopCommand, ENT_QUOTES); ?>')" style="padding: 4px 10px; cursor: pointer; margin-right: 5px;">
+                                        Stop
+                                    </button>
+
+                                    <form method="GET" action="/createlab.php" style="margin: 0; display: inline-block;">
+                                        <input type="hidden" name="laboratory" value="<?php echo htmlspecialchars($labName); ?>">
                                         <button type="submit" style="padding: 4px 10px; cursor: pointer;">Edit</button>
                                     </form>
                                 </td>
@@ -161,15 +184,6 @@ if (!$settingsData["einar2"]["jailbreak"]) {
         <center><p><b>Deployed laboratories</b></p></center>
 
         <?php
-            $command = 'echo exec einar2 labs list all | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
-            $response = shell_exec($command);
-
-            $phpArray = [];
-
-            if ($response !== null && trim($response) !== '') {
-                $phpArray = json_decode($response, true);
-            }
-
             $groupedContainers = [];
             $outcastContainersGroupName = 'System / Chores';
             if (is_array($phpArray)) {
@@ -281,6 +295,27 @@ if (!$settingsData["einar2"]["jailbreak"]) {
         <div style="margin-top: 15px;">
             <a href="/index.php">Home</a>
         </div>
+
+
+        <!-- callFancyEinarDaemon loading screen -->
+        <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.75); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-family: monospace;">
+            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #333; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+            <div style="color: #333; font-size: 0.95em; font-weight: bold;">Applying changes...</div>
+        </div>
+
+        <!-- callStreamingEinarDaemon loading screen + terminal output -->
+        <div id="streaming-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-family: monospace; padding: 20px; box-sizing: border-box;">
+            <div style="border: 4px solid #333; border-top: 4px solid #fff; border-radius: 50%; width: 35px; height: 35px; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+            <div style="color: #fff; font-size: 0.95em; font-weight: bold; margin-bottom: 20px; letter-spacing: 0.5px;">Applying changes...</div>
+            <pre id="terminal-output" style="width: 100%; max-width: 700px; height: 250px; background: #111; color: #00ff66; border: 1px solid #333; border-radius: 4px; padding: 12px; overflow-y: auto; text-align: left; font-size: 0.85em; margin: 0; white-space: pre-wrap; word-break: break-all;"></pre>
+        </div>
+
+        <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        </style>
     </body>
     <script>
     function callEinarDaemon(event, payload) {
@@ -294,8 +329,75 @@ if (!$settingsData["einar2"]["jailbreak"]) {
             body: 'payload=' + encodeURIComponent(payload)
         })
         .then(response => response.text())
-        .then(data => {})
+        .then(data => {
+            window.location.reload();
+        })
         .catch(error => { console.error('Error:', error); });
+    }
+
+    function callFancyEinarDaemon(event, payload) {
+        event.preventDefault();
+        document.getElementById('loading-overlay').style.display = 'flex';
+
+        fetch('/startprogram.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'payload=' + encodeURIComponent(payload)
+        })
+        .then(response => response.text())
+        .then(data => {
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loading-overlay').style.display = 'none';
+        });
+    }
+
+    async function callStreamingEinarDaemon(event, payload) {
+        event.preventDefault();
+
+        const overlay = document.getElementById('streaming-overlay');
+        const terminal = document.getElementById('terminal-output');
+
+        terminal.textContent = '';
+        overlay.style.display = 'flex';
+
+        try {
+            const response = await fetch('/startstream.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'payload=' + encodeURIComponent(payload)
+            });
+
+            if (!response.body) throw new Error('ReadableStream not supported.');
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                terminal.textContent += decoder.decode(value, { stream: true });
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+
+            const reloadTimeout = <?php echo (int)($settingsData['eworker']['timeout'] ?? 5000); ?>;
+
+            setTimeout(() => {
+                window.location.reload();
+            }, reloadTimeout);
+
+        } catch (error) {
+            console.error('Error:', error);
+            terminal.textContent += '\n[Stream error: ' + error.message + ']';
+            setTimeout(() => { overlay.style.display = 'none'; }, 8000);
+        }
     }
     </script>
 </html>
