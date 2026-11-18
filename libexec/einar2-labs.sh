@@ -46,6 +46,15 @@ labs_list() {
     fi
 }
 
+labs_open() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: labs open <container-name>"
+        exit 1
+    else
+        eterm docker exec -it "$1" bash
+    fi
+}
+
 [ -z "${1-}" ] && exit 0
 
 while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
@@ -53,6 +62,11 @@ while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
         list)
             shift
             labs_list "$@"
+            exit 0
+            ;;
+        open)
+            shift
+            labs_open "$@"
             exit 0
             ;;
         *)

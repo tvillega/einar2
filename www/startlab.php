@@ -250,14 +250,17 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                                         ?>
                                     </td>
                                     <td style="padding: 8px; vertical-align: middle; text-align: right;">
-
                                         <?php if ($rawNameValue === 'einar2-webui'): ?>
                                             <span style="font-weight: bold; color: black;">WEBUI</span>
                                         <?php else: ?>
-                                            <form method="GET" action="" style="margin: 0; display: inline-block;">
-                                                <input type="hidden" name="laboratory" value="<?php echo htmlspecialchars($rawNameValue); ?>">
-                                                <button type="submit" style="padding: 4px 10px; cursor: pointer;">Manage</button>
-                                            </form>
+                                            <?php
+                                                $isRunning = ($stateValue === 'running');
+                                                $btnStyle = 'padding: 4px 10px; cursor: ' . ($isRunning ? 'pointer' : 'not-allowed') . ';';
+                                                if (!$isRunning) {
+                                                    $btnStyle .= ' opacity: 0.5; background-color: #eee; color: #888; border: 1px solid #ccc;';
+                                                }
+                                            ?>
+                                            <button onclick="callEinarDaemon(event, 'exec einar2 labs open <?php echo htmlspecialchars($rawNameValue, ENT_QUOTES); ?>')" style="<?php echo $btnStyle; ?>" <?php echo $isRunning ? '' : 'disabled'; ?>>Open</button>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -279,4 +282,20 @@ if (!$settingsData["einar2"]["jailbreak"]) {
             <a href="/index.php">Home</a>
         </div>
     </body>
+    <script>
+    function callEinarDaemon(event, payload) {
+        event.preventDefault();
+
+        fetch('/startprogram.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'payload=' + encodeURIComponent(payload)
+        })
+        .then(response => response.text())
+        .then(data => {})
+        .catch(error => { console.error('Error:', error); });
+    }
+    </script>
 </html>
