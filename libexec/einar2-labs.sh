@@ -55,6 +55,24 @@ labs_open() {
     fi
 }
 
+labs_start() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: labs start <lab>"
+        exit 1
+    else
+        docker compose -f "${LABS_ROOT}/${1}/docker-compose.yml" --progress plain up
+    fi
+}
+
+labs_stop() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: labs stop <lab>"
+        exit 1
+    else
+        docker compose -f "${LABS_ROOT}/${1}/docker-compose.yml" --progress plain down
+    fi
+}
+
 [ -z "${1-}" ] && exit 0
 
 while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
@@ -67,6 +85,16 @@ while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
         open)
             shift
             labs_open "$@"
+            exit 0
+            ;;
+        start)
+            shift
+            labs_start "$@"
+            exit 0
+            ;;
+        stop)
+            shift
+            labs_stop "$@"
             exit 0
             ;;
         *)
