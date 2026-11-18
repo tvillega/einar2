@@ -119,10 +119,26 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                     }
         ?>
                             <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 8px; vertical-align: middle;"><?php echo $labName; ?></td>
-                                <td style="padding: 8px; vertical-align: middle; color: #666; font-size: 0.9em;"><?php echo $labDir; ?></td>
-                                <td style="padding: 8px; vertical-align: middle; line-height: 1.4;"><?php echo $switchesHtml; ?></td>
-                                <td style="padding: 8px; vertical-align: middle; line-height: 1.4;"><?php echo $machinesHtml; ?></td>
+                                <td style="padding: 8px; vertical-align: middle; max-width: 150px;">
+                                    <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                        <?php echo $labName; ?>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; vertical-align: middle; color: #666; font-size: 0.9em; max-width: 250px;">
+                                    <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                        <?php echo $labDir; ?>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; vertical-align: middle; line-height: 1.4; max-width: 200px;">
+                                    <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                        <?php echo $switchesHtml; ?>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; vertical-align: middle; line-height: 1.4; max-width: 200px;">
+                                    <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                        <?php echo $machinesHtml; ?>
+                                    </div>
+                                </td>
                                 <td style="padding: 8px; vertical-align: middle; text-align: right;">
                                     <form method="GET" action="" style="margin: 0;">
                                         <input type="hidden" name="laboratory" value="<?php echo $labName; ?>">
@@ -165,7 +181,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                         $labGroupName = $matches[1];
                     } else {
 
-                        $labGroupName = $$outcastContainersGroupName;
+                        $labGroupName = $outcastContainersGroupName;
                     }
 
                     $groupedContainers[$labGroupName][] = $row;
@@ -201,7 +217,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                         $stateValue    = isset($row['State']) ? htmlspecialchars($row['State']) : '';
 
                         $displayName = $rawNameValue;
-                        if ($labGroupName != $$outcastContainersGroupName) {
+                        if ($labGroupName != $outcastContainersGroupName) {
                             $prefix = 'e2-' . $labGroupName . '-';
                             if (strpos($rawNameValue, $prefix) === 0) {
                                 $displayName = substr($rawNameValue, strlen($prefix));
@@ -209,9 +225,21 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                         }
         ?>
                                 <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 8px; vertical-align: middle;"><?php echo htmlspecialchars($displayName); ?></td>
-                                    <td style="padding: 8px; vertical-align: middle;"><?php echo $imageValue; ?></td>
-                                    <td style="padding: 8px; vertical-align: middle;"><?php echo $networksValue; ?></td>
+                                    <td style="padding: 8px; vertical-align: middle; max-width: 200px;">
+                                        <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                            <?php echo htmlspecialchars($displayName); ?>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 8px; vertical-align: middle; max-width: 250px;">
+                                        <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                            <?php echo $imageValue; ?>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 8px; vertical-align: middle; max-width: 200px;">
+                                        <div style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                                            <?php echo $networksValue; ?>
+                                        </div>
+                                    </td>
                                     <td style="padding: 8px; vertical-align: middle;">
                                         <?php
                                             if ($stateValue === 'running') {
