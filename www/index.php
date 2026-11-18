@@ -31,22 +31,6 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
-                        <p><span style="color: gray; cursor: not-allowed;"
-                                 title="Only available on jailbroken Einar2">Start a lab<span></p>
-                    <?php else: ?>
-                        <p><a href="/startlab.php">Start a lab</a></p>
-                    <?php endif; ?>
-                </div>
-                <div style="display: table-cell;">
-                    <p>Start a new lab</p>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
                     <p><a href="/createlab.php">Create a lab</a></p>
                 </div>
                 <div style="display: table-cell;">
@@ -58,64 +42,15 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Not available.">Edit a lab</span></p>
-                </div>
-                <div style="display: table-cell;">
-                    <p>Edit an existing lab</p>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
                     <?php if (!$settingsData['einar2']['jailbreak']): ?>
                         <p><span style="color: gray; cursor: not-allowed;"
-                                 title="Only available on jailbroken Einar2">Running labs<span></p>
+                                 title="Only available on jailbroken Einar2">Manage labs<span></p>
                     <?php else: ?>
-                        <p><a href="/runninglabs.php">Running labs</a></p>
+                        <p><a href="/startlab.php">Manage labs</a></p>
                     <?php endif; ?>
                 </div>
                 <div style="display: table-cell;">
-                    <p>View and stop running labs</p>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Not available.">Import a lab</span></p>
-                </div>
-                <div style="display: table-cell;">
-                    <p>Import a lab from USB or internet</p>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
-                    <p><a href="/releasenotes.php">Release notes</a></p>
-                </div>
-                <div style="display: table-cell;">
-                    <p>View the release notes for this release</p>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <br>
-
-        <center><p><b>Configurations</b></p></center>
-
-        <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
-                    <p><a href="/archetypes/">Archetypes</a></p>
-                </div>
-                <div style="display: table-cell;">
-                    <p>Docker compose files and blocks written in simplified Tera template engine.</p>
+                    <p>View running and stopped labs</p>
                 </div>
             </div>
         </div>
@@ -134,47 +69,18 @@ $settingsData  = json_decode($settingsRaw, true);
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
-                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Setup a firewall</span></p>
+                    <p><a href="https://github.com/tvillega/einar2/releases">Release notes</a></p>
                 </div>
-                <div style="display: table-cell;"> 
-                    <p>The webserver is running as root. This will set up iptables to prevent others from reaching it.</p>
+                <div style="display: table-cell;">
+                    <p>Check out what's new on Einar2!'</p>
                 </div>
             </div>
         </div>
         <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
-                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
-                        <p><span style="color: gray; cursor: not-allowed;"
-                                 title="Only available on jailbroken Einar2">Renew ip<span></p>
-                    <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'exec dhcpcd')">Renew ip</a></p>
-                    <?php endif; ?>
+        <br>
 
-                </div>
-                <div style="display: table-cell;">
-                    <p>There is no IP set by default, this will try to renew with DHCP. Consider setting up the firewall first.</p>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div style="width: 100%; display: table;">
-            <div style="display: table-row">
-                <div style="width: 160px; display: table-cell;">
-                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
-                        <p><span style="color: gray; cursor: not-allowed;"
-                                 title="Only available on jailbroken Einar2">Reset dns<span></p>
-                    <?php else: ?>
-                        <p><a href="" onClick="callEinarDaemon(event, 'exec dnsfix')">Reset dns</a></p>
-                    <?php endif; ?>
+        <center><p><b>Programs</b></p></center>
 
-                </div>
-                <div style="display: table-cell;">
-                    <p>Systemd overwrites resolv.conf, this will try to reset it to 8.8.8.8</p>
-                </div>
-            </div>
-        </div>
         <hr>
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
@@ -225,6 +131,88 @@ $settingsData  = json_decode($settingsRaw, true);
             </div>
         </div>
         <hr>
+        <br>
+
+        <center><p><b>Configurations</b></p></center>
+
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <p><a href="/archetypes/">Archetypes</a></p>
+                </div>
+                <div style="display: table-cell;">
+                    <p>Docker compose files and blocks written in simplified Tera template engine.</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Edit webui<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec eterm')">Edit webui</a></p>
+                    <?php endif; ?>
+                </div>
+                <div style="display: table-cell;">
+                    <p>Starts wireshark to analyze network traffic</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <center><p><b>Chores</b></p></center>
+
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <p><span style="color: gray; cursor: not-allowed;" title="Legacy feat from Einar1.">Setup a firewall</span></p>
+                </div>
+                <div style="display: table-cell;">
+                    <p>The webserver is running as root. This will set up iptables to prevent others from reaching it.</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Renew ip address<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec dhcpcd')">Renew ip address</a></p>
+                    <?php endif; ?>
+
+                </div>
+                <div style="display: table-cell;">
+                    <p>There is no IP set by default, this will try to renew with DHCP. Consider setting up the firewall first.</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; display: table;">
+            <div style="display: table-row">
+                <div style="width: 160px; display: table-cell;">
+                    <?php if (!$settingsData['einar2']['jailbreak']): ?>
+                        <p><span style="color: gray; cursor: not-allowed;"
+                                 title="Only available on jailbroken Einar2">Reset faulty DNS<span></p>
+                    <?php else: ?>
+                        <p><a href="" onClick="callEinarDaemon(event, 'exec dnsfix')">Reset faulty DNS</a></p>
+                    <?php endif; ?>
+
+                </div>
+                <div style="display: table-cell;">
+                    <p>Systemd overwrites resolv.conf, this will try to reset it to 8.8.8.8</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <!-- I REFUSE TO REMOVE THIS SECTION -- this is such an Einar classic but reversed hahha -->
         <div style="width: 100%; display: table;">
             <div style="display: table-row">
                 <div style="width: 160px; display: table-cell;">
