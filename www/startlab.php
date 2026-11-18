@@ -58,6 +58,15 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                             $jsonContent = file_get_contents($jsonFile);
                             $labData = json_decode($jsonContent, true);
                             if ($labData) {
+                                $networksFile = $fullPath . '/networks.json';
+                                if (file_exists($networksFile)) {
+                                    $netContent = file_get_contents($networksFile);
+                                    $netData = json_decode($netContent, true);
+                                    if (is_array($netData)) {
+                                        $labData['networks_data'] = $netData;
+                                    }
+                                }
+
                                 $availableLabs[] = $labData;
                             }
                         }
@@ -83,7 +92,22 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                 foreach ($availableLabs as $lab):
                     $labName  = isset($lab['lab_name']) ? htmlspecialchars($lab['lab_name']) : '';
                     $labDir   = isset($lab['lab_dir']) ? htmlspecialchars($lab['lab_dir']) : '';
-                    $switches = isset($lab['switches']) ? htmlspecialchars($lab['switches']) : '';
+
+                    $switchesHtml = '';
+                    if (isset($lab['networks_data']) && is_array($lab['networks_data'])) {
+                        $switchLines = [];
+                        foreach ($lab['networks_data'] as $sName => $sDetails) {
+                            if (isset($sDetails['network'])) {
+                                $switchLines[] = htmlspecialchars($sDetails['network']) . ' (net)';
+                            }
+                            if (isset($sDetails['gateway'])) {
+                                $switchLines[] = htmlspecialchars($sDetails['gateway']) . ' (gw)';
+                            }
+                        }
+                        $switchesHtml = implode('<br>', $switchLines);
+                    } else {
+                        $switchesHtml = isset($lab['switches']) ? htmlspecialchars($lab['switches']) : '';
+                    }
 
                     $machinesHtml = '';
                     if (isset($lab['machines']) && is_array($lab['machines'])) {
@@ -97,7 +121,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                             <tr style="border-bottom: 1px solid #eee;">
                                 <td style="padding: 8px; vertical-align: middle;"><?php echo $labName; ?></td>
                                 <td style="padding: 8px; vertical-align: middle; color: #666; font-size: 0.9em;"><?php echo $labDir; ?></td>
-                                <td style="padding: 8px; vertical-align: middle;"><?php echo $switches; ?></td>
+                                <td style="padding: 8px; vertical-align: middle; line-height: 1.4;"><?php echo $switchesHtml; ?></td>
                                 <td style="padding: 8px; vertical-align: middle; line-height: 1.4;"><?php echo $machinesHtml; ?></td>
                                 <td style="padding: 8px; vertical-align: middle; text-align: right;">
                                     <form method="GET" action="" style="margin: 0;">
@@ -137,7 +161,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: monospace;">
                         <thead>
                             <tr style="border-bottom: 2px solid #ccc; background-color: #f4f4f4;">
-                                <th style="padding: 8px;">NAME</th>
+                                <th style="padding: 8px;">MACHINE</th>
                                 <th style="padding: 8px;">IMAGE</th>
                                 <th style="padding: 8px;">NETWORKS</th>
                                 <th style="padding: 8px;">STATE</th>
@@ -148,14 +172,14 @@ if (!$settingsData["einar2"]["jailbreak"]) {
 
         <?php
                 foreach ($phpArray as $row):
-                    $nameValue     = isset($row['Name']) ? htmlspecialchars($row['Name']) : '';
+                    $machineValue  = isset($row['Name']) ? htmlspecialchars($row['Name']) : '';
                     $imageValue    = isset($row['Image']) ? htmlspecialchars($row['Image']) : '';
                     $networksValue = isset($row['Networks']) ? htmlspecialchars($row['Networks']) : '';
                     $stateValue    = isset($row['State']) ? htmlspecialchars($row['State']) : '';
         ?>
 
                             <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 8px; vertical-align: middle;"><?php echo $nameValue; ?></td>
+                                <td style="padding: 8px; vertical-align: middle;"><?php echo $machineValue; ?></td>
                                 <td style="padding: 8px; vertical-align: middle;"><?php echo $imageValue; ?></td>
                                 <td style="padding: 8px; vertical-align: middle;"><?php echo $networksValue; ?></td>
                                 <td style="padding: 8px; vertical-align: middle;">
@@ -170,11 +194,11 @@ if (!$settingsData["einar2"]["jailbreak"]) {
 
                                 </td>
                                 <td style="padding: 8px; vertical-align: middle; text-align: right;">
-                                    <?php if ($nameValue === 'einar2-webui'): ?>
+                                    <?php if ($machineValue === 'einar2-webui'): ?>
                                         <span style="font-weight: bold; color: black;">WEBUI</span>
                                     <?php else: ?>
                                         <form method="GET" action="" style="margin: 0; display: inline-block;">
-                                            <input type="hidden" name="laboratory" value="<?php echo $nameValue; ?>">
+                                            <input type="hidden" name="laboratory" value="<?php echo $machineValue; ?>">
                                             <button type="submit" style="padding: 4px 10px; cursor: pointer;">Manage</button>
                                         </form>
                                     <?php endif; ?>
