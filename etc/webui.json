@@ -5,5 +5,8 @@
   },
   "einard": {
     "socket": "/var/run/einar2.sock"
+  },
+  "eworker": {
+    "timeout": 5000
   }
 }

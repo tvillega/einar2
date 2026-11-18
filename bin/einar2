@@ -31,6 +31,8 @@ export LOCAL UPSTREAM
 export UTILS_TARBALL IMAGE_TARBALL
 export UPSTREAM_UTILS_URL UPSTREAM_IMAGE_URL
 
+export LABS_ROOT
+
 cmd_init() {
   if [ "$#" -eq 0 ] ; then
     "$PKG_LIB_DIR/einar2-help.sh" init
@@ -39,6 +41,17 @@ cmd_init() {
     "$PKG_LIB_DIR/einar2-hook.sh" init -1 "${@}"
     "$PKG_LIB_DIR/einar2-init.sh" "${@}"
     "$PKG_LIB_DIR/einar2-hook.sh" init 1 "${@}"
+  fi
+}
+
+cmd_labs() {
+  if [ "$#" -eq 0 ] ; then
+    #"$PKG_LIB_DIR/einar2-help.sh" labs
+    exit
+  else
+    #"$PKG_LIB_DIR/einar2-hook.sh" labs -1 "${@}"
+    "$PKG_LIB_DIR/einar2-labs.sh" "${@}"
+    #"$PKG_LIB_DIR/einar2-hook.sh" labs 1 "${@}"
   fi
 }
 
@@ -53,6 +66,7 @@ cmd_run() {
   fi
 }
 
+
 cmd="$1"
 
 if [ -z "$cmd" ] ; then
@@ -62,6 +76,10 @@ if [ -z "$cmd" ] ; then
 elif [ "$cmd" = "selfupdate" ] ; then
   shift
   cmd_init selfupdate
+
+elif [ "$cmd" = "labs" ] ; then
+  shift
+  cmd_labs "${@}"
 
 elif [ "$cmd" = "run" ] ; then
   shift

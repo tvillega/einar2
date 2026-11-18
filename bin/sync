@@ -91,7 +91,7 @@ fun_sync_defaults() {
   if [[ $s -lt 0 ]] ; then
     rm -v "$PKG_WWW_DIR"/webui.json
   else
-    cp -v  --remove-destination "$PKG_ETC_DIR"/webui/webui.json "$PKG_WWW_DIR"/webui.json
+    cp -v  --remove-destination "$PKG_ETC_DIR"/webui.json "$PKG_WWW_DIR"/webui.json
   fi
 
 }
