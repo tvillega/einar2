@@ -60,30 +60,44 @@ parser_launch() {
 }
 
 parser_exec() {
+
+    # Here the entire string is on $1 (sh is strict about it)
+    old_ifs="$IFS"
+    IFS=' '
+    set -f
+    set -- $1
+    set +f
+    IFS="$old_ifs"
+    # Now I have each arg on a $1 $2 .. and $@
+
     case "$1" in
-        einar2*)
-            log "executing $1"
-            RESP=$(einar2 "${1#einar2 }")
+        einar2)
+            log "executing $*"
+            shift
+            RESP=$(einar2 "$@")
             reply "$RESP"
             ;;
-        eterm*)
-            log "executing $1"
-            RESP=$(eterm "${1#eterm }")
+        eterm)
+            log "executing $*"
+            shift
+            RESP=$(eterm "$@")
             reply "DONE"
             ;;
-        dhcpcd*)
-            log "executing $1"
-            dhcpcd -k ; dhcpcd
+        dhcpcd)
+            log "executing $*"
+            shift
+            dhcpcd -k "$@" ; dhcpcd "$@"
             reply "DONE"
             ;;
-        dnsfix*)
-            log "executing $1"
+        dnsfix)
+            log "executing dnsfix"
             RESP=$(rm /etc/resolv.conf && echo "nameserver 8.8.8.8" > /etc/resolv.conf)
             reply "$RESP"
             ;;
-        setxkbmap*)
-            log "executing $1"
-            setxkbmap "${1#setxkbmap }"
+        setxkbmap)
+            log "executing $*"
+            shift
+            setxkbmap "$@"
             reply "DONE"
             ;;
         shutdown)

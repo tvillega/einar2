@@ -11,9 +11,6 @@ if (!$settingsData["einar2"]["jailbreak"]) {
   die("Action forbidden: container isolated from host");
 }
 
-$command = 'echo "einar2 run list labs" | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
-$output = shell_exec($command);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,21 +40,38 @@ $output = shell_exec($command);
 
         <h1>Start a lab</h1>
 
-        <center><p><b>Built-in laboratories</b></p></center>
+        <center><p><b>Available laboratories</b></p></center>
+
+        <!-- I have to list the /einar2/labs that should be the DOCUMENT_ROOT I think  -->
+
         <?php
-          $array = array_filter(explode("\n", $output));
-          echo "<pre>";
-          echo print_r($array);
-          echo "</pre>";
+            echo "<pre>";
+            $dirs = scandir($_SERVER["DOCUMENT_ROOT"] . "/labs");
+            array_shift($dirs);
+            array_shift($dirs);
+            echo "</pre>";
         ?>
-        <center><p><b>Your laboratories</b></p></center>
+
+        <center><p><b>Deployed laboratories</b></p></center>
         <?php
-          echo "<pre>";
-          $dirs = scandir($_SERVER["DOCUMENT_ROOT"] . "/labs");
-          array_shift($dirs);
-          array_shift($dirs);
-          echo print_r($dirs);
-          echo "</pre>";
+            $command = 'echo exec einar2 labs list all | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
+            $response = shell_exec($command);
+
+            echo "<pre>";
+            echo $response;
+            echo "</pre>";
+
+            $phpArray = [];
+
+            if ($response !== null && trim($response) !== '') {
+                $phpArray = json_decode($response, true);
+            }
+
+            $jsonArray = json_encode($phpArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+            echo "<pre>";
+            echo print_r($jsonArray);
+            echo "</pre>";
         ?>
 
         <div style="margin-top: 15px;">
