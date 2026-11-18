@@ -53,13 +53,10 @@ if (!$settingsData["einar2"]["jailbreak"]) {
         ?>
 
         <center><p><b>Deployed laboratories</b></p></center>
+
         <?php
             $command = 'echo exec einar2 labs list all | socat - UNIX-CONNECT:' . escapeshellarg($settingsData["einard"]["socket"]);
             $response = shell_exec($command);
-
-            echo "<pre>";
-            echo $response;
-            echo "</pre>";
 
             $phpArray = [];
 
@@ -67,11 +64,66 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                 $phpArray = json_decode($response, true);
             }
 
-            $jsonArray = json_encode($phpArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            if (!empty($phpArray) && is_array($phpArray)):
+        ?>
 
-            echo "<pre>";
-            echo print_r($jsonArray);
-            echo "</pre>";
+                <div style="margin: 0 auto; width: 80%;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: monospace;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #ccc; background-color: #f4f4f4;">
+                                <th style="padding: 8px;">NAME</th>
+                                <th style="padding: 8px;">IMAGE</th>
+                                <th style="padding: 8px;">NETWORKS</th>
+                                <th style="padding: 8px;">STATE</th>
+                                <th style="padding: 8px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+        <?php
+                foreach ($phpArray as $row):
+                    $nameValue     = isset($row['Name']) ? htmlspecialchars($row['Name']) : '';
+                    $imageValue    = isset($row['Image']) ? htmlspecialchars($row['Image']) : '';
+                    $networksValue = isset($row['Networks']) ? htmlspecialchars($row['Networks']) : '';
+                    $stateValue    = isset($row['State']) ? htmlspecialchars($row['State']) : '';
+        ?>
+
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 8px; vertical-align: middle;"><?php echo $nameValue; ?></td>
+                                <td style="padding: 8px; vertical-align: middle;"><?php echo $imageValue; ?></td>
+                                <td style="padding: 8px; vertical-align: middle;"><?php echo $networksValue; ?></td>
+                                <td style="padding: 8px; vertical-align: middle;">
+
+                                    <?php
+                                        if ($stateValue === 'running') {
+                                            echo '<span style="color: green; font-weight: bold;">running</span>';
+                                        } else {
+                                            echo '<span style="color: chocolate; font-weight: bold;">' . $stateValue . '</span>';
+                                        }
+                                    ?>
+
+                                </td>
+                                <td style="padding: 8px; vertical-align: middle; text-align: right;">
+                                    <?php if ($nameValue === 'einar2-webui'): ?>
+                                        <span style="font-weight: bold; color: black;">WEBUI</span>
+                                    <?php else: ?>
+                                        <form method="GET" action="" style="margin: 0; display: inline-block;">
+                                            <input type="hidden" name="laboratory" value="<?php echo $nameValue; ?>">
+                                            <button type="submit" style="padding: 4px 10px; cursor: pointer;">Manage</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+        <?php
+                endforeach;
+        ?>
+                        </tbody>
+                    </table>
+                </div>
+        <?php
+            else:
+                echo '<p style="text-align: center;">No deployed laboratories found.</p>';
+            endif;
         ?>
 
         <div style="margin-top: 15px;">
