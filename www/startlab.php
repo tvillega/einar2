@@ -42,14 +42,80 @@ if (!$settingsData["einar2"]["jailbreak"]) {
 
         <center><p><b>Available laboratories</b></p></center>
 
-        <!-- I have to list the /einar2/labs that should be the DOCUMENT_ROOT I think  -->
-
         <?php
-            echo "<pre>";
-            $dirs = scandir($_SERVER["DOCUMENT_ROOT"] . "/labs");
-            array_shift($dirs);
-            array_shift($dirs);
-            echo "</pre>";
+            $labsBasePath = $_SERVER['DOCUMENT_ROOT'] . '/labs';
+            $availableLabs = [];
+
+            if (is_dir($labsBasePath)) {
+                $scanDirs = scandir($labsBasePath);
+                foreach ($scanDirs as $dir) {
+                    if ($dir === '.' || $dir === '..') continue;
+
+                    $fullPath = $labsBasePath . '/' . $dir;
+                    if (is_dir($fullPath)) {
+                        $jsonFile = $fullPath . '/lab.json';
+                        if (file_exists($jsonFile)) {
+                            $jsonContent = file_get_contents($jsonFile);
+                            $labData = json_decode($jsonContent, true);
+                            if ($labData) {
+                                $availableLabs[] = $labData;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!empty($availableLabs)):
+        ?>
+                <div style="margin: 0 auto; width: 80%; margin-bottom: 30px;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: monospace;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #ccc; background-color: #f4f4f4;">
+                                <th style="padding: 8px;">LAB NAME</th>
+                                <th style="padding: 8px;">DIRECTORY</th>
+                                <th style="padding: 8px;">SWITCHES</th>
+                                <th style="padding: 8px;">MACHINES</th>
+                                <th style="padding: 8px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        <?php
+                foreach ($availableLabs as $lab):
+                    $labName  = isset($lab['lab_name']) ? htmlspecialchars($lab['lab_name']) : '';
+                    $labDir   = isset($lab['lab_dir']) ? htmlspecialchars($lab['lab_dir']) : '';
+                    $switches = isset($lab['switches']) ? htmlspecialchars($lab['switches']) : '';
+
+                    $machinesHtml = '';
+                    if (isset($lab['machines']) && is_array($lab['machines'])) {
+                        $machineLines = [];
+                        foreach ($lab['machines'] as $mName => $mVal) {
+                            $machineLines[] = htmlspecialchars($mName) . ' (' . htmlspecialchars($mVal) . ')';
+                        }
+                        $machinesHtml = implode('<br>', $machineLines);
+                    }
+        ?>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 8px; vertical-align: middle;"><?php echo $labName; ?></td>
+                                <td style="padding: 8px; vertical-align: middle; color: #666; font-size: 0.9em;"><?php echo $labDir; ?></td>
+                                <td style="padding: 8px; vertical-align: middle;"><?php echo $switches; ?></td>
+                                <td style="padding: 8px; vertical-align: middle; line-height: 1.4;"><?php echo $machinesHtml; ?></td>
+                                <td style="padding: 8px; vertical-align: middle; text-align: right;">
+                                    <form method="GET" action="" style="margin: 0;">
+                                        <input type="hidden" name="laboratory" value="<?php echo $labName; ?>">
+                                        <button type="submit" style="padding: 4px 10px; cursor: pointer;">Start</button>
+                                    </form>
+                                </td>
+                            </tr>
+        <?php
+                endforeach;
+        ?>
+                        </tbody>
+                    </table>
+                </div>
+        <?php
+            else:
+                echo '<p style="text-align: center;">No available laboratories found.</p>';
+            endif;
         ?>
 
         <center><p><b>Deployed laboratories</b></p></center>
