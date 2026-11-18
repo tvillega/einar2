@@ -16,10 +16,10 @@ if (!$settingsData["einar2"]["jailbreak"]) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Setup interfaces</title>
+    <title>Start a lab</title>
     <style>
         body {
-            padding: 20px;
+            padding: 7px;
         }
         .form-group {
             padding: 5px 0px;
