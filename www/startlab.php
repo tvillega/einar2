@@ -193,7 +193,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
 
                 foreach ($groupedContainers as $labGroupName => $containers) {
         ?>
-                    <details open style="margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
+                    <details style="margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
                         <summary style="padding: 10px 15px; background-color: #f4f4f4; font-family: monospace; font-weight: bold; cursor: pointer; user-select: none;">
                             Lab: <?php echo htmlspecialchars($labGroupName); ?> (<?php echo count($containers); ?> containers)
                         </summary>
