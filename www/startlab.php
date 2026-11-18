@@ -140,7 +140,7 @@ if (!$settingsData["einar2"]["jailbreak"]) {
                                     </div>
                                 </td>
                                 <td style="padding: 8px; vertical-align: middle; text-align: right;">
-                                    <form method="GET" action="/createlab" style="margin: 0;">
+                                    <form method="GET" action="/createlab.php" style="margin: 0;">
                                         <input type="hidden" name="laboratory" value="<?php echo $labName; ?>">
                                         <button type="submit" style="padding: 4px 10px; cursor: pointer;">Edit</button>
                                     </form>
