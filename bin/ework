@@ -113,7 +113,7 @@ parser_exec() {
             ;;
         shutdown)
             log "shutting down system"
-            shutdown
+            poweroff
             reply "DONE"
             ;;
         *)
