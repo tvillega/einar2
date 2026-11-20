@@ -7,6 +7,17 @@ if [ "$#" -eq 1 ]; then
     IFS="$old_ifs"
 fi
 
+# settings overrides
+[ -f /etc/einar2/einard.conf ] && . /etc/einar2/einard.conf
+[ -f /usr/local/etc/einar2/einard.conf ] && . /usr/local/etc/einar2/einard.conf
+[ -f ~/.einard.conf ] && . ~/.einard.conf
+
+# systemd unit does not set $HOME
+HOME="${HOME:-$(getent passwd "$(id -u)" | cut -d: -f6)}"
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+[ -f "$XDG_CONFIG_HOME/einar2/einard.conf" ] && . "$XDG_CONFIG_HOME/einar2/einard.conf"
+
 mode="halt-on-error"
 
 while [ "$#" -gt 0 ]; do
@@ -59,4 +70,4 @@ case "$mode" in
         ;;
 esac
 
-lxterminal -e "$cmd" &
+$TERM -e "$cmd" &
