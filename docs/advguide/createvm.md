@@ -38,7 +38,7 @@ Creates a *stage 3* overlay that adds and setups `einar2-utils`.
 (1) Create the `qcow2` image:
 
 ```
-qemu-img create -f qcow2 -F qcow2 -b einar2-stage2.img einar2-stage3.img
+qemu-img create -f qcow2 -F qcow2 -b einar2-stage2.img dist/einar2-stage3.img
 ```
 
 (2) Create a script to start the VM:
@@ -143,7 +143,7 @@ This stage creates a ready-to-use VM to export.
 > This will merge all overlays on the final image.
 
 ```
-qemu-img convert -p -m 8 -O qcow2 -c -o compression_type=zstd,cluster_size=64k einar2-stage3.img einar2-$TAG.img
+qemu-img convert -p -m 8 -O qcow2 -c -o compression_type=zstd,cluster_size=64k dist/einar2-stage3.img dist/einar2-$TAG.img
 ```
 
 (2) Create a **Virtual Box compatible** disk:

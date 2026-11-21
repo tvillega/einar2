@@ -9,6 +9,18 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
+init_unload_webui() {
+    echo "  -> Unloading webui..."
+    docker compose -f "${PKG_SHARE_DIR}/compose.yml" down
+    sleep 2
+}
+
+init_load_webui() {
+    echo "  -> Loading webui..."
+    docker compose -f "${PKG_SHARE_DIR}/compose.yml" up -d
+    sleep 2
+}
+
 init_utils() {
     echo "==> Updating einar2-utils..."
     echo "  -> Fetching tarball from upstream..."
@@ -29,8 +41,10 @@ init_image() {
         echo "==> ERROR: Failed to fetch. Did you setup the server?"
         exit 1
     fi
+    init_unload_webui
     echo "  -> Installing image on system..."
     docker load < "${LOCAL}/${IMAGE_TARBALL}"
+    init_load_webui
 }
 
 init_daemon_docker() {
