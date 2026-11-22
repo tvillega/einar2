@@ -96,10 +96,6 @@ elif [ "$cmd" = "netns" ] ; then
   shift
   cmd_netns "${@}"
 
-elif [ "$cmd" = "run" ] ; then
-  shift
-  cmd_run "${@}"
-
 else
   echo "$(basename "$0"): unknown command: $cmd" >&2
 fi
