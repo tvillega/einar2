@@ -1,5 +1,9 @@
 #!/bin/sh
 
+set -eu
+IFS='
+	'
+
 PKG_BIN_DIR=$( cd "$(dirname "$0")" ; pwd -P )
 PKG_ROOT_DIR=$( cd "$PKG_BIN_DIR/.." ; pwd -P )
 
@@ -40,40 +44,29 @@ cmd_init() {
   else
     "$PKG_LIB_DIR/einar2-hook.sh" init -1 "${@}"
     "$PKG_LIB_DIR/einar2-init.sh" "${@}"
-    "$PKG_LIB_DIR/einar2-hook.sh" init 1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" init  1 "${@}"
   fi
 }
 
 cmd_labs() {
   if [ "$#" -eq 0 ] ; then
-    #"$PKG_LIB_DIR/einar2-help.sh" labs
+   "$PKG_LIB_DIR/einar2-help.sh" labs
     exit
   else
-    #"$PKG_LIB_DIR/einar2-hook.sh" labs -1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" labs -1 "${@}"
     "$PKG_LIB_DIR/einar2-labs.sh" "${@}"
-    #"$PKG_LIB_DIR/einar2-hook.sh" labs 1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" labs  1 "${@}"
   fi
 }
 
 cmd_netns() {
   if [ "$#" -eq 0 ] ; then
-    #"$PKG_LIB_DIR/einar2-help.sh" netns
+    "$PKG_LIB_DIR/einar2-help.sh" netns
     exit
   else
-    #"$PKG_LIB_DIR/einar2-hook.sh" netns -1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" netns -1 "${@}"
     "$PKG_LIB_DIR/einar2-netns.sh" "${@}"
-    #"$PKG_LIB_DIR/einar2-hook.sh" netns 1 "${@}"
-  fi
-}
-
-cmd_run() {
-  if [ "$#" -eq 0 ] ; then
-    "$PKG_LIB_DIR/einar2-help.sh" run
-    exit
-  else
-    "$PKG_LIB_DIR/einar2-hook.sh" run -1 "${@}"
-    "$PKG_LIB_DIR/einar2-run.sh" "${@}"
-    "$PKG_LIB_DIR/einar2-hook.sh" run 1 "${@}"
+    "$PKG_LIB_DIR/einar2-hook.sh" netns  1 "${@}"
   fi
 }
 
