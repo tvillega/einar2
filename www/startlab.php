@@ -167,6 +167,11 @@ if ($response !== null && trim($response) !== '') {
                                         <input type="hidden" name="laboratory" value="<?php echo htmlspecialchars($labName); ?>">
                                         <button type="submit" style="padding: 4px 10px; cursor: pointer;">Edit</button>
                                     </form>
+
+                                    <form method="GET" action="/selfdocs.php" style="margin: 0; display: inline-block;">
+                                        <input type="hidden" name="laboratory" value="<?php echo htmlspecialchars($labName); ?>">
+                                        <button type="submit" style="padding: 4px 10px; cursor: pointer;">Docs</button>
+                                    </form>
                                 </td>
                             </tr>
         <?php
