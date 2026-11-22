@@ -1,3 +1,5 @@
+<!-- title: Create an Einar2 VM: Stage 1  -->
+
 ## Stage 1
 
 Creates a *stage 1* overlay of a minimal Ubuntu.

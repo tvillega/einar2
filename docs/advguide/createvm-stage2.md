@@ -1,3 +1,5 @@
+<!-- title: Create an Einar2 VM: Stage 2 -->
+
 ## Stage 2
 
 Creates a *stage 2* overlay with required packages.
