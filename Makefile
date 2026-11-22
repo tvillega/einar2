@@ -47,7 +47,6 @@ install:
 	install -m 755 bin/einard             $(DESTDIR)$(bindir)/einard
 	install -m 755 bin/eterm              $(DESTDIR)$(bindir)/eterm
 	install -m 755 bin/ework              $(DESTDIR)$(bindir)/ework
-	install -m 755 bin/netns              $(DESTDIR)$(bindir)/netns
 
 	install -m 644 etc/einar2.conf        $(DESTDIR)$(sysconfdir)/einar2.conf
 	install -m 644 etc/einard.conf        $(DESTDIR)$(sysconfdir)/einard.conf
@@ -90,7 +89,6 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/einard
 	rm -f $(DESTDIR)$(bindir)/eterm
 	rm -f $(DESTDIR)$(bindir)/ework
-	rm -f $(DESTDIR)$(bindir)/netns
 
 	rm -f $(DESTDIR)$(dockerovrdir)/override.conf
 	rm -f $(DESTDIR)/etc/profile.d/einar2-utils.sh
