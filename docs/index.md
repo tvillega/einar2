@@ -14,35 +14,7 @@ The docker image is based on Alpine which is a lightweight Linux distribution ta
 
 ## How do I get started?
 
-Create a directory on your system and enter it:
-
-```
-mkdir path/to/work && cd path/to/work
-```
-
-Create the following `docker-compose.yml`:
-
-```
-services:
-
-  einar2-webui:
-    image: tvillega/einar2:latest
-    container_name: einar2-webui
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./config:/einar2/config
-      - ./labs:/einar2/labs
-```
-
-Spin up the container:
-
-```
-docker compose up -d
-```
-
-You will get a startpage at `localhost` on your web browser where you can get started.
+Your instructor will provide you an Einar2 VM tailored to the course.
 
 ## Why the name Einar2?
 

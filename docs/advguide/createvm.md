@@ -1,3 +1,5 @@
+<!-- title: Create an Einar2 VM -->
+
 ## Create VM
 
 Steps are grouped into *stages*, each stage creates an overlay

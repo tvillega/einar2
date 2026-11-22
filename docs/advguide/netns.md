@@ -1,10 +1,11 @@
+<!-- title: Manage docker network namespaces -->
+
 ## Network Namespaces
 
 Docker saves its network namespaces in `/run/docker/netns`, separated to the system's `/run/netns`.
-Einar2 provides a utility to attach those namespaces to your system.
+Einar2 provides a utility command to attach those namespaces to your system.
 
 Once your containers are up and running, check their existence on the host.
-You require superuser privileges to include docker private network namespace directory on the list.
 
 ```
 lsns -t net
@@ -13,7 +14,7 @@ lsns -t net
 Knowing that, you can now let einar2 attach them to your system:
 
 ```
-einar2 run util netns-attach
+netns attach
 ```
 
 List the network namespaces again and you'll find that each of them now has as alias the container's name:
@@ -35,10 +36,10 @@ You can also run a new process under that namespaces and it will have the same n
 nsenter --net=/run/netns/<container-name> <command>
 ```
 
-To detach the network namespaces of your host, run the following einar2 utility:
+To detach the network namespaces from your system, run the following:
 
 ```
-einar2 run util netns-detach
+netns detach
 ```
 
 If you don't do this before spinning down the containers, the network namespaces will linger on your system.

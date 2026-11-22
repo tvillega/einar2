@@ -2,40 +2,6 @@
 
 Einar Is Not A Router v2, networking laboratory on docker.
 
-## Classroom Environment
-
-Create a directory on your system and enter it:
-
-```
-mkdir path/to/work && cd path/to/work
-```
-
-Create the following `docker-compose.yaml`:
-
-```
-services:
-
-  einar2-webui:
-    image: tvillega/einar2:latest
-    container_name: einar2-webui
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./config:/einar2/config
-      - ./labs:/einar2/labs
-```
-
-Now you can go to `localhost` or `127.0.0.1:80` on your web browser to start using Einar2.
-
-## CLI Usage
-
-Learn more about the CLI by running:
-
-```
-einar2
-```
-
 ## Credits
 
 ### Einar1.0
@@ -45,5 +11,4 @@ All the credits of this invention, as well as the authorship of the name `Einar`
 
 ### [michelf/php-markdown](https://github.com/michelf/php-markdown)
 
-Their awesome library allowed me to write simple markdown files for docs and changelogs,
-converting them to ready-to-use websites in two PHP lines.
+Their awesome library allowed me to write simple markdown files for docs, converting them to ready-to-use websites in two PHP lines.
