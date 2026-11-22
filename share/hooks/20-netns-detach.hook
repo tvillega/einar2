@@ -1,9 +1,0 @@
-# share/hooks/20-netns-detach.hook
-[Trigger]
-Command = labs
-Subcommand = stop
-
-[Action]
-Description = Detaching e2-* network namespaces before lab teardown...
-When = PreTransaction
-Exec = "$PKG_LIB_DIR/einar2-netns.sh" detach
