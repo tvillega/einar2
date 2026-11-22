@@ -1,0 +1,9 @@
+# share/hooks/00-labs-check.hook
+[Trigger]
+Command = labs
+Subcommand = *
+
+[Action]
+Description = Checking Docker daemon availability...
+When = PreTransaction
+Exec = docker info >/dev/null 2>&1 || { echo "err: docker daemon is not running" >&2; exit 1; }

@@ -1,0 +1,9 @@
+# share/hooks/10-netns-attach.hook
+[Trigger]
+Command = labs
+Subcommand = start
+
+[Action]
+Description = Attaching running e2-* container network namespaces...
+When = PostTransaction
+Exec = "$PKG_LIB_DIR/einar2-netns.sh" attach
