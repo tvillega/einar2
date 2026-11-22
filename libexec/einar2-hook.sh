@@ -9,74 +9,73 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
-hook_run() {
-    local s="$1"
-    shift
+parse_hook_field() {
+    file="$1"
+    section="$2"
+    key="$3"
 
-    if [ "$s" -lt 0 ]; then
-        for a in "$PKG_HOOK_DIR"/*pre.run; do
-            [ -f "$a" ] || continue
-            "$a" "$@"
-        done
+    awk -v target_sec="$section" -v target_key="$key" '
+        /^[[:space:]]*(#|;|$)/ { next }
+        /^\[.*\]/ {
+            sec = $0
+            sub(/^\[/, "", sec)
+            sub(/\][[:space:]]*$/, "", sec)
+            in_sec = (sec == target_sec)
+            next
+        }
+        in_sec {
+            eq = index($0, "=")
+            if (eq == 0) next
+            k = substr($0, 1, eq - 1)
+            v = substr($0, eq + 1)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", k)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", v)
+            if (k == target_key) {
+                print v
+                exit
+            }
+        }
+    ' "$file"
+}
+
+run_matching_hooks() {
+    cmd="$1"
+    phase_num="$2"
+    subcmd="${3:-*}"
+
+    if [ "$phase_num" -lt 0 ]; then
+        phase="PreTransaction"
     else
-        for a in "$PKG_HOOK_DIR"/*post.run; do
-            [ -f "$a" ] || continue
-            "$a" "$@"
-        done
+        phase="PostTransaction"
     fi
+
+    [ -d "${PKG_HOOK_DIR:-}" ] || return 0
+
+    for hook_file in "$PKG_HOOK_DIR"/*.hook; do
+        [ -f "$hook_file" ] || continue
+
+        h_cmd=$(parse_hook_field "$hook_file" "Trigger" "Command")
+        h_sub=$(parse_hook_field "$hook_file" "Trigger" "Subcommand")
+
+        [ "$h_cmd" = "$cmd" ] || continue
+        if [ -n "$h_sub" ] && [ "$h_sub" != "*" ] && [ "$h_sub" != "$subcmd" ]; then
+            continue
+        fi
+
+        h_desc=$(parse_hook_field "$hook_file" "Action" "Description")
+        h_when=$(parse_hook_field "$hook_file" "Action" "When")
+        h_exec=$(parse_hook_field "$hook_file" "Action" "Exec")
+
+        [ "$h_when" = "$phase" ] || continue
+        [ -n "$h_exec" ] || continue
+
+        if [ -n "$h_desc" ]; then
+            echo ":: $h_desc"
+        fi
+
+        sh -c "$h_exec"
+    done
 }
 
-hook_ipc() {
-    local s="$1"
-    shift
-
-    if [ "$s" -lt 0 ]; then
-        for a in "$PKG_HOOK_DIR"/*pre.ipc; do
-            [ -f "$a" ] || continue
-            "$a" "$@"
-        done
-    else
-        for a in "$PKG_HOOK_DIR"/*post.ipc; do
-            [ -f "$a" ] || continue
-            "$a" "$@"
-        done
-    fi
-}
-
-hook_or_disable() {
-    # Default hooks are mandatory for simplicity
-    # removing any of them will disable all hooks
-
-    [ -d "${PKG_HOOK_DIR:-}" ] || exit 0
-    [ -f "${PKG_HOOK_DIR}/00-default-post.run" ] || exit 0
-    [ -f "${PKG_HOOK_DIR}/00-default-pre.run" ] || exit 0
-    [ -f "${PKG_HOOK_DIR}/00-default-post.ipc" ] || exit 0
-    [ -f "${PKG_HOOK_DIR}/00-default-pre.ipc" ] || exit 0
-}
-
-hook_or_disable
-
-[ -z "${1-}" ] && exit 0
-
-while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
-    case "$1" in
-        run)
-            shift
-            hook_run "$@"
-            exit 0
-            ;;
-        ipc)
-            shift
-            hook_ipc "$@"
-            exit 0
-            ;;
-        *)
-            break
-            ;;
-    esac
-    shift
-done
-
-if [ "${1-}" = '--' ]; then
-    shift
-fi
+[ "$#" -lt 2 ] && exit 0
+run_matching_hooks "$@"

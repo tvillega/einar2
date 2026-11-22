@@ -18,6 +18,11 @@ netns_attach() {
     for c in $(docker ps --format '{{.Names}}'); do
         case "$c" in
             e2-*)
+                if [ -e "/run/netns/$c" ]; then
+                    echo "Skipping $c (already attached)"
+                    continue
+                fi
+
                 P=$(docker inspect --format '{{ .State.Pid }}' "$c" 2>/dev/null)
                 if [ -n "$P" ] && [ "$P" != "0" ]; then
                     echo "$c -> $P"
@@ -39,13 +44,11 @@ netns_detach() {
 
     echo ":: Detaching einar2 docker containers"
 
-    for c in $(docker ps --format '{{.Names}}'); do
-        case "$c" in
-            e2-*)
-                echo "Detaching $c"
-                ip netns delete "$c" 2>/dev/null || true
-                ;;
-        esac
+    for ns_path in /run/netns/e2-*; do
+        [ -e "$ns_path" ] || continue
+        c="${ns_path##*/}"
+        echo "Detaching $c"
+        ip netns delete "$c" 2>/dev/null || true
     done
 
     echo "-> ip net list"
