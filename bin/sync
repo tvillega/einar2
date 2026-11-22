@@ -13,6 +13,17 @@ PKG_DOCS_DIR="${PKG_ROOT_DIR}/docs"
 PKG_WWW_DIR="${PKG_ROOT_DIR}/www"
 PKG_CFG_DIR="${PKG_ROOT_DIR}/config"
 
+print_help_sync() {
+cat << 'EOF'
+usage: sync <command>
+
+Devel util. Sync configuration files to DOCUMENT_ROOT.
+
+  <command> ::= yay
+              | nay
+EOF
+}
+
 fun_sync_archetypes() {
 
   local s="$1" ; shift
@@ -124,7 +135,7 @@ fun_sync_all() {
 cmd="$1"
 
 if [[ -z "$cmd" ]] ; then
-  $PKG_LIBX_DIR/einar2-help.sh sync
+  print_help_sync
   exit
 
 elif [[ "$cmd" == "yay" || "$cmd" == "y" ]] ; then
