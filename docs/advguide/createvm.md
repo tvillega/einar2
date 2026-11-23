@@ -7,6 +7,14 @@ on top of the previously constructed image. This helps saving
 bandwith and time as a misconfigured overlay can just be destroyed
 and re-built starting from a previous one.
 
+### Dependencies
+
+The following programs are required to build the VM:
+
+* [`dosfstools`](https://man.archlinux.org/listing/core/dosfstools/)
+* [`debootstrap`](https://archlinux.org/packages/extra/any/debootstrap/)
+* [`arch-install-scripts`](https://man.archlinux.org/listing/extra/arch-install-scripts/)
+
 (1) Start by cloning the repository:
 
 ```
