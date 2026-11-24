@@ -28,6 +28,9 @@ export PKG_HOOK_DIR
 [ -f /usr/local/etc/einar2/einar2.conf ] && . /usr/local/etc/einar2/einar2.conf
 [ -f ~/.einar2.conf ] && . ~/.einar2.conf
 
+# systemd unit does not set $HOME
+HOME="${HOME:-$(getent passwd "$(id -u)" | cut -d: -f6)}"
+
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ -f "$XDG_CONFIG_HOME/einar2/einar2.conf" ] && . "$XDG_CONFIG_HOME/einar2/einar2.conf"
 
