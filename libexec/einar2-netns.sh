@@ -9,7 +9,41 @@ if [ -z "${PKG_ROOT_DIR:-}" ]; then
     exit 1
 fi
 
+netns_attach_one() {
+    c="$1"
+
+    if [ -e "/run/netns/$c" ]; then
+        echo "Skipping $c (already attached)"
+        return 0
+    fi
+
+    P=$(docker inspect --format '{{ .State.Pid }}' "$c" 2>/dev/null)
+    if [ -n "$P" ] && [ "$P" != "0" ]; then
+        echo "$c -> $P"
+        ip netns attach "$c" "$P"
+    else
+        echo "Warning: Could not get valid PID for $c" >&2
+        return 1
+    fi
+}
+
+netns_detach_one() {
+    c="$1"
+
+    if [ -e "/run/netns/$c" ]; then
+        echo "Detaching $c"
+        ip netns delete "$c" 2>/dev/null || true
+    else
+        echo "Skipping $c (not attached)"
+    fi
+}
+
 netns_attach() {
+    if [ "$#" -gt 0 ]; then
+        netns_attach_one "$1"
+        return $?
+    fi
+
     echo "-> ip net list"
     ip net list
 
@@ -18,18 +52,7 @@ netns_attach() {
     for c in $(docker ps --format '{{.Names}}'); do
         case "$c" in
             e2-*)
-                if [ -e "/run/netns/$c" ]; then
-                    echo "Skipping $c (already attached)"
-                    continue
-                fi
-
-                P=$(docker inspect --format '{{ .State.Pid }}' "$c" 2>/dev/null)
-                if [ -n "$P" ] && [ "$P" != "0" ]; then
-                    echo "$c -> $P"
-                    ip netns attach "$c" "$P"
-                else
-                    echo "Warning: Could not get valid PID for $c" >&2
-                fi
+                netns_attach_one "$c" || true
                 ;;
         esac
     done
@@ -39,6 +62,11 @@ netns_attach() {
 }
 
 netns_detach() {
+    if [ "$#" -gt 0 ]; then
+        netns_detach_one "$1"
+        return $?
+    fi
+
     echo "-> ip net list"
     ip net list
 
@@ -47,8 +75,7 @@ netns_detach() {
     for ns_path in /run/netns/e2-*; do
         [ -e "$ns_path" ] || continue
         c="${ns_path##*/}"
-        echo "Detaching $c"
-        ip netns delete "$c" 2>/dev/null || true
+        netns_detach_one "$c"
     done
 
     echo "-> ip net list"
@@ -61,14 +88,22 @@ netns_list() {
 }
 
 netns_exec() {
-    c="$1"
+    c="${1:-}"
+    if [ -z "$c" ]; then
+        echo "usage: netns exec <container-name> <command...>" >&2
+        return 1
+    fi
     shift
     echo "-> ip netns exec $c $*"
     ip netns exec "$c" "$@"
 }
 
 netns_peek() {
-    c="$1"
+    c="${1:-}"
+    if [ -z "$c" ]; then
+        echo "usage: netns peek <container-name> [command...]" >&2
+        return 1
+    fi
     shift
     if [ "$#" -eq 0 ]; then
         set -- "${SHELL:-/bin/sh}"
