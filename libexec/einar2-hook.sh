@@ -39,9 +39,10 @@ parse_hook_field() {
 }
 
 run_matching_hooks() {
-    cmd="$1"
-    phase_num="$2"
-    subcmd="${3:-*}"
+    cmd="$1" ; shift
+    phase_num="$1" ; shift
+    subcmd="${1:-*}"
+    [ "$#" -gt 0 ] && shift
 
     if [ "$phase_num" -lt 0 ]; then
         phase="PreTransaction"
@@ -73,7 +74,7 @@ run_matching_hooks() {
             echo ":: $h_desc"
         fi
 
-        sh -c "$h_exec"
+        sh -c "$h_exec" _ "$@"
     done
 }
 
