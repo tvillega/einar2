@@ -46,13 +46,38 @@ labs_list() {
     fi
 }
 
-labs_open() {
-    if [ "$#" -eq 0 ]; then
-        echo "usage: labs open <container-name>"
-        exit 1
-    else
-        eterm docker exec -it "$1" bash
+labs_open_one() {
+    c="$1"
+    eterm docker exec -it "$c" bash
+}
+
+labs_open_all() {
+    lab="$1"
+    compose_file="${LABS_ROOT}/${lab}/docker-compose.yml"
+    containers=""
+
+    sleep 5
+
+    if [ -f "$compose_file" ]; then
+        containers=$(
+            docker compose -f "$compose_file" ps --status running --format '{{.Name}}' 2>/dev/null || true
+        )
     fi
+
+    if [ -z "$containers" ]; then
+        containers=$(
+            docker ps --status running --filter "name=^/e2-${lab}" --format '{{.Names}}' | sort
+        )
+    fi
+
+    if [ -z "$containers" ]; then
+        echo "warn: no running containers found for lab '$lab'" >&2
+        return 0
+    fi
+
+    for c in $containers; do
+        labs_open_one "$c"
+    done
 }
 
 labs_start() {
@@ -84,7 +109,12 @@ while [ "${1-}" != "--" ] && [ -n "${1-}" ]; do
             ;;
         open)
             shift
-            labs_open "$@"
+            labs_open_one "$@"
+            exit 0
+            ;;
+        open-all)
+            shift
+            labs_open_all "$@"
             exit 0
             ;;
         start)
